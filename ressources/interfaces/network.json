@@ -1,0 +1,29 @@
+{
+  "name": "GtNetworkInterface",
+  "fileName": "gt_networkinterface",
+  "functions": 
+  [
+    {
+      "name": "accessId",
+      "returnValue": "QString"
+    },
+    {
+      "name": "accessConnection",
+      "returnValue": "QMetaObject",
+      "baseClass":
+      {
+        "name": "GtAbstractAccessDataConnection",
+        "fileName": "gt_abstractaccessdataconnection",
+        "outputPath": "network",
+        "functions":
+        [
+          {
+            "name": "testConnection",
+            "returnValue": "bool",
+            "parameter": "const GtAccessData& accessData"
+          }
+        ]
+      }
+    }
+  ]
+}

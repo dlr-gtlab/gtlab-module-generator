@@ -1,0 +1,57 @@
+{
+  "name": "GtCalculatorExecInterface",
+  "fileName": "gt_calculatorexecinterface",
+  "functions": 
+  [
+    {
+      "name": "executorId",
+      "returnValue": "QString"
+    },
+    {
+      "name": "executorDescription",
+      "returnValue": "QString"
+    },
+    {
+      "name": "executor",
+      "returnValue": "QMetaObject",
+      "baseClass":
+        {
+            "name": "GtAbstractCalculatorExecutor",
+            "fileName": "gt_abstractcalculatorexecutor",
+            "outputPath": "exec",
+            "functions":
+            [
+              {
+                "name": "exec",
+                "returnValue": "bool",
+                "parameter": "GtCalculator* calculator"
+              }
+            ]
+        }
+    },
+    {
+      "name": "executorSettings",
+      "returnValue": "QList<GtAbstractProperty*>",
+      "baseClass":
+      {
+        "name": "GtAbstractProperty",
+        "fileName": "gt_abstractproperty",
+        "outputPath": "exec",
+        "functions":
+        [
+          {
+            "name": "valueToVariant",
+            "returnValue": "QVariant",
+            "parameter": "const QString& unit, bool* success = 0",
+            "qualifier": "const"
+          },
+          {
+            "name": "setValueFromVariant",
+            "returnValue": "bool",
+            "parameter": "const QVariant& val, const QString& unit, bool* success = 0"
+          }
+        ]
+      }
+    }
+  ]
+}

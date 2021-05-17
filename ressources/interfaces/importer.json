@@ -1,0 +1,36 @@
+{
+  "name": "GtImporterInterface",
+  "fileName": "gt_importerinterface",
+  "functions":
+  [
+    {
+      "name": "importer",
+      "returnValue": "QList<QMetaObject>",
+      "qualifier": "const",
+      "baseClass":
+      {
+        "name": "GtAbstractImporter",
+        "fileName": "gt_abstractimporter",
+        "outputPath": "importer",
+        "functions": 
+        [
+          {
+            "name": "targets",
+            "returnValue": "QStringList",
+            "qualifier": "const"
+          },
+          {
+            "name": "icon",
+            "returnValue": "QIcon",
+            "qualifier": "const"
+          },
+          {
+            "name": "import",
+            "returnValue": "bool",
+            "parameter": "GtObject* data, QFile& file"
+          }
+        ]
+      }
+    }
+  ]
+}

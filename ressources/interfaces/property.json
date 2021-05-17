@@ -1,0 +1,31 @@
+{
+  "name": "GtPropertyInterface",
+  "fileName": "gt_propertyinterface",
+  "functions": 
+  [
+    {
+      "name": "propertyItems",
+      "returnValue": "QMap<const char*, QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtAbstractPropertyItem",
+        "fileName": "gt_abstractpropertyitem",
+        "outputPath": "property",
+        "functions":
+        [
+          {
+            "name": "data",
+            "returnValue": "QVariant",
+            "parameter": "int column, int role",
+            "qualifier": "const"
+          },
+          {
+            "name": "setData",
+            "returnValue": "bool",
+            "parameter": "int column, const QVariant& value, GtObject* obj, int role = Qt::EditRole"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "GtExporterInterface",
+  "fileName": "gt_exporterinterface",
+  "functions": 
+  [
+    {
+      "name": "exporter",
+      "returnValue": "QList<QMetaObject>",
+      "qualifier": "const",
+      "baseClass":
+      {
+        "name": "GtAbstractExporter",
+        "fileName": "gt_abstractexporter",
+        "outputPath": "exporter",
+        "functions":
+        [
+          {
+            "name": "targets",
+            "returnValue": "QStringList",
+            "qualifier": "const"
+          },
+          {
+            "name": "icon",
+            "returnValue": "QIcon",
+            "qualifier": "const"
+          },
+          {
+            "name": "doExport",
+            "returnValue": "bool",
+            "parameter": "GtObject* data, QFile& file"
+          }
+        ]
+      }
+    }
+  ]
+}

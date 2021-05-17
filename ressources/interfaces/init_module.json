@@ -1,0 +1,11 @@
+{
+  "name": "GtInitModuleInterface",
+  "fileName": "gt_initmoduleinterface",
+  "functions": 
+  [
+    {
+      "name": "init",
+      "returnValue": "void"
+    }
+  ]
+}

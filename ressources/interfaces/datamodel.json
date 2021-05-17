@@ -1,0 +1,31 @@
+{
+  "name": "GtDatamodelInterface",
+  "fileName": "gt_datamodelinterface",
+  "functions": 
+  [
+    {
+      "name": "package",
+      "returnValue": "QMetaObject",
+      "baseClass":
+      {
+        "name": "GtPackage",
+        "fileName": "gt_package",
+        "outputPath": "data"
+      }
+    },
+    {
+      "name": "data",
+      "returnValue": "QList<QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtObject",
+        "fileName": "gt_object",
+        "outputPath": "data"
+      }
+    },
+    {
+      "name": "standAlone",
+      "returnValue": "bool"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/cross.png</file>
+        <file>images/error.png</file>
+        <file>images/error_original.png</file>
+        <file>images/warning.png</file>
+        <file>images/warning_original.png</file>
+        <file>templates/basic_derived_class.cpp</file>
+        <file>templates/basic_derived_class.h</file>
+        <file>templates/basic_module_class.cpp</file>
+        <file>templates/basic_module_class.h</file>
+        <file>templates/local_settings.pri</file>
+        <file>templates/module.pro</file>
+        <file>templates/settings.pri</file>
+        <file>interfaces/datamodel.json</file>
+        <file>interfaces/exporter.json</file>
+        <file>interfaces/importer.json</file>
+        <file>interfaces/calculator_exec.json</file>
+        <file>interfaces/collection.json</file>
+        <file>interfaces/init_module.json</file>
+        <file>interfaces/mdi.json</file>
+        <file>interfaces/network.json</file>
+        <file>interfaces/process.json</file>
+        <file>interfaces/property.json</file>
+    </qresource>
+</RCC>

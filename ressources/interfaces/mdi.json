@@ -1,0 +1,72 @@
+{
+  "name": "GtMdiInterface",
+  "fileName": "gt_mdiinterface",
+  "functions": 
+  [
+    {
+      "name": "mdiItems",
+      "returnValue": "QList<QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtMdiItem",
+        "fileName": "gt_mdiitem",
+        "outputPath": "mdi"
+      }
+    },
+    {
+      "name": "dockWidgets",
+      "returnValue": "QList<QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtDockWidget",
+        "fileName": "gt_dockwidget",
+        "outputPath": "mdi",
+        "functions":
+        [
+          {
+            "name": "getDockWidgetArea",
+            "returnValue": "Qt::DockWidgetArea"
+          }
+        ]
+      }
+    },
+    {
+      "name": "uiItems",
+      "returnValue": "QMap<const char*, QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtObjectUI",
+        "fileName": "gt_objectui",
+        "outputPath": "mdi"
+      }
+    },
+    {
+      "name": "postItems",
+      "returnValue": "QList<QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtObject",
+        "fileName": "gt_object",
+        "outputPath": "mdi"
+      }
+    },
+    {
+      "name": "postPlots",
+      "returnValue": "QList<QMetaObject>",
+      "baseClass":
+      {
+        "name": "GtPostTemplateItem",
+        "fileName": "gt_posttemplateitem",
+        "outputPath": "mdi",
+        "functions":
+        [
+          {
+            "name": "createUI",
+            "returnValue": "GtAbstractPostWidget*",
+            "parameter": "GtPostTemplateItem* dm, QWidget* parent"
+          }
+        ]
+      }
+    }
+  ]
+}

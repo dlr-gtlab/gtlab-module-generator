@@ -1,0 +1,34 @@
+{
+  "name": "GtProcessInterface",
+  "fileName": "gt_processinterface",
+  "functions": 
+  [
+    {
+      "name": "calculators",
+      "returnValue": "QList<GtCalculatorData>",
+      "baseClass":
+      {
+        "name": "GtCalculator",
+        "fileName": "gt_calculator",
+        "outputPath": "calculators",
+        "functions": 
+        [
+          {
+            "name": "run",
+            "returnValue": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "tasks",
+      "returnValue": "QList<GtTaskData>",
+      "baseClass":
+      {
+        "name": "GtTask",
+        "fileName": "gt_task",  
+        "outputPath": "tasks"
+      }
+    }
+  ]
+}

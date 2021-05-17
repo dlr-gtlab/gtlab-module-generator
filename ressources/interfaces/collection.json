@@ -1,0 +1,56 @@
+{
+  "name": "GtCollectionInterface",
+  "fileName": "gt_collectioninterface",
+  "functions": 
+  [
+    {
+      "name": "collectionIcon",
+      "returnValue": "QIcon",
+      "qualifier": "const"
+    },
+    {
+      "name": "collectionId",
+      "returnValue": "QString",
+      "qualifier": "const"
+    },
+    {
+      "name": "collectionSettings",
+      "returnValue": "QMetaObject",
+      "qualifier": "const",
+      "baseClass":
+      {
+        "name": "GtAbstractCollectionSettings",
+        "fileName": "gt_abstractcollectionsettings",
+        "outputPath": "collections",
+        "functions": 
+        [
+          {
+            "name": "localCollectionWidget",
+            "returnValue": "QWidget*",
+            "parameter": "QWidget* parent"
+          },
+          {
+            "name": "setLocalCollectionData",
+            "returnValue": "void",
+            "parameter": "QWidget* widget, QList<GtCollectionItem> items"
+          },
+          {
+            "name": "browserWidget",
+            "returnValue": "GtAbstractBrowserWidget*",
+            "parameter": "QWidget* parent"
+          },
+          {
+            "name": "setBrowserWidgetData",
+            "returnValue": "void",
+            "parameter": "GtAbstractBrowserWidget* widget, QList<GtCollectionNetworkItem> installedItems, QList<GtCollectionNetworkItem> availableItems, QList<GtCollectionNetworkItem> updataAvailableItems"
+          }
+        ]
+      }
+    },
+    {
+      "name": "collectionStructure",
+      "returnValue": "QMap<QString, QMetaType::Type>",
+      "qualifier": "const"
+    }
+  ]
+}
