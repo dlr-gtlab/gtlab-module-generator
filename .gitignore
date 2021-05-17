@@ -1,0 +1,11 @@
+Makefile*
+build/
+debug/
+release/
+
+*.pro.user
+*.autosave
+*.directory
+*.qmake.stash
+*.o
+*.pyc
