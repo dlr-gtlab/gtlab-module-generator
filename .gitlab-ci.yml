@@ -1,0 +1,43 @@
+########################################################
+############### Pipeline  ############
+########################################################
+
+stages:
+  - build
+  - copy
+
+# Windows build
+windowsBuild:
+  stage: build
+  script:
+    - .\ci\build-512.bat 1>buildLog512.txt
+  tags:
+    - Win10
+  artifacts:
+    paths:
+      - release/GtModuleGenerator.exe
+      - buildLog512.txt
+    expire_in: 1 week
+    when: always
+  variables:
+    BUILDMODE: release
+    PROFILENAME: GtModuleGenerator.pro
+
+# Linux build
+linuxBuild:
+  stage: build 
+  tags:
+    - Linux
+  script:
+    - /opt/Qt/5.12.5/gcc_64/bin/qmake $PROFILENAME -spec linux-g++ CONFIG+=$BUILDMODE
+    - make clean
+    - make -j 20 |& tee linuxBuild.txt
+  artifacts:
+    paths:
+      - GtModuleGenerator
+    when: always
+    expire_in: 1 week
+  variables:
+    BUILDMODE: release
+    PROFILENAME: GtModuleGenerator.pro
+ 
