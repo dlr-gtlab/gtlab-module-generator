@@ -28,6 +28,7 @@ private:
     ClassStructsPtr m_interfaces;
 
     ClassStruct* searchForClass(const QJsonObject& classJObject);
+
     FunctionStructsPtr searchForFunctions(const QJsonArray& functionsJArray);
 
     void clearInterfaceStructs();

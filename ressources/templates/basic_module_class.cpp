@@ -1,12 +1,14 @@
 $$SIGNATURE$$
 
-/**
+/*
  * generated $$GENERATOR_VERSION$$
  */
  
 #include "$$FILE_NAME$$.h"
 
-$$INCLUDE_FILE$$$$QT_INCLUDE_FILE$$
+$$INCLUDE_FILE$$
+$$ADD_INCLUDE_FILE$$
+$$QT_INCLUDE_FILE$$
 
 GtVersionNumber
 $$CLASS_NAME$$::version()
@@ -24,9 +26,7 @@ QString
 $$CLASS_NAME$$::description() const
 {
     return "$$MODULE_DESCRIPTION$$";
-}
-
-$$FUNCTION$$
+}$$FUNCTION$$
 
 
 

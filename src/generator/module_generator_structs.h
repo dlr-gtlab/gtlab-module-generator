@@ -18,6 +18,12 @@ struct IdentifierPair
 {
     QString identifier;
     QString value;
+
+    bool operator==(const IdentifierPair& other)
+    {
+        return (other.identifier == this->identifier &&
+                other.value == this->value);
+    }
 };
 
 struct ModuleClass
@@ -38,6 +44,8 @@ struct AuthorDetails
 struct ImplementationStruct
 {
     QStringList values;
+    QStringList includes;
+    QStringList forwardDeclarations;
     QList<ClassStruct> derivedClasses;
 };
 

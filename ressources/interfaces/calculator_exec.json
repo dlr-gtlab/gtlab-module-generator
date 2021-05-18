@@ -43,7 +43,11 @@
             "name": "valueToVariant",
             "returnValue": "QVariant",
             "parameter": "const QString& unit, bool* success = 0",
-            "qualifier": "const"
+            "qualifier": "const",
+            "includes":
+            [
+              "QVariant"
+            ]
           },
           {
             "name": "setValueFromVariant",

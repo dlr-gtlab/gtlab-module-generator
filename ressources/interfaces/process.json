@@ -6,6 +6,11 @@
     {
       "name": "calculators",
       "returnValue": "QList<GtCalculatorData>",
+      "includes":
+      [
+        "gt_application",
+        "gt_extendedcalculatordata"
+      ],
       "baseClass":
       {
         "name": "GtCalculator",
@@ -23,6 +28,11 @@
     {
       "name": "tasks",
       "returnValue": "QList<GtTaskData>",
+      "includes":
+      [
+        "gt_application",
+        "gt_extendedtaskdata"
+      ],
       "baseClass":
       {
         "name": "GtTask",

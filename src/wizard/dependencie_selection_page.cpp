@@ -28,27 +28,26 @@ const QString S_DEPENDENCIE_LABEL =
 DependencieSelectionPage::DependencieSelectionPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
-    m_infoTextLabel = new QLabel;
-    m_addDependencieLabel = new QLabel;
+    m_infoTextLabel = new QLabel(S_INFO_TEXT);
+    m_addDependencieLabel = new QLabel(S_DEPENDENCIE_ADD_LABEL);
+    m_dependenciesLabel = new QLabel(S_DEPENDENCIE_LABEL);
     m_addDependencieEdit = new QLineEdit;
     m_addDependenciePushBtn = new QPushButton;
-    m_dependenciesLabel = new QLabel;
 
     m_baseLayout = new QGridLayout(this);
 
     m_widgetListView = new WidgetListView;
 
+    // page gui
     setTitle(tr(C_DEPENDENCIE_PAGE_TITLE));
 
     m_infoTextLabel->setWordWrap(true);
     m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
     m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    m_addDependencieLabel->setText(S_DEPENDENCIE_ADD_LABEL);
     m_addDependenciePushBtn->setText(S_DEPENDENCIE_BTN_TEXT);
     m_addDependenciePushBtn->setEnabled(false);
 
-    m_dependenciesLabel->setText(S_DEPENDENCIE_LABEL);
     m_dependenciesLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     m_baseLayout->addWidget(m_infoTextLabel, 0, 0, 1, 2);
@@ -75,8 +74,6 @@ void
 DependencieSelectionPage::initializePage()
 {
     LOG_INSTANCE("dependencie page...");
-
-    m_infoTextLabel->setText(S_INFO_TEXT);
 
     m_addDependenciePushBtn->setDefault(true);
 }

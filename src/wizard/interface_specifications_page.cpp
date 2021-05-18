@@ -12,17 +12,17 @@
 
 const char* C_TITLE_INTERFACE_SPECIFICATIONS_PAGE = "Interface Specifications";
 
-const QString S_INFO_TEXT =
-        QStringLiteral("Most interfaces require additional data and classes to be registered. "
-                       "This process can be automate by filling out the required fields below. "
-                       "If not filled out fully the module may not be able to compile and must be fixed manually. "
-                       "Reverting to the previous page will delete all changes.");
+const QString S_INFO_TEXT = QStringLiteral(
+    "Most interfaces require additional data and classes to be registered. "
+    "This process can be automate by filling out the required fields below. "
+    "If not filled out fully the module may not be able to compile and must "
+    "be fixed manually. Reverting to the previous page may delete all changes.");
 
 InterfaceSpecificationsPage::InterfaceSpecificationsPage(ModuleGeneratorSettings* settings,
                                                         QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
-    m_infoTextLabel = new QLabel;
+    m_infoTextLabel = new QLabel(S_INFO_TEXT);
     m_baseLayout = new QGridLayout;
 
     m_interfaceTabBar = new QTabWidget();
@@ -46,9 +46,24 @@ InterfaceSpecificationsPage::initializePage()
 {
     LOG_INSTANCE("interface specifications page...");
 
-    m_infoTextLabel->setText(S_INFO_TEXT);
+    // only regenerate the widgets if the selection changed
+    bool reload = false;
+    auto interfaces = settings()->selectedInterfaces();
 
-    setSelectedInterfaces();
+    for (auto* interface : interfaces)
+    {
+        if (interface == Q_NULLPTR) continue;
+        if (!m_activeInterfaces.contains(interface->className))
+        {
+            reload = true; break;
+        }
+    }
+
+    if (reload || m_activeInterfaces.length() != interfaces.length())
+    {
+        LOG_INFO << "reloading all widgets!" << ENDL;
+        setSelectedInterfaces();
+    }
 
     LOG_INFO << "done!";
 }
@@ -70,14 +85,11 @@ InterfaceSpecificationsPage::validatePage()
 }
 
 void
-InterfaceSpecificationsPage::cleanupPage()
-{
-    clearInterfaceTabs();
-}
-
-void
 InterfaceSpecificationsPage::setSelectedInterfaces()
 {
+    m_activeInterfaces.clear();
+    clearInterfaceTabs();
+
     LOG_INSTANCE("setting up selected interfaces...");
 
     for (auto* interface : settings()->selectedInterfaces())
@@ -88,7 +100,11 @@ InterfaceSpecificationsPage::setSelectedInterfaces()
             continue;
         }
 
-        LOG_INSTANCE(interface->className);
+        QString className(interface->className);
+
+        LOG_INSTANCE(className);
+
+        m_activeInterfaces << className;
 
         auto* widget = new FunctionSpecificationWidget(interface->functions, settings());
 
@@ -99,7 +115,7 @@ InterfaceSpecificationsPage::setSelectedInterfaces()
             continue;
         }
 
-        QString trimmedName = interface->className;
+        QString trimmedName = className;
 
         trimmedName.replace("Gt", "");
         trimmedName.replace("Interface", "");
@@ -247,11 +263,18 @@ InterfaceSpecificationsPage::checkInterfaceData()
 
         if (!checkClassImplementation(*interface, classNames))
         {
+            LOG_WARN << "missing class implementation!";
             return false;
         }
     }
 
-    return checkDuplicateClassNames(classNames);
+    if (!checkDuplicateClassNames(classNames))
+    {
+        LOG_WARN << "duplicate class!";
+        return false;
+    }
+
+    return true;
 }
 
 

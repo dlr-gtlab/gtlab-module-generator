@@ -1,8 +1,15 @@
 #include "module_generator_settings.h"
 
 #include "module_generator.h"
+#include "module_generator_logger.h"
+#include "module_generator_utils.h"
 
 #include <QStringList>
+#include <QDate>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QApplication>
 
 const QString
     ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0"));
@@ -14,17 +21,30 @@ const QRegularExpression
     ModuleGeneratorSettings::REG_VERSION(QStringLiteral("\\d+(.\\d+)?(.\\d+)?(-\\w+)?"));
 const QRegularExpression
     ModuleGeneratorSettings::REG_AUTHOR(QStringLiteral("[A-Za-z].*"));
+const QRegularExpression
+    ModuleGeneratorSettings::REG_AUTHOR_EMAIL(QStringLiteral(".*"));
+
+const QString S_YEAR = QDate::currentDate().toString("yyyy");
+const QString S_DATE = QDate::currentDate().toString("dd.MM.yyyy");
+
+const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
+        "/* GTlab - Gas Turbine laboratory\n"
+        " * Source File: $$FILE_NAME$$\n"
+        " * copyright 2009-") + S_YEAR + QStringLiteral(" by DLR\n"
+        " * \n"
+        " * Created on: ") + S_DATE + QStringLiteral("\n"
+        " * Author: ") + ModuleGenerator::S_ID_AUTHOR + QStringLiteral("\n"
+        " * Email: ") + ModuleGenerator::S_ID_AUTHOR_EMAIL + QStringLiteral("\n"
+        " */");
 
 
 ModuleGeneratorSettings::ModuleGeneratorSettings()
 {
-//    m_gtlabPath     = "C:\\GTlab-DevTools-1_7\\stable\\1_7";
-//    m_devToolsPath  = "C:\\GTlab-DevTools-1_7\\stable\\1_7";
-//    m_outputPath    = "C:\\tmp";
+    deserialize();
 
-//    m_gtlabPath     = "D:\\";
-//    m_devToolsPath  = "D:\\";
-//    m_outputPath    = "D:\\";
+    // defaults
+    if (m_moduleClass.version.isEmpty())
+        m_moduleClass.version = QStringLiteral("0.0.1");
 }
 
 QString
@@ -90,20 +110,6 @@ ModuleGeneratorSettings::fileNamingScheme(const QString& name) const
     return fileNamingScheme(name, modulePrefix());
 }
 
-QString
-ModuleGeneratorSettings::signatureString() const
-{
-//    return "// generated " + ModuleGenerator::S_ID_GENERATOR_VERSION;
-
-    return m_signature;
-}
-
-void
-ModuleGeneratorSettings::setSignatureString(const QString& signature)
-{
-    m_signature = signature;
-}
-
 void
 ModuleGeneratorSettings::preLoad()
 {    
@@ -120,4 +126,69 @@ ModuleGeneratorSettings::preLoad()
 
     m_preLoader.searchForInterfaces();
     m_preLoader.searchForPrefixes(devToolsPath());
+}
+
+void
+ModuleGeneratorSettings::serialize() const
+{
+    LOG_INSTANCE("serializing wizard data to json...");
+
+    QJsonObject contactObject;
+    contactObject["author"] = m_authorDetails.name;
+    contactObject["email"]  = m_authorDetails.email;
+
+    QJsonObject pathsObject;
+    pathsObject["output"]   = m_outputPath;
+    pathsObject["devtools"] = m_devToolsPath;
+    pathsObject["gtlab"]    = m_gtlabPath;
+
+//    QJsonObject moduleObject;
+//    moduleObject["prefix"]  = m_modulePrefix;
+//    moduleObject["ident"]  = m_moduleClass.ident;
+//    moduleObject["version"]     = m_moduleClass.version;
+//    moduleObject["description"] = m_moduleClass.description;
+
+    QJsonObject rootObject;
+    rootObject["contact"] = contactObject;
+    rootObject["paths"]  = pathsObject;
+//    rootObject["lastModule"] = moduleObject;
+
+    QJsonDocument document(rootObject);
+
+    QString json(document.toJson());
+
+    QDir appDir(QApplication::applicationDirPath());
+
+    utils::writeStringToFile(json, appDir, "module_generator.json");
+
+    LOG_INFO << "done!";
+}
+
+void
+ModuleGeneratorSettings::deserialize()
+{
+    LOG_INSTANCE("deserializing wizard data from json...");
+
+    QDir appDir(QApplication::applicationDirPath());
+
+    QString json = utils::readFile(appDir.absoluteFilePath("module_generator.json"));
+
+    QJsonDocument document(QJsonDocument::fromJson(json.toUtf8()));
+
+    if (document.isNull())
+    {
+        LOG_WARN << "null json document";
+        return;
+    }
+
+    QJsonObject contactObject = document["contact"].toObject();
+    m_authorDetails.name  = contactObject["author"].toString();
+    m_authorDetails.email = contactObject["email"].toString();
+
+    QJsonObject pathsObject = document["paths"].toObject();
+    m_outputPath   = pathsObject["output"].toString();
+    m_devToolsPath = pathsObject["devtools"].toString();
+    m_gtlabPath    = pathsObject["gtlab"].toString();
+
+    LOG_INFO << "done!";
 }

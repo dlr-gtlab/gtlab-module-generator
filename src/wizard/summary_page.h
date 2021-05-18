@@ -66,11 +66,6 @@ private:
      */
     void printSummary();
 
-    /**
-     * @brief generateJson - generates .json settings file for this wizard
-     */
-    void generateJson();
-
 signals:
 
     void validated();

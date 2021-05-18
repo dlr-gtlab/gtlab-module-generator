@@ -19,7 +19,9 @@ public:
     const static QRegularExpression REG_OBJECT_NAME;
     const static QRegularExpression REG_VERSION;
     const static QRegularExpression REG_AUTHOR;
+    const static QRegularExpression REG_AUTHOR_EMAIL;
 
+    const static QString S_SIGNATURE;
 
     /**
      * @brief mode enum - enumerations for the two modes of the wizard
@@ -63,9 +65,6 @@ public:
     inline void setSelectedDependencies(const DependencieStructs dependencies) { m_selectedDependencies = dependencies; }
 
     // signature
-    QString signatureString() const;
-    void setSignatureString(const QString& signature);
-
     AuthorDetails authorDetails() const { return m_authorDetails; };
     inline void setAuthorDetails(const AuthorDetails& details) { m_authorDetails = details; };
 
@@ -74,6 +73,10 @@ public:
 
     QStringList reservedPrefixes() const { return m_preLoader.prefixes(); }
     ClassStructsPtr availableInterfaces() const { return m_preLoader.interfaceStructs(); }
+
+    // serialize
+    void serialize() const;
+    void deserialize();
 
 private:
 

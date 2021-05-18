@@ -15,8 +15,8 @@ public:
         Error = 2
     };
 
-    static void registerFunction(void (*)(QString&, Type, int));
-    static int indentSize();
+    static void unregisterLoggingFunction();
+    static void registerLoggingFunction(void (*)(QString&, Type, int));    
     static QString typeName(Type type);
 
     ModuleGeneratorLogger(const QString& text = "", const Type& type = Info);
@@ -24,7 +24,7 @@ public:
 
     ModuleGeneratorLogger& operator<<(const QString& text);
 
-    void setType(const Type& type) { m_type = type; }
+    inline void setType(const Type& type) { m_type = type; }
 
 private:
 

@@ -6,7 +6,7 @@ $$SIGNATURE$$
 #include "gt_moduleinterface.h"
 $$INCLUDE_FILE$$
 
-
+$$S_ID_CLASS_FORWARD_DECL$$
 /**
  * @generated $$GENERATOR_VERSION$$
  * @brief The $$CLASS_NAME$$ class
@@ -38,9 +38,7 @@ public:
      * @brief Returns module description
      * @return description
      */
-    QString description() const Q_DECL_OVERRIDE;
-
-	$$FUNCTION$$	
+    QString description() const Q_DECL_OVERRIDE;$$FUNCTION$$
 };
 
 #endif // $$HEADER_NAME$$_H

@@ -11,20 +11,16 @@
 
 PreLoader::~PreLoader()
 {
-    for (auto* interface : m_interfaces)
-    {
-        if (interface == Q_NULLPTR) continue;
-
-        delete interface;
-    }
+    clearInterfaceStructs();
 }
 
 const QString S_INCLUDE_CORE_PATH = QStringLiteral("core");
 const QString S_INCLUDE_PATH      = QStringLiteral("include");
 
-/* intended for auto detecting interfaces and functions
-
-const QRegularExpression REGEXP_INTERFACE(QStringLiteral("Q_DECLARE_INTERFACE\\((\\w+),"));
+/*
+// intended for auto detecting interfaces and functions
+const QRegularExpression REGEXP_INTERFACE(
+        QStringLiteral("Q_DECLARE_INTERFACE\\((\\w+),"));
 const QRegularExpression REGEXP_VIRTUAL_FUNCTION(
         QStringLiteral("(\\/\\*\\*.*\\n(\\s+\\*.*\\n)+\\s+\\*\\/)?\\s+" // comment block
                        "virtual\\s+" // virtual keyword
@@ -41,6 +37,12 @@ PreLoader::searchForInterfaces(/*const QString& devToolsPath*/)
 {
     LOG_INSTANCE("searching for interfaces...");
 
+    if (!m_interfaces.isEmpty())
+    {
+        LOG_WARN << "interfaces already set!";
+        return;
+    }
+
     clearInterfaceStructs();
 
     QDirIterator iterator(":/interfaces/", QStringList() << "*.json", QDir::Files, QDirIterator::NoIteratorFlags);
@@ -50,7 +52,6 @@ PreLoader::searchForInterfaces(/*const QString& devToolsPath*/)
         QString file = iterator.next();
 
         LOG_INSTANCE(file);
-//        LOG_INFO << file << ENDL;
 
         auto document = QJsonDocument::fromJson(utils::readFile(file).toUtf8());
 
@@ -139,11 +140,12 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
         QString qualifier   = functionJObject["qualifier"].toString();
         QString parameter   = functionJObject["parameter"].toString();
         QString description = functionJObject["description"].toString();
+        QJsonArray includes     = functionJObject["includes"].toArray();
+        QJsonArray forwardDecls = functionJObject["forwardDecl"].toArray();
 
         auto baseClassJObject = functionJObject["baseClass"].toObject();
 
         LOG_INFO << returnValue << " " << name << ENDL;
-
 //        LOG_INFO << "name        " << name        << ENDL;
 //        LOG_INFO << "returnValue " << returnValue << ENDL;
 //        LOG_INFO << "qualifier   " << qualifier   << ENDL;
@@ -161,9 +163,33 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 
         function->baseClass  = baseClass;
 
-        functions << function;
+        // includes
+        for (auto jsonValueRef : includes)
+        {
+            QString include = jsonValueRef.toString();
 
-//        LOG_INFO << "done!";
+            if (!include.isEmpty())
+            {
+                LOG_INFO << "added inlcude '" << include << "'" << ENDL;
+
+                function->implementation.includes << include;
+            }
+        }
+
+        // forward declarations
+        for (auto jsonValueRef : forwardDecls)
+        {
+            QString forwardDecl = jsonValueRef.toString();
+
+            if (!forwardDecl.isEmpty())
+            {
+                LOG_INFO << "added forward declaration '" << forwardDecl << "'" << ENDL;
+
+                function->implementation.forwardDeclarations << forwardDecl;
+            }
+        }
+
+        functions << function;
     }
 
     LOG_INFO << "done!";
@@ -174,9 +200,13 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 void
 PreLoader::searchForPrefixes(const QString& devToolsPath)
 {
-    LOG_INSTANCE("searching for occupied prefixes...");
+    LOG_INSTANCE("searching for occupied prefixes...");    
 
-    m_prefixes.clear();
+    if (!m_interfaces.isEmpty())
+    {
+        LOG_WARN << "prefixes already set!";
+        return;
+    }
 
     LOG_INFO << "chaning to dev tools dir..." << ENDL;
 

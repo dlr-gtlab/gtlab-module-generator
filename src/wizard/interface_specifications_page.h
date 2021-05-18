@@ -24,10 +24,9 @@ protected:
 
     bool validatePage() Q_DECL_OVERRIDE;
 
-    void cleanupPage() Q_DECL_OVERRIDE;
-
 private:
 
+    QStringList m_activeInterfaces;
     /// info text label
     QLabel* m_infoTextLabel;
     /// grid layout

@@ -22,7 +22,11 @@
           {
             "name": "icon",
             "returnValue": "QIcon",
-            "qualifier": "const"
+            "qualifier": "const",
+            "includes":
+            [
+              "QIcon"
+            ]
           },
           {
             "name": "doExport",

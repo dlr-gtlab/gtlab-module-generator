@@ -47,7 +47,7 @@ ModuleSpecificationsPage::ModuleSpecificationsPage(ModuleGeneratorSettings* sett
     m_nameValidator = new QRegularExpressionValidator(ModuleGeneratorSettings::REG_OBJECT_NAME, this);
     m_versionValidator = new QRegularExpressionValidator(ModuleGeneratorSettings::REG_VERSION, this);
 
-    m_infoTextLabel = new QLabel();
+    m_infoTextLabel = new QLabel(S_INFO_TEXT);
     m_modulePrefixLabel = new QLabel(S_MODULE_PREFIX_LABEL);
     m_classNameLabel = new QLabel(S_CLASS_NAME_LABEL);
     m_fileNameLabel = new QLabel(S_FILE_NAME_LABEL);
@@ -61,23 +61,11 @@ ModuleSpecificationsPage::ModuleSpecificationsPage(ModuleGeneratorSettings* sett
     m_moduleNameEdit = new QLineEdit;
     m_versionEdit = new QLineEdit;
     m_descriptionEdit = new QLineEdit;
-
-    m_autoEditCheckBox = new QCheckBox();
-    m_autoEditCheckBox->setText(S_AUTO_COMPLETE_LABEL);
-    m_autoEditCheckBox->setChecked(true);
-    onAutoCompleteChanged(true);
+    m_autoEditCheckBox = new QCheckBox(S_AUTO_COMPLETE_LABEL);
 
     m_baseLayout = new QGridLayout;
 
-    m_vSpacer = new QSpacerItem(1, 1000,
-                               QSizePolicy::Minimum,
-                               QSizePolicy::Expanding);
-
-
-    m_fileNameEdit->setEnabled(false);
-    m_fileNameEdit->setToolTip(S_AUTO_GENERATED_TOOLTIP);
-    m_classNameEdit->setEnabled(false);
-    m_classNameEdit->setToolTip(S_AUTO_GENERATED_TOOLTIP);
+    m_vSpacer = new QSpacerItem(1, 1000, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     // page gui
     setTitle(tr(C_TITLE_SPECIFICATIONS_PAGE));
@@ -89,6 +77,11 @@ ModuleSpecificationsPage::ModuleSpecificationsPage(ModuleGeneratorSettings* sett
     m_modulePrefixEdit->setValidator(m_prefixValidator);
     m_moduleNameEdit->setValidator(m_nameValidator);
     m_versionEdit->setValidator(m_versionValidator);
+
+    m_fileNameEdit->setEnabled(false);
+    m_fileNameEdit->setToolTip(S_AUTO_GENERATED_TOOLTIP);
+    m_classNameEdit->setEnabled(false);
+    m_classNameEdit->setToolTip(S_AUTO_GENERATED_TOOLTIP);
 
     m_baseLayout->addWidget(m_infoTextLabel, 0, 0, 1, 2);
     m_baseLayout->addWidget(m_modulePrefixLabel, 1, 0);
@@ -131,10 +124,14 @@ ModuleSpecificationsPage::ModuleSpecificationsPage(ModuleGeneratorSettings* sett
     connect(m_autoEditCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(onAutoCompleteChanged(int)));
 
-    // TMP
-//    m_modulePrefixEdit->setText("test");
-//    m_moduleNameEdit->setText("Example Module");
-//    m_versionEdit->setText("0.0.1");
+    // defaults
+    m_autoEditCheckBox->setChecked(true);
+    onAutoCompleteChanged(true);
+
+    m_modulePrefixEdit->setText(settings->modulePrefix());
+    m_moduleNameEdit->setText(settings->moduleClass().ident);
+    m_versionEdit->setText(settings->moduleClass().version);
+    m_descriptionEdit->setText(settings->moduleClass().description);
 }
 
 /*
@@ -144,8 +141,6 @@ void
 ModuleSpecificationsPage::initializePage()
 {
     LOG_INSTANCE("specifications page...");
-
-    m_infoTextLabel->setText(S_INFO_TEXT);
 }
 
 bool

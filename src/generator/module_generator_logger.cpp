@@ -5,24 +5,28 @@ void defaultFunction(QString&, ModuleGeneratorLogger::Type, int);
 static const int s_indentSize =  3;
 static       int s_indent     = 0;
 
-static void (*function)(QString&, ModuleGeneratorLogger::Type, int)(defaultFunction);
+static void (*s_loggingFunction)(QString&, ModuleGeneratorLogger::Type, int)(defaultFunction);
 
 
 void
-ModuleGeneratorLogger::registerFunction(void(*func)(QString&, Type, int))
+ModuleGeneratorLogger::unregisterLoggingFunction()
 {
-    if (func != Q_NULLPTR)
+    // reset indent
+    s_indent = 0;
+    // register default function
+    s_loggingFunction = defaultFunction;
+}
+
+void
+ModuleGeneratorLogger::registerLoggingFunction(void(*function)(QString&, Type, int))
+{
+    if (function != Q_NULLPTR)
     {
         // reset indent
         s_indent = 0;
         // register new function
-        function = func;
+        s_loggingFunction = function;
     }
-}
-
-int ModuleGeneratorLogger::indentSize()
-{
-    return s_indentSize;
 }
 
 QString
@@ -80,7 +84,7 @@ ModuleGeneratorLogger::operator<<(const QString& text)
     {
         m_isEndl = true;
 
-        function(m_bufferText, m_type, s_indent);
+        s_loggingFunction(m_bufferText, m_type, s_indent);
 
         // reset type to info
         if (m_type != Type::Info) m_type = Type::Info;

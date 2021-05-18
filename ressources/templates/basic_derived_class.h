@@ -5,6 +5,7 @@ $$SIGNATURE$$
 
 #include "$$BASE_FILE_NAME$$.h"
 
+$$CLASS_FORWARD_DECL$$
 /**
  * @generated $$GENERATOR_VERSION$$
  * @brief The $$CLASS_NAME$$ class
@@ -15,9 +16,7 @@ class $$CLASS_NAME$$ : $$BASE_CLASS$$
 	
 public:
 
-    Q_INVOKABLE $$CLASS_NAME$$();
-
-	$$FUNCTION$$	
+    Q_INVOKABLE $$CLASS_NAME$$();$$FUNCTION$$
 };
 
 #endif // $$HEADER_NAME$$_H

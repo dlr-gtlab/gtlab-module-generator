@@ -7,7 +7,6 @@ class QLabel;
 class QLineEdit;
 class QGridLayout;
 class QTextEdit;
-class QCheckBox;
 class QRegularExpressionValidator;
 class SignaturePage : public AbstractWizardPage
 {
@@ -41,6 +40,8 @@ private:
     QGridLayout* m_baseLayout;
     /// author name validator
     QRegularExpressionValidator* m_authorValdidator;
+
+    QRegularExpressionValidator* m_emailValdidator;
 
 private slots:
 

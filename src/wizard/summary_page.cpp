@@ -14,7 +14,7 @@
 #include "module_generator_settings.h"
 #include "module_generator_logger.h"
 
-static QTextEdit* s_summaryEdit;
+static QTextEdit* s_summaryEdit; // ref for updateSummary methode
 
 void updateSummary(QString&, ModuleGeneratorLogger::Type, int);
 
@@ -38,7 +38,6 @@ SummaryPage::SummaryPage(ModuleGeneratorSettings *settings, QWidget *parent) :
     m_checkBox = new QCheckBox;
     m_summaryTextEdit = new QTextEdit;
     m_vLayout = new QVBoxLayout(this);
-
 
     // page gui
     setTitle(tr(C_SUMMARY_PAGE_TITLE));
@@ -96,15 +95,17 @@ bool
 SummaryPage::validatePage()
 {
     if (wizard()->buttonText(QWizard::FinishButton) == S_DONE_BUTTON_TEXT && m_isComplete)
-    {
+    {        
+        ModuleGeneratorLogger::unregisterLoggingFunction();
+
         return true;
     }
 
-    m_isComplete = false;
-
     LOG_INSTANCE("validated!");
 
-    generateJson();
+    m_isComplete = false;
+
+    settings()->serialize();
 
     printSummary();
 
@@ -118,7 +119,7 @@ SummaryPage::validatePage()
 
     wizard()->setOption(QWizard::NoCancelButton);
 
-    ModuleGeneratorLogger::registerFunction(updateSummary);
+    ModuleGeneratorLogger::registerLoggingFunction(updateSummary);
 
     emit validated();
 
@@ -271,16 +272,6 @@ SummaryPage::printSummary()
     qDebug() << debugString.toStdString().c_str();
     qDebug() << line;
 }
-
-
-/*
- *  private
- */
-void
-SummaryPage::generateJson()
-{
-}
-
 
 void
 updateSummary(QString& text, ModuleGeneratorLogger::Type type, int indent)

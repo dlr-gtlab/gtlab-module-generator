@@ -17,7 +17,11 @@
             "name": "data",
             "returnValue": "QVariant",
             "parameter": "int column, int role",
-            "qualifier": "const"
+            "qualifier": "const",
+            "includes":
+            [
+              "QVariant"
+            ]
           },
           {
             "name": "setData",

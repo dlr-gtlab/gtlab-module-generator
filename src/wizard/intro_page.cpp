@@ -23,9 +23,9 @@ IntroPage::IntroPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
     // initializations
-    m_infoTextLabel = new QLabel;
-    m_createRBtn = new QRadioButton;
-    m_editRBtn = new QRadioButton;
+    m_infoTextLabel = new QLabel(S_INFO_TEXT);
+    m_createRBtn = new QRadioButton(S_CREATE_BUTTON_TEXT);
+    m_editRBtn = new QRadioButton(S_EDIT_BUTTON_TEXT);
     m_baseLayout = new QVBoxLayout;
 
 
@@ -55,12 +55,6 @@ void
 IntroPage::initializePage()
 {
     LOG_INSTANCE("intro page...");
-
-    m_infoTextLabel->setText(S_INFO_TEXT);
-
-    m_createRBtn->setText(S_CREATE_BUTTON_TEXT);
-
-    m_editRBtn->setText(S_EDIT_BUTTON_TEXT);
 }
 
 bool

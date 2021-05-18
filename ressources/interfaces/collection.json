@@ -6,7 +6,11 @@
     {
       "name": "collectionIcon",
       "returnValue": "QIcon",
-      "qualifier": "const"
+      "qualifier": "const",
+      "includes":
+      [
+        "QIcon"
+      ]
     },
     {
       "name": "collectionId",
@@ -17,11 +21,19 @@
       "name": "collectionSettings",
       "returnValue": "QMetaObject",
       "qualifier": "const",
+      "includes":
+      [
+        "gt_object"
+      ],
       "baseClass":
       {
         "name": "GtAbstractCollectionSettings",
         "fileName": "gt_abstractcollectionsettings",
         "outputPath": "collections",
+        "includes":
+        [
+          "gt_object"
+        ],
         "functions": 
         [
           {
@@ -32,7 +44,15 @@
           {
             "name": "setLocalCollectionData",
             "returnValue": "void",
-            "parameter": "QWidget* widget, QList<GtCollectionItem> items"
+            "parameter": "QWidget* widget, QList<GtCollectionItem> items",
+            "includes":
+            [
+              "gt_collectionitem"
+            ],
+            "forwardDecl":
+            [
+              "GtCollectionItem"
+            ]
           },
           {
             "name": "browserWidget",
@@ -42,7 +62,15 @@
           {
             "name": "setBrowserWidgetData",
             "returnValue": "void",
-            "parameter": "GtAbstractBrowserWidget* widget, QList<GtCollectionNetworkItem> installedItems, QList<GtCollectionNetworkItem> availableItems, QList<GtCollectionNetworkItem> updataAvailableItems"
+            "parameter": "GtAbstractBrowserWidget* widget, QList<GtCollectionNetworkItem> installedItems, QList<GtCollectionNetworkItem> availableItems, QList<GtCollectionNetworkItem> updataAvailableItems",
+            "includes":
+            [
+              "gt_collectionnetworkitem"
+            ],
+            "forwardDecl":
+            [
+              "GtCollectionNetworkItem"
+            ]
           }
         ]
       }
@@ -50,7 +78,11 @@
     {
       "name": "collectionStructure",
       "returnValue": "QMap<QString, QMetaType::Type>",
-      "qualifier": "const"
+      "qualifier": "const",
+      "includes":
+      [
+        "QMap"
+      ]
     }
   ]
 }

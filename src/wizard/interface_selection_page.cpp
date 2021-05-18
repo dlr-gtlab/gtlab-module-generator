@@ -23,8 +23,8 @@ InterfaceSelectionPage::InterfaceSelectionPage(ModuleGeneratorSettings* settings
     AbstractWizardPage(settings, parent)
 {
     // initializations
-    m_infoTextLabel = new QLabel;
-    m_interfaceLabel = new QLabel;
+    m_infoTextLabel = new QLabel(S_INFO_TEXT);
+    m_interfaceLabel = new QLabel(S_INTERFACE_LABEL);
     m_gridLayout = new QGridLayout;
 
     m_widgetListView = new WidgetListView;
@@ -36,7 +36,6 @@ InterfaceSelectionPage::InterfaceSelectionPage(ModuleGeneratorSettings* settings
     m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
     m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    m_interfaceLabel->setText(S_INTERFACE_LABEL);
     m_interfaceLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     m_gridLayout->addWidget(m_infoTextLabel, 0, 0, 1, 2);
@@ -52,9 +51,10 @@ InterfaceSelectionPage::initializePage()
 {
     LOG_INSTANCE("interface page...");
 
-    m_infoTextLabel->setText(S_INFO_TEXT);
-
-    setInterfaces();
+    if (m_widgetListView->widgets().isEmpty())
+    {
+        setInterfaces();
+    }
 }
 
 bool
@@ -85,8 +85,6 @@ InterfaceSelectionPage::validatePage()
 void
 InterfaceSelectionPage::setInterfaces()
 {
-    m_widgetListView->clearWidgets();
-
     auto interfaceStructs = settings()->availableInterfaces();
 
     for (auto* interfaceStruct : interfaceStructs)

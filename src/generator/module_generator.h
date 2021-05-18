@@ -20,6 +20,8 @@ public:
     const static QString S_ID_GENERATOR_VERSION;
     const static QString S_ID_INCLUDE_FILE;
     const static QString S_ID_QT_INCLUDE_FILE;
+    const static QString S_ID_ADD_INCLUDE_FILE;
+    const static QString S_ID_CLASS_FORWARD_DECL;
 
     const static QString S_ID_BASE_CLASS;
     const static QString S_ID_BASE_FILE_NAME;
@@ -45,6 +47,7 @@ public:
     const static QString S_ID_PRO_SOURCE_PATH;
 
     const static QString S_ID_AUTHOR;
+    const static QString S_ID_AUTHOR_EMAIL;
 
     ModuleGenerator(ModuleGeneratorSettings* settings):
         m_settings(settings) { }
@@ -77,15 +80,25 @@ private:
 
     bool generateModule();
 
-    void generateFunction(QString& headerString, QString& sourceString, FunctionStruct* f);
+    void generateFunction(QString& headerString,
+                          QString& sourceString,
+                          FunctionStruct& f);
 
-    void generateImplementation(QString& sourceString, FunctionStruct& function);
+    void generateImplementation(QString& headerString,
+                                QString& sourceString,
+                                FunctionStruct& function);
 
-    void generateQtIncludes(QString& sourceString, QString& returnValue);
+    void generateBasicClass(ClassStruct* base,
+                            ClassStruct& derived);
 
-    void generateBasicClass(ClassStruct* base, ClassStruct& derived);
+    void generateIncludes(QString& sourceString,
+                          QStringList& includes);
 
-    void appendProjectFile(QString& fileName, const QString& path);
+    void generateForwardDeclarations(QString& headerString,
+                                     QStringList& forwardDecls);
+
+    void appendProjectFile(QString& fileName,
+                           const QString& path);
 
     void clearIdentifiers(QString& fileString);
 
