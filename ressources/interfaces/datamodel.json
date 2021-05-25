@@ -1,6 +1,7 @@
 {
   "name": "GtDatamodelInterface",
   "fileName": "gt_datamodelinterface",
+  "shortName": "Datamodel",
   "functions": 
   [
     {

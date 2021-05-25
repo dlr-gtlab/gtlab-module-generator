@@ -5,18 +5,19 @@
 #include <QLineEdit>
 #include <QComboBox>
 
-#include "abstract_class_specification_widget.h"
+#include "abstract_class_specification.h"
 #include "module_generator_structs.h"
 
+// BOOLEAN
 class BoolClassSpecificationWidget : public QCheckBox,
         public AbstractClassSpecification
 {
 public:
 
-    BoolClassSpecificationWidget(ImplementationStruct& implementation,
-                                 QWidget* parent = nullptr);
-
-protected:
+    BoolClassSpecificationWidget(const ImplementationStruct& implementation,
+                                 QWidget* parent = nullptr) :
+      QCheckBox(parent),
+      AbstractClassSpecification(implementation) { }
 
     QStringList implementationValues() override
     {
@@ -25,15 +26,16 @@ protected:
 };
 
 
+// STRINGS
 class StringClassSpecificationWidget : public QLineEdit,
         public AbstractClassSpecification
 {
 public:
 
-    StringClassSpecificationWidget(ImplementationStruct& implementation,
-                                   QWidget* parent = nullptr);
-
-protected:
+    StringClassSpecificationWidget(const ImplementationStruct& implementation,
+                                   QWidget* parent = nullptr) :
+        QLineEdit(parent),
+        AbstractClassSpecification(implementation) { }
 
     QStringList implementationValues() override
     {
@@ -42,6 +44,7 @@ protected:
 };
 
 
+// ICONS, DOCKWIDGETAREA
 class ComboClassSpecificationWidget : public QComboBox,
         public AbstractClassSpecification
 {
@@ -55,13 +58,18 @@ public:
      * @param suffix
      * @param parent
      */
-    ComboClassSpecificationWidget(ImplementationStruct& implementation,
+    ComboClassSpecificationWidget(const ImplementationStruct& implementation,
                                   const QStringList& values,
                                   const QString& prefix = "",
                                   const QString& suffix = "",
-                                  QWidget* parent = nullptr);
-
-protected:
+                                  QWidget* parent = nullptr) :
+        QComboBox(parent),
+        AbstractClassSpecification(implementation),
+        m_prefix(prefix),
+        m_suffix(suffix)
+    {
+        addItems(values);
+    }
 
     QStringList implementationValues() override
     {

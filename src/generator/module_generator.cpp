@@ -287,15 +287,14 @@ ModuleGenerator::generateModule()
         identifierPairs.clear();
 
         // IMPLEMENT FUNCTIONS
-        for (auto* function : interface->functions)
+        for (auto& function : interface->functions)
         {
-            if (function == Q_NULLPTR)
+            if (!function.isValid())
             {
-                LOG_WARN << "null function!" << ENDL;
-                continue;
+                LOG_WARN << "skipping invalid function!" << ENDL; continue;
             }
 
-            generateFunction(headerString, sourceString, *function);
+            generateFunction(headerString, sourceString, function);
         }
 
         LOG_INFO << "done!";
@@ -413,7 +412,7 @@ ModuleGenerator::generateImplementation(QString& headerString,
     // function return value
     if (implementation.values.isEmpty())
     {
-        LOG_WARN << "empty implementation!" << ENDL;
+        LOG_WARN << "skipping invalid implementation!" << ENDL;
 
         return;
     }
@@ -442,7 +441,10 @@ ModuleGenerator::generateImplementation(QString& headerString,
     // classes to generate
     for (ClassStruct& derived : implementation.derivedClasses)
     {
-        if (derived.className.isEmpty()) continue;
+        if (!derived.isValid() || !function.baseClass.isValid())
+        {
+            LOG_WARN << "skipping invalid class structs!" << ENDL; continue;
+        }
 
         IdentifierPair pair;
         pair.identifier = S_ID_INCLUDE_FILE;
@@ -457,7 +459,7 @@ ModuleGenerator::generateImplementation(QString& headerString,
 }
 
 void
-ModuleGenerator::generateBasicClass(ClassStruct* base, ClassStruct& derived)
+ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
 {
     LOG_INSTANCE("generating class '" + derived.className + "'...");
 
@@ -472,24 +474,23 @@ ModuleGenerator::generateBasicClass(ClassStruct* base, ClassStruct& derived)
     IdentifierPairs identifierPairs;
 
     // IMPLEMENT FUNCTIONS
-    for (auto* function : base->functions)
+    for (auto& function : derived.functions)
     {
-        if (function == Q_NULLPTR)
+        if (!function.isValid())
         {
-            LOG_WARN << "null function!" << ENDL;
-            continue;
+            LOG_WARN << "skipping invalid function!" << ENDL; continue;
         }
 
-        generateFunction(headerString, sourceString, *function);
+        generateFunction(headerString, sourceString, function);
     }
 
     LOG_INFO << "setting identifiers..." << ENDL;
 
     // FILL IDENTIFIER
     identifierPairs.append({ S_ID_SIGNATURE, ModuleGeneratorSettings::S_SIGNATURE });
-    identifierPairs.append({ S_ID_BASE_FILE_NAME, base->fileName});
+    identifierPairs.append({ S_ID_BASE_FILE_NAME, base.fileName});
     identifierPairs.append({ S_ID_BASE_CLASS,
-                             QStringLiteral("public ") + base->className });
+                             QStringLiteral("public ") + base.className });
     identifierPairs.append({ S_ID_HEADER_NAME, derived.className.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, derived.className });
     identifierPairs.append({ S_ID_OBJECT_NAME, derived.objectName });
@@ -514,14 +515,14 @@ ModuleGenerator::generateBasicClass(ClassStruct* base, ClassStruct& derived)
 
     QDir targetDir = m_outputDir.cleanPath(m_outputDir.absolutePath() +
                                            QDir::separator() +
-                                           base->outputPath);
+                                           base.outputPath);
 
     targetDir.mkpath(targetDir.absolutePath());
 
     utils::writeStringToFile(headerString, targetDir, derived.fileName + ".h");
     utils::writeStringToFile(sourceString, targetDir, derived.fileName + ".cpp");
 
-    appendProjectFile(derived.fileName, base->outputPath);
+    appendProjectFile(derived.fileName, base.outputPath);
 
     LOG_INFO << "done!";
 }

@@ -1,6 +1,7 @@
 {
   "name": "GtNetworkInterface",
   "fileName": "gt_networkinterface",
+  "shortName": "Network",
   "functions": 
   [
     {

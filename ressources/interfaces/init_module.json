@@ -1,6 +1,7 @@
 {
   "name": "GtInitModuleInterface",
   "fileName": "gt_initmoduleinterface",
+  "shortName": "Init",
   "functions": 
   [
     {

@@ -1,6 +1,7 @@
 {
   "name": "GtCollectionInterface",
   "fileName": "gt_collectioninterface",
+  "shortName": "Collection",
   "functions": 
   [
     {

@@ -1,6 +1,7 @@
 {
   "name": "GtImporterInterface",
   "fileName": "gt_importerinterface",
+  "shortName": "Importer",
   "functions":
   [
     {

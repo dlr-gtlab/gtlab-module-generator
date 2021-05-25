@@ -14,7 +14,7 @@ class InterfaceSpecificationsPage : public AbstractWizardPage
 public:
 
     InterfaceSpecificationsPage(ModuleGeneratorSettings* settings,
-                               QWidget* parent = nullptr);
+                                QWidget* parent = nullptr);
 
 protected:
 

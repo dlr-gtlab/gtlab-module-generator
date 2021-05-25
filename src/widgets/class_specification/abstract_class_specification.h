@@ -2,34 +2,32 @@
 #define ABSTRACTCLASSSPECIFICATIONWIDGET_H
 
 #include "module_generator_structs.h"
+#include "module_generator_logger.h"
 
 class AbstractClassSpecification
 {
 
 public:
 
-    AbstractClassSpecification(ImplementationStruct& imp)
-        : m_implementation(imp) { }
+    AbstractClassSpecification(const ImplementationStruct& implementation) :
+        m_implementation(implementation) { }
 
     virtual ~AbstractClassSpecification() { }
 
-    void setImplementation()
+    ImplementationStruct functionImplementation()
     {
-        QStringList list     = this->implementationValues();
-        ClassStructs classes = this->derivedClasses();
+        m_implementation.values = this->implementationValues();
+        m_implementation.derivedClasses = this->derivedClasses();
 
-        m_implementation.values = list;
-        m_implementation.derivedClasses = classes;
+        return m_implementation;
     }
-
-protected:
 
     virtual QStringList implementationValues() = 0;
     virtual ClassStructs derivedClasses() { return ClassStructs(); }
 
 private:
 
-    ImplementationStruct& m_implementation;
+    ImplementationStruct m_implementation;
 };
 
 #endif // ABSTRACTCLASSSPECIFICATIONWIDGET_H

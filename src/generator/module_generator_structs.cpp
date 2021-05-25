@@ -1,26 +1,27 @@
 #include "module_generator_structs.h"
 
-FunctionStruct::~FunctionStruct()
-{
-    if (baseClass != Q_NULLPTR)
-    {
-        delete baseClass;
-        baseClass = Q_NULLPTR;
-    }
 
-    delete& implementation; // is this neccassary?
-}
+//FunctionStruct::~FunctionStruct()
+//{
+//    if (baseClass != Q_NULLPTR)
+//    {
+//        delete baseClass;
+//        baseClass = Q_NULLPTR;
+//    }
 
-ClassStruct::~ClassStruct()
-{
-    for (auto* func : functions)
-    {
-        if (func == Q_NULLPTR)
-        {
-            continue;
-        }
+//    delete implementation; // is this neccassary?
+//}
 
-        delete func;
-        func = Q_NULLPTR;
-    }
-}
+//ClassStruct::~ClassStruct()
+//{
+//    for (auto* func : functions)
+//    {
+//        if (func == Q_NULLPTR)
+//        {
+//            continue;
+//        }
+
+//        delete func;
+//        func = Q_NULLPTR;
+//    }
+//}

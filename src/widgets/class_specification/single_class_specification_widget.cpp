@@ -18,7 +18,7 @@ const QString S_LINKED_CLASS_PLACEHOLDER =
 const QString S_SPECIFICATIONS_BTN_TEXT = QStringLiteral("...");
 const QString S_DELETE_BTN_ICON_PATH = QStringLiteral(":/images/cross.png");
 
-SingleClassSpecificationWidget::SingleClassSpecificationWidget(FunctionStruct& function,
+SingleClassSpecificationWidget::SingleClassSpecificationWidget(const FunctionStruct& function,
                                                                ModuleGeneratorSettings* settings,
                                                                bool deletable,
                                                                bool editable,
@@ -68,13 +68,13 @@ SingleClassSpecificationWidget::SingleClassSpecificationWidget(FunctionStruct& f
 
     setLayout(m_baseLayout);
 
-    m_specificationsWidget = new ClassSpecificationWidget(function, settings);
+    m_specificationsWidget = new ClassSpecificationWidget(m_functionStruct, settings);
     m_specificationsWidget->setWindowFlag(Qt::Dialog);
     m_specificationsWidget->setWindowModality(Qt::ApplicationModal);
     m_specificationsWidget->setMinimumWidth(300);
     m_specificationsWidget->setMinimumHeight(150);
 
-    m_specificationsWidget->setWindowTitle(function.baseClass->className);
+    m_specificationsWidget->setWindowTitle(m_functionStruct.baseClass.className);
 
     connect(m_deleteButton, SIGNAL(pressed()),
             this, SLOT(onDeleteBtnPressed()));
@@ -96,23 +96,11 @@ SingleClassSpecificationWidget::linkedClassName() const
 }
 
 QStringList
-SingleClassSpecificationWidget::implementation()
-{
-    return implementationValues();
-}
-
-ClassStruct
-SingleClassSpecificationWidget::classImplementation()
-{
-    return derivedClasses()[0];
-}
-
-QStringList
 SingleClassSpecificationWidget::implementationValues()
 {
-    LOG_INSTANCE("retrieving class implemenation return values...");
+//    LOG_INSTANCE("retrieving single class implemenation values...");
 
-    ClassStruct implementation = m_specificationsWidget->classImplementation();
+    ClassStruct implementation = m_specificationsWidget->implementedClass();
     QString returnValue = m_functionStruct.returnValue;
 
     // QMap<const char*, QMetaObject> -> QMetaObject
@@ -176,7 +164,7 @@ SingleClassSpecificationWidget::implementationValues()
     }
     else
     {
-        LOG_ERR << "return value not implemented: " << returnValue;
+        LOG_INSTANCE("return value not implemented: " + returnValue, ModuleGeneratorLogger::Type::Error);
         values << QString();
     }
 
@@ -186,10 +174,9 @@ SingleClassSpecificationWidget::implementationValues()
 ClassStructs
 SingleClassSpecificationWidget::derivedClasses()
 {
-    ClassStruct  implementation = m_specificationsWidget->classImplementation();
     ClassStructs list;
 
-    list << implementation;
+    list << m_specificationsWidget->implementedClass();
 
     return list;
 }
@@ -215,10 +202,8 @@ SingleClassSpecificationWidget::onSpecificationsBtnPressed()
 void
 SingleClassSpecificationWidget::onHideSpecficationsWidget()
 {
-    ClassStruct implementation = m_specificationsWidget->classImplementation();
-
     if (!m_editable || m_nameLineEdit->text().isEmpty())
     {
-        m_nameLineEdit->setText(implementation.className);
+        m_nameLineEdit->setText(m_specificationsWidget->implementedClass().className);
     }
 }

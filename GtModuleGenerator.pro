@@ -30,10 +30,8 @@ SOURCES += \
     src/generator/module_generator_utils.cpp \
     src/main.cpp \
     src/settings/module_generator_settings.cpp \
-    src/widgets/class_specification/abstract_class_specification_widget.cpp \
     src/widgets/class_specification/function_specification_widget.cpp \
     src/widgets/class_specification/multiple_class_specification_widget.cpp \
-    src/widgets/class_specification/simple_class_specification_widget.cpp \
     src/widgets/class_specification/class_specification_widget.cpp \
     src/widgets/class_specification/single_class_specification_widget.cpp \
     src/widgets/dependencie_selection_widget.cpp \
@@ -56,7 +54,7 @@ HEADERS += \
     src/generator/module_generator_structs.h \
     src/generator/module_generator_utils.h \
     src/settings/module_generator_settings.h \
-    src/widgets/class_specification/abstract_class_specification_widget.h \
+    src/widgets/class_specification/abstract_class_specification.h \
     src/widgets/class_specification/function_specification_widget.h \
     src/widgets/class_specification/multiple_class_specification_widget.h \
     src/widgets/class_specification/simple_class_specification_widget.h \

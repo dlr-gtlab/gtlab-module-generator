@@ -1,6 +1,7 @@
 {
   "name": "GtExporterInterface",
   "fileName": "gt_exporterinterface",
+  "shortName": "Exporter",
   "functions": 
   [
     {
