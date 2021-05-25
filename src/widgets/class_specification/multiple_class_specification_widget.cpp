@@ -11,7 +11,7 @@
 
 const QString S_ADD_CLASS_BTN = QStringLiteral("Add Class ...");
 
-MultipleClassSpecificationWidget::MultipleClassSpecificationWidget(FunctionStruct& function,
+MultipleClassSpecificationWidget::MultipleClassSpecificationWidget(const FunctionStruct& function,
                                                                    ModuleGeneratorSettings* settings,
                                                                    QWidget *parent) :
     QWidget(parent),
@@ -49,14 +49,14 @@ MultipleClassSpecificationWidget::implementationValues()
 
         if (widget == Q_NULLPTR) continue;
 
-        QStringList implementation = widget->implementation();
+        QStringList implementation = widget->implementationValues();
 
         if (implementation.isEmpty()) continue;
 
-        // implementation contaisn multiple lines
+        // implementation contains multiple lines
         if (implementation.length() > 1)
         {
-            if (values.length() < 2) values << ""; // for
+            if (values.length() > 2) values << ""; // for nicer indent
             values << implementation.mid(0, implementation.length() - 1);
             values << "";
         }
@@ -77,7 +77,7 @@ MultipleClassSpecificationWidget::implementationValues()
     }
 
     // return variable
-    values << "";
+    if (values.length() > 2) values << ""; // for nicer indent
     values << "retVal";
 
     return values;
@@ -94,7 +94,7 @@ MultipleClassSpecificationWidget::derivedClasses()
 
         if (widget == Q_NULLPTR) continue;
 
-        classes << widget->classImplementation();
+        classes << widget->derivedClasses()[0]; // must have one entry
     }
 
     return classes;
@@ -103,22 +103,13 @@ MultipleClassSpecificationWidget::derivedClasses()
 void
 MultipleClassSpecificationWidget::onAddButtonPressed()
 {
+    LOG_INSTANCE("Adding new class for '" + m_functionStruct.name + "'...");
+
     bool editable = m_functionStruct.returnValue.startsWith(QStringLiteral("QMap<"));
 
     auto* widget = new SingleClassSpecificationWidget(m_functionStruct, m_settings, true, editable);
 
-    connect(widget, SIGNAL(deleted(SingleClassSpecificationWidget*)),
-            this, SLOT(onWidgetDeleted(SingleClassSpecificationWidget*)));
-
     m_widgetListView->insertWidget(-1, widget);
-}
 
-void
-MultipleClassSpecificationWidget::onWidgetDeleted(SingleClassSpecificationWidget* widget)
-{
-    auto* w = dynamic_cast<QWidget*>(widget);
-
-    if (w == Q_NULLPTR) return;
-
-    m_widgetListView->removeWidget(w);
+    LOG_INFO << "done!";
 }

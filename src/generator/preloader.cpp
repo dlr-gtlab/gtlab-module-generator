@@ -63,15 +63,11 @@ PreLoader::searchForInterfaces(/*const QString& devToolsPath*/)
 
         auto interfaceJObject = document.object();
 
-        auto* interface = searchForClass(interfaceJObject);
+        auto interfaceLocal = searchForClass(interfaceJObject);
 
-        if (interface == Q_NULLPTR)
-        {
-            LOG_ERR << "null interface!";
-            continue;
-        }
+        if (!interfaceLocal.isValid()) continue;
 
-        m_interfaces << interface;
+        m_interfaces << new ClassStruct(interfaceLocal);
 
         LOG_INFO << "done!";
     }
@@ -79,43 +75,42 @@ PreLoader::searchForInterfaces(/*const QString& devToolsPath*/)
     LOG_INFO << "done!";
 }
 
-ClassStruct*
+ClassStruct
 PreLoader::searchForClass(const QJsonObject& classJObject)
 {
 //    LOG_INSTANCE("searching for class...");
 
-    if (classJObject.isEmpty()) return Q_NULLPTR;
+    if (classJObject.isEmpty()) return ClassStruct();
 
     QString className  = classJObject["name"].toString();
     QString fileName   = classJObject["fileName"].toString();
     QString outputPath = classJObject["outputPath"].toString();
+    QString objectName = classJObject["shortName"].toString();
 
     auto functionsJArray = classJObject["functions"].toArray();
 
-
     LOG_INSTANCE("className  " + className);
-//    LOG_INFO << "fileName   " << fileName   << ENDL;
-//    LOG_INFO << "outputpath "  << outputPath << ENDL;
 
     auto functions = searchForFunctions(functionsJArray);
-    auto* classStruct = new ClassStruct;
 
-    classStruct->className = className;
-    classStruct->fileName = fileName;
-    classStruct->outputPath = outputPath;
-    classStruct->functions = functions;
+    ClassStruct classStruct;
+    classStruct.className  = className;
+    classStruct.fileName   = fileName;
+    classStruct.objectName = objectName;
+    classStruct.outputPath = outputPath;
+    classStruct.functions  = functions;
 
     LOG_INFO << "done!";
 
     return classStruct;
 }
 
-FunctionStructsPtr
+FunctionStructs
 PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 {
     LOG_INSTANCE("searching for functions...");
 
-    FunctionStructsPtr functions;
+    FunctionStructs functions;
 
     if (functionsJArray.isEmpty())
     {
@@ -125,8 +120,6 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 
     for (auto jsonValueRef : functionsJArray)
     {
-//        LOG_INSTANCE("function...");
-
         auto functionJObject = jsonValueRef.toObject();
 
         if (functionJObject.isEmpty())
@@ -146,22 +139,15 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
         auto baseClassJObject = functionJObject["baseClass"].toObject();
 
         LOG_INFO << returnValue << " " << name << ENDL;
-//        LOG_INFO << "name        " << name        << ENDL;
-//        LOG_INFO << "returnValue " << returnValue << ENDL;
-//        LOG_INFO << "qualifier   " << qualifier   << ENDL;
-//        LOG_INFO << "parameter   " << parameter   << ENDL;
 
-        auto* baseClass  = searchForClass(baseClassJObject);
+        FunctionStruct function;
 
-        auto* function = new FunctionStruct(*new ImplementationStruct);
-
-        function->name = name;
-        function->returnValue = returnValue;
-        function->qualifier = qualifier;
-        function->parameter = parameter;
-        function->description = description;
-
-        function->baseClass  = baseClass;
+        function.name = name;
+        function.returnValue = returnValue;
+        function.qualifier   = qualifier;
+        function.parameter   = parameter;
+        function.description = description;
+        function.baseClass   = searchForClass(baseClassJObject);
 
         // includes
         for (auto jsonValueRef : includes)
@@ -172,7 +158,7 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
             {
                 LOG_INFO << "added inlcude '" << include << "'" << ENDL;
 
-                function->implementation.includes << include;
+                function.implementation.includes << include;
             }
         }
 
@@ -185,7 +171,7 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
             {
                 LOG_INFO << "added forward declaration '" << forwardDecl << "'" << ENDL;
 
-                function->implementation.forwardDeclarations << forwardDecl;
+                function.implementation.forwardDeclarations << forwardDecl;
             }
         }
 

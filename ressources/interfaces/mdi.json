@@ -1,6 +1,7 @@
 {
   "name": "GtMdiInterface",
   "fileName": "gt_mdiinterface",
+  "shortName": "Mdi",
   "functions": 
   [
     {

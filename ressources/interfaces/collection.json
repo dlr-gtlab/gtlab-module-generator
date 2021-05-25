@@ -1,6 +1,7 @@
 {
   "name": "GtCollectionInterface",
   "fileName": "gt_collectioninterface",
+  "shortName": "Collection",
   "functions": 
   [
     {
@@ -9,6 +10,7 @@
       "qualifier": "const",
       "includes":
       [
+        "gt_application",
         "QIcon"
       ]
     },

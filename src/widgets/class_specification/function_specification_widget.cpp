@@ -17,10 +17,12 @@
 const QFont F_LABEL_FONT = QFont(QStringLiteral("Consolas"), 9);
 
 
-FunctionSpecificationWidget::FunctionSpecificationWidget(FunctionStructsPtr functions,
+FunctionSpecificationWidget::FunctionSpecificationWidget(const FunctionStructs& functions,
                                                          ModuleGeneratorSettings* settings,
                                                          QWidget* parent)
-    : QScrollArea(parent), m_functions(functions), m_settings(settings)
+    : QScrollArea(parent),
+      m_functions(functions),
+      m_settings(settings)
 {
     m_scrollWidget = new QWidget();
     m_baseLayout   = new QGridLayout();
@@ -39,7 +41,7 @@ FunctionSpecificationWidget::FunctionSpecificationWidget(FunctionStructsPtr func
 int
 FunctionSpecificationWidget::count() const
 {
-    return m_widgets.length();
+    return m_specificationWidgets.keys().length();
 }
 
 bool
@@ -48,15 +50,30 @@ FunctionSpecificationWidget::isEmpty() const
     return this->count() == 0;
 }
 
-void
-FunctionSpecificationWidget::setImplementation()
-{
-    for (AbstractClassSpecification* widget : m_widgets)
-    {
-        if (widget == Q_NULLPTR) continue;
 
-        widget->setImplementation();
+
+FunctionStructs
+FunctionSpecificationWidget::implementedFunctions()
+{
+    QMapIterator<QString, AbstractClassSpecification*> iterator(m_specificationWidgets);
+
+    while (iterator.hasNext())
+    {
+        iterator.next();
+        if (iterator.value() == Q_NULLPTR) continue;
+
+        for (int i = 0; i < m_functions.length(); ++i)
+        {
+            if (m_functions[i].name == iterator.key())
+            {
+                m_functions[i].implementation = iterator.value()->functionImplementation();
+
+                break;
+            }
+        }
     }
+
+    return m_functions;
 }
 
 void
@@ -64,48 +81,43 @@ FunctionSpecificationWidget::setContent()
 {
     LOG_INSTANCE("setting content...");
 
-    for (auto* function : m_functions)
+    for (auto& function : m_functions)
     {
-        if (function == Q_NULLPTR)
-        {
-            LOG_ERR << "null fucntion!";
-            continue;
-        }
-
         LOG_INSTANCE("setting specifcation widget for '" +
-                     function->returnValue + ' ' +
-                     function->name + "'...");
+                     function.returnValue + ' ' +
+                     function.name + "'...");
 
-        AbstractClassSpecification* widget = setSpecificationWidget(*function);
+        AbstractClassSpecification* widget = setSpecificationWidget(function);
         QWidget* inputWidget = dynamic_cast<QWidget*>(widget);
 
         if (inputWidget == Q_NULLPTR)
         {
-            setStandardImplementation(*function);
+            setStandardImplementation(function);
+            LOG_INFO << "done!";
             continue;
         }
 
-        QLabel* returnType   = new QLabel(function->returnValue);
-        QLabel* functionName = new QLabel(function->name);
+        QLabel* returnTypeLabel = new QLabel(function.returnValue);
+        QLabel* functionLabel   = new QLabel(function.name);
 
-        returnType->setMinimumHeight(20);
-        returnType->setFont(F_LABEL_FONT);
-        returnType->setStyleSheet("color : DarkBlue;");
+        returnTypeLabel->setMinimumHeight(20);
+        returnTypeLabel->setFont(F_LABEL_FONT);
+        returnTypeLabel->setStyleSheet("color : DarkBlue;");
 
-        functionName->setFont(F_LABEL_FONT);
-        functionName->setMinimumHeight(20);
-        functionName->setStyleSheet("color : black;");
+        functionLabel->setFont(F_LABEL_FONT);
+        functionLabel->setMinimumHeight(20);
+        functionLabel->setStyleSheet("color : black;");
 
-        returnType->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-        functionName->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+        returnTypeLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+        functionLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
 
         int widgetCount = this->count();
 
-        m_baseLayout->addWidget(functionName, widgetCount, 0, 1, 1, Qt::AlignTop);
-        m_baseLayout->addWidget(returnType, widgetCount, 1, 1, 1, Qt::AlignTop);
+        m_baseLayout->addWidget(functionLabel, widgetCount, 0, 1, 1, Qt::AlignTop);
+        m_baseLayout->addWidget(returnTypeLabel, widgetCount, 1, 1, 1, Qt::AlignTop);
         m_baseLayout->addWidget(inputWidget, widgetCount, 2, 1, 1, Qt::AlignTop);
 
-        m_widgets << widget;
+        m_specificationWidgets.insert(function.name, widget);
 
         LOG_INFO << "done!";
     }
@@ -154,13 +166,14 @@ FunctionSpecificationWidget::setStandardImplementation(FunctionStruct& function)
     }
 
     function.implementation.values = values;
+
+    LOG_INFO << "done!";
 }
 
 AbstractClassSpecification*
-FunctionSpecificationWidget::setSpecificationWidget(FunctionStruct& function)
+FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& function)
 {
     QString returnValue = function.returnValue;
-
 
     // simple return types
     if (returnValue == QStringLiteral("bool"))
@@ -174,11 +187,14 @@ FunctionSpecificationWidget::setSpecificationWidget(FunctionStruct& function)
     if (returnValue == QStringLiteral("QIcon"))
     {
         QStringList values;
-        values << QStringLiteral("");
-        values << QStringLiteral("notificationIcon.png");
+        values << QStringLiteral("-");
+        values << QStringLiteral("exportIcon");
+        values << QStringLiteral("importIcon");
+        values << QStringLiteral("collectionIcon");
 
         return new ComboClassSpecificationWidget(function.implementation,
-                                                 values, "QIcon(\"", "\")");
+                                                 values,
+                                                 "gtApp->icon(\"", ".png\")");
     }
     if (returnValue == QStringLiteral("Qt::DockWidgetArea"))
     {
@@ -193,9 +209,9 @@ FunctionSpecificationWidget::setSpecificationWidget(FunctionStruct& function)
     }
 
     // complex return types
-    ClassStruct* baseClass = function.baseClass;
+    ClassStruct baseClass = function.baseClass;
 
-    if (baseClass == Q_NULLPTR)
+    if (baseClass.className.isEmpty())
     {
         LOG_INSTANCE("null base class!", ModuleGeneratorLogger::Type::Warning);
         return Q_NULLPTR;

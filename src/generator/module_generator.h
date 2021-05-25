@@ -88,7 +88,7 @@ private:
                                 QString& sourceString,
                                 FunctionStruct& function);
 
-    void generateBasicClass(ClassStruct* base,
+    void generateBasicClass(ClassStruct& base,
                             ClassStruct& derived);
 
     void generateIncludes(QString& sourceString,

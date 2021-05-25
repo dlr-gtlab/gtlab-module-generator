@@ -18,16 +18,17 @@ class ClassSpecificationWidget : public QWidget
 
 public:
 
-    ClassSpecificationWidget(FunctionStruct& function,
+    ClassSpecificationWidget(const FunctionStruct& function,
                              ModuleGeneratorSettings* settings,
                              QWidget* parent = nullptr);
 
-    ClassStruct classImplementation();
+    ClassStruct implementedClass();
 
 private:
 
-    FunctionStruct& m_functionStruct;
     ModuleGeneratorSettings* m_settings;
+
+    ClassStruct m_implementedClass;
 
     QLineEdit* m_classNameEdit;
     QLabel* m_classNameLabel;

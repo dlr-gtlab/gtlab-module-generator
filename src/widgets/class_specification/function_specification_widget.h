@@ -16,28 +16,28 @@ class FunctionSpecificationWidget : public QScrollArea
 
 public:
 
-    FunctionSpecificationWidget(FunctionStructsPtr functions,
+    FunctionSpecificationWidget(const FunctionStructs& functions,
                                 ModuleGeneratorSettings* settings,
                                 QWidget* parent = nullptr);
 
     int count() const;
     bool isEmpty() const;
 
-    void setImplementation();
+    FunctionStructs implementedFunctions();
 
 private:
 
-    FunctionStructsPtr m_functions;
+    FunctionStructs m_functions;
     ModuleGeneratorSettings* m_settings;
     QWidget* m_scrollWidget;
     QGridLayout* m_baseLayout;
-    QList<AbstractClassSpecification*> m_widgets;
+    QMap<QString, AbstractClassSpecification*> m_specificationWidgets;
 
     void setContent();
 
     void setStandardImplementation(FunctionStruct& function);
 
-    AbstractClassSpecification* setSpecificationWidget(FunctionStruct& function);
+    AbstractClassSpecification* setSpecificationWidget(const FunctionStruct& function);
 };
 
 #endif // INTERFACESPECIFICATIONSWIDGET_H

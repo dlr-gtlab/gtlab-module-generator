@@ -1,6 +1,7 @@
 {
   "name": "GtPropertyInterface",
   "fileName": "gt_propertyinterface",
+  "shortName": "Property",
   "functions": 
   [
     {

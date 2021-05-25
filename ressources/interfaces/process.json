@@ -1,6 +1,7 @@
 {
   "name": "GtProcessInterface",
   "fileName": "gt_processinterface",
+  "shortName": "Process",
   "functions": 
   [
     {

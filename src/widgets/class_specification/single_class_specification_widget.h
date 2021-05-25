@@ -1,7 +1,7 @@
 #ifndef SINGLECLASSSPECIFICATIONWIDGET_H
 #define SINGLECLASSSPECIFICATIONWIDGET_H
 
-#include "abstract_class_specification_widget.h"
+#include "abstract_class_specification.h"
 
 #include <QWidget>
 
@@ -18,7 +18,7 @@ class SingleClassSpecificationWidget :
 
 public:
 
-    SingleClassSpecificationWidget(FunctionStruct& function,
+    SingleClassSpecificationWidget(const FunctionStruct& function,
                                    ModuleGeneratorSettings* settings,
                                    bool deletable  = false,
                                    bool editable   = false,
@@ -26,20 +26,16 @@ public:
     ~SingleClassSpecificationWidget() override;
 
     QString linkedClassName() const;
-    QStringList implementation();
-    ClassStruct classImplementation();
 
     inline bool deleteable() const { return m_deletable; }
     inline bool editable()   const { return m_editable; }
-
-protected:
 
     QStringList implementationValues() override;
     ClassStructs derivedClasses() override;
 
 private:
 
-    FunctionStruct& m_functionStruct;
+    FunctionStruct m_functionStruct;
     bool m_deletable;
     bool m_editable;
 

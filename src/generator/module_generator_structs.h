@@ -49,6 +49,21 @@ struct ImplementationStruct
     QList<ClassStruct> derivedClasses;
 };
 
+struct ClassStruct
+{
+    QString className;
+    QString fileName;
+    QString objectName;
+    QString outputPath;
+    QList<FunctionStruct> functions;
+
+    bool isValid() const
+    {
+        return !className.isEmpty() && !fileName.isEmpty();
+    }
+//    ~ClassStruct();
+};
+
 struct FunctionStruct
 {
     QString name;
@@ -56,27 +71,20 @@ struct FunctionStruct
     QString parameter;
     QString qualifier;
     QString description;
-    ClassStruct* baseClass = Q_NULLPTR;
-    ImplementationStruct& implementation;
+    ClassStruct baseClass;
+    ImplementationStruct implementation;
 
-    FunctionStruct(ImplementationStruct& imp) : implementation(imp) {}
-    ~FunctionStruct();
+    bool isValid() const
+    {
+        return !returnValue.isEmpty() && !name.isEmpty();
+    }
+
+//    ~FunctionStruct();
 };
-
-struct ClassStruct
-{
-    QString className;
-    QString fileName;
-    QString objectName;
-    QString outputPath;
-    QList<FunctionStruct*> functions;
-
-    ~ClassStruct();
-};
-
 using DependencieStructs = QList<DependencieStruct>;
 using IdentifierPairs    = QList<IdentifierPair>;
 using FunctionStructsPtr = QList<FunctionStruct*>;
+using FunctionStructs    = QList<FunctionStruct>;
 using ClassStructsPtr    = QList<ClassStruct*>;
 using ClassStructs       = QList<ClassStruct>;
 

@@ -1,6 +1,7 @@
 {
   "name": "GtExporterInterface",
   "fileName": "gt_exporterinterface",
+  "shortName": "Exporter",
   "functions": 
   [
     {
@@ -25,6 +26,7 @@
             "qualifier": "const",
             "includes":
             [
+              "gt_application",
               "QIcon"
             ]
           },

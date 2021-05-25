@@ -1,6 +1,7 @@
 {
   "name": "GtCalculatorExecInterface",
   "fileName": "gt_calculatorexecinterface",
+  "shortName": "Calculator Exec",
   "functions": 
   [
     {

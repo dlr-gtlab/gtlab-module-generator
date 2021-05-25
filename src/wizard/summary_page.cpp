@@ -230,20 +230,20 @@ SummaryPage::filesToGenerate()
     {
         if (interface == Q_NULLPTR) continue;
 
-        for (auto* function : interface->functions)
+        for (const auto& function : interface->functions)
         {
-            if (function == Q_NULLPTR) continue;
+//            if (function == Q_NULLPTR) continue;
 
-            auto* baseClass  = function->baseClass;
+            const auto& baseClass  = function.baseClass;
 
-            if (baseClass == Q_NULLPTR) continue;
+//            if (baseClass == Q_NULLPTR) continue;
 
 
-            for (auto derivedClass : function->implementation.derivedClasses)
+            for (auto derivedClass : function.implementation.derivedClasses)
             {
                 if (derivedClass.className.isEmpty()) continue;
 
-                QString filePath (baseFolder + baseClass->outputPath +
+                QString filePath (baseFolder + baseClass.outputPath +
                                   QDir::separator() + derivedClass.fileName);
 
                 content << QString(filePath + ".h");
