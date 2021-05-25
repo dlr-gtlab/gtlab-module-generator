@@ -25,6 +25,7 @@
             "qualifier": "const",
             "includes":
             [
+              "gt_application",
               "QIcon"
             ]
           },

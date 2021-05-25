@@ -174,11 +174,13 @@ FunctionSpecificationWidget::setSpecificationWidget(FunctionStruct& function)
     if (returnValue == QStringLiteral("QIcon"))
     {
         QStringList values;
-        values << QStringLiteral("");
-        values << QStringLiteral("notificationIcon.png");
+        values << QStringLiteral("-");
+        values << QStringLiteral("exportIcon");
+        values << QStringLiteral("importIcon");
+        values << QStringLiteral("collectionIcon");
 
         return new ComboClassSpecificationWidget(function.implementation,
-                                                 values, "QIcon(\"", "\")");
+                                                 values, "gtApp->icon(\"", ".png\")");
     }
     if (returnValue == QStringLiteral("Qt::DockWidgetArea"))
     {
