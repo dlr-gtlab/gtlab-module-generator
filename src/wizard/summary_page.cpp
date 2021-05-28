@@ -105,7 +105,7 @@ SummaryPage::validatePage()
 
     m_isComplete = false;
 
-    settings()->serialize();
+    settings()->serializeUserData();
 
     printSummary();
 

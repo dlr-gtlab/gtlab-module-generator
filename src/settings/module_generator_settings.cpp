@@ -11,6 +11,9 @@
 #include <QJsonDocument>
 #include <QApplication>
 
+#include <QFuture>
+#include <QtConcurrent>
+
 const QString
     ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0"));
 const QRegularExpression
@@ -40,7 +43,9 @@ const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
 
 ModuleGeneratorSettings::ModuleGeneratorSettings()
 {
-    deserialize();
+    deserializeUserData();
+
+    m_preLoader.searchForInterfaces();
 
     // defaults
     if (m_moduleClass.version.isEmpty())
@@ -112,24 +117,20 @@ ModuleGeneratorSettings::fileNamingScheme(const QString& name) const
 
 void
 ModuleGeneratorSettings::preLoad()
-{    
-    /*
-    // load interfaces and prefixes in a separate thread
+{
+    m_preLoader.searchForPrefixes(devToolsPath());
+
+    // load dependencies in a separate thread
     auto function = [](PreLoader* loader, QString path) -> void
     {
-        loader->searchForInterfaces();
-        loader->searchForPrefixes(path);
+        loader->searchForDependencies(path);
     };
 
-    auto future = QtConcurrent::run(function, &m_preLoader, devToolsPath());
-    */
-
-    m_preLoader.searchForInterfaces();
-    m_preLoader.searchForPrefixes(devToolsPath());
+    QFuture<void> future = QtConcurrent::run(function, &m_preLoader, gtlabPath());
 }
 
 void
-ModuleGeneratorSettings::serialize() const
+ModuleGeneratorSettings::serializeUserData() const
 {
     LOG_INSTANCE("serializing wizard data to json...");
 
@@ -165,7 +166,7 @@ ModuleGeneratorSettings::serialize() const
 }
 
 void
-ModuleGeneratorSettings::deserialize()
+ModuleGeneratorSettings::deserializeUserData()
 {
     LOG_INSTANCE("deserializing wizard data from json...");
 

@@ -9,6 +9,10 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include <QProcess>
+#include <QStringList>
+#include <QDomDocument>
+
 PreLoader::~PreLoader()
 {
     clearInterfaceStructs();
@@ -16,6 +20,12 @@ PreLoader::~PreLoader()
 
 const QString S_INCLUDE_CORE_PATH = QStringLiteral("core");
 const QString S_INCLUDE_PATH      = QStringLiteral("include");
+
+const QString S_GTLAB_PATH        = QStringLiteral("bin");
+const QString S_GTLAB_CONSOLE_EXE = QStringLiteral("GTlabConsole.exe");
+const QStringList S_GTLAB_CONSOLE_EXE_ARGS = QStringList(QStringLiteral("--footprint"));
+
+const int I_PROCESS_TIMEOUT_MS = 6000;
 
 /*
 // intended for auto detecting interfaces and functions
@@ -33,15 +43,9 @@ const QRegularExpression REGEXP_PREFIX(QStringLiteral("(\\w+?)_\\w+\\.h"));
 
 
 void
-PreLoader::searchForInterfaces(/*const QString& devToolsPath*/)
+PreLoader::searchForInterfaces()
 {
     LOG_INSTANCE("searching for interfaces...");
-
-    if (!m_interfaces.isEmpty())
-    {
-        LOG_WARN << "interfaces already set!";
-        return;
-    }
 
     clearInterfaceStructs();
 
@@ -78,8 +82,6 @@ PreLoader::searchForInterfaces(/*const QString& devToolsPath*/)
 ClassStruct
 PreLoader::searchForClass(const QJsonObject& classJObject)
 {
-//    LOG_INSTANCE("searching for class...");
-
     if (classJObject.isEmpty()) return ClassStruct();
 
     QString className  = classJObject["name"].toString();
@@ -188,43 +190,126 @@ PreLoader::searchForPrefixes(const QString& devToolsPath)
 {
     LOG_INSTANCE("searching for occupied prefixes...");    
 
-    if (!m_interfaces.isEmpty())
-    {
-        LOG_WARN << "prefixes already set!";
-        return;
-    }
+    m_prefixes.clear();
 
-    LOG_INFO << "chaning to dev tools dir..." << ENDL;
-
-    QDir devToolsDir(devToolsPath);
-
-    devToolsDir.cd(S_INCLUDE_PATH);
+    QDir devToolsDir(devToolsPath + QDir::separator() + S_INCLUDE_PATH);
 
     if (!devToolsDir.exists())
     {
         LOG_ERR << "devtools dir does not exists!";
-
         return;
     }
 
-    QDirIterator iterator(devToolsDir.absolutePath(), QStringList() << "*.h", QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator dirIterator(devToolsDir.absolutePath(), QStringList(),
+                             QDir::Dirs, QDirIterator::NoIteratorFlags);
 
-    while (iterator.hasNext())
+    while (dirIterator.hasNext())
     {
-        QString fileName = iterator.next();
+        QDir subDir = dirIterator.next();
 
-        auto match = REGEXP_PREFIX.match(fileName);
+        QDirIterator iterator(subDir.absolutePath(), QStringList() << "*.h",
+                              QDir::Files, QDirIterator::NoIteratorFlags);
 
-        QString prefix = match.captured(1);
+        while (iterator.hasNext())
+        {
+            QString fileName = iterator.next();
 
-        if (prefix.isEmpty()) continue;
+            auto match = REGEXP_PREFIX.match(fileName);
 
-        m_prefixes.append(prefix);
+            QString prefix = match.captured(1);
+
+            if (prefix.isEmpty()) continue;
+
+            if (m_prefixes.indexOf(prefix) < 0)
+            {
+                LOG_INFO << "'" << prefix << "'" << ENDL;
+
+                m_prefixes.append(prefix);
+            }
+        }
     }
 
-    m_prefixes.removeDuplicates();
+    LOG_INFO << QString::number(m_prefixes.count()) << " reserved prefixes found!";
+}
 
-    LOG_INFO << QString::number(m_prefixes.count()) << " reserved prefixes found";
+void
+PreLoader::searchForDependencies(const QString& gtlabPath)
+{    
+    LOG_INSTANCE("searching for dependencies...");
+
+    m_dependencies.clear();
+
+    QDir gtlabDir(gtlabPath + QDir::separator() + S_GTLAB_PATH);
+
+    if (!gtlabDir.exists(S_GTLAB_CONSOLE_EXE))
+    {
+        LOG_ERR << "invlaid path to GTlabConsole.exe!";
+        return;
+    }
+
+    // start process
+    QProcess process;
+    process.start(gtlabDir.absoluteFilePath(S_GTLAB_CONSOLE_EXE),
+                  S_GTLAB_CONSOLE_EXE_ARGS);
+
+    if (!process.waitForFinished(I_PROCESS_TIMEOUT_MS))
+    {
+        LOG_ERR << "process timeout!";
+        process.terminate();
+        return;
+    }
+
+    QString output = process.readAllStandardOutput();
+
+    int start = output.indexOf("<modules>");
+    int end   = output.indexOf("</modules>");
+
+    // parse output as xml document
+    QDomDocument moduleXml;
+
+    moduleXml.setContent(output.mid(start, end));
+    QDomElement root = moduleXml.documentElement();
+
+    if (root.isNull())
+    {
+        LOG_ERR << "parsed xml is null!";
+        return;
+    }
+
+    QDomNodeList list(root.elementsByTagName(QStringLiteral("module")));
+
+    for (int i = 0; i < list.length(); ++i)
+    {
+        QDomElement module(list.at(i).toElement());
+        QDomNodeList entries(module.childNodes());
+
+        if (entries.length() != 2)
+        {
+            LOG_ERR << "invalid subentry!" << ENDL; continue;
+        }
+
+        DependencieStruct dependencie;
+
+        for (int j = 0; j < entries.length(); ++j)
+        {
+            QDomElement entry(entries.at(j).toElement());
+
+            if (entry.tagName() == QStringLiteral("id"))
+            {
+                dependencie.name = entry.text();
+            }
+            else
+            {
+                dependencie.version = entry.text();
+            }
+        }
+
+        m_dependencies << dependencie;
+
+        LOG_INFO << dependencie.name << ": " << dependencie.version << ENDL;
+    }
+
+    LOG_INFO << QString::number(m_dependencies.count()) << " reserved dependencies found!";
 }
 
 void

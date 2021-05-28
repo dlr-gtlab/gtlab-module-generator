@@ -37,11 +37,11 @@ const QString S_OUTPUT_TOOLTIP =
         QStringLiteral("All module files will be placed in a separate subfolder.\n"
                        "The path is created at runtime if necessary");
 const QString S_DEVTOOLS_TOOLTIP =
-        QStringLiteral("The directory should contain the 'include', 'lib' \n"
-                       "and 'ThirdPartyLibraries' subfolder");
+        QStringLiteral("This directory should contain the 'include', 'lib' \n"
+                       "and 'ThirdPartyLibraries' subfolders");
 const QString S_GTLAB_TOOLTIP =
-        QStringLiteral("The directory should contain the 'bin' folder,\n"
-                       "which in turn should contains the 'GTlab.exe");
+        QStringLiteral("This directory should contain the 'bin' folder,\n"
+                       "which in turn should contain the 'GTlab.exe'");
 
 const QString S_DIR_BTN_TOOLTIP =
         QStringLiteral("select directory");
@@ -229,15 +229,18 @@ SettingsPage::isComplete() const
 bool
 SettingsPage::validatePage()
 {
-    LOG_INSTANCE("validated!");
+    // for nicer debug output
+    {
+        LOG_INSTANCE("validated!");
 
-    LOG_INFO << "output path " << outputPath() << ENDL;
-    LOG_INFO << "path to GTlab " << gtlabPath() << ENDL;
-    LOG_INFO << "path to DevTools " << devToolsPath() << ENDL;
+        LOG_INFO << "output path " << outputPath() << ENDL;
+        LOG_INFO << "path to GTlab " << gtlabPath() << ENDL;
+        LOG_INFO << "path to DevTools " << devToolsPath() << ENDL;
 
-    settings()->setOutputPath(outputPath());
-    settings()->setGTlabPath(gtlabPath());
-    settings()->setDevToolsPath(devToolsPath());
+        settings()->setOutputPath(outputPath());
+        settings()->setGTlabPath(gtlabPath());
+        settings()->setDevToolsPath(devToolsPath());
+    }
 
     settings()->preLoad();
 

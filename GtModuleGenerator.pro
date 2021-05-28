@@ -1,6 +1,6 @@
 QT       += core gui concurrent
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets xml
 
 CONFIG += c++11
 

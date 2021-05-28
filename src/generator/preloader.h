@@ -11,25 +11,27 @@ public:
 
     ~PreLoader();
 
-    void searchForInterfaces(/*const QString& devToolsPath*/);
+    void searchForInterfaces();
 
     void searchForPrefixes(const QString& devToolsPath);
 
-    ClassStructsPtr interfaceStructs() const { return m_interfaces; }
+    void searchForDependencies(const QString& gtlabPath);
 
+    ClassStructsPtr interfaces() const { return m_interfaces; }
+    DependencieStructs dependencies() const { return m_dependencies; }
     QStringList prefixes() const { return m_prefixes; }
 
 private:
 
-    QString m_devToolsPath;
-
     QStringList m_prefixes;
-
     ClassStructsPtr m_interfaces;
+    DependencieStructs m_dependencies;
 
     ClassStruct searchForClass(const QJsonObject& classJObject);
 
     FunctionStructs searchForFunctions(const QJsonArray& functionsJArray);
+
+
 
     void clearInterfaceStructs();
 };

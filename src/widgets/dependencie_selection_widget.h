@@ -10,24 +10,21 @@ class QCheckBox;
 class QHBoxLayout;
 class QRegularExpressionValidator;
 struct DependencieStruct;
-
-
 class DependencieSelectionWidget : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    DependencieSelectionWidget(QString& name, QWidget* parent = nullptr);
+    DependencieSelectionWidget(const DependencieStruct& dependencie,
+                               const bool isEditable,
+                               QWidget* parent = nullptr);
 
-    QString name() const;
-
-    QString version() const;
+    DependencieStruct dependencie() const;
 
     bool isChecked() const;
 
     bool isComplete() const;
-
 
 private:
 
