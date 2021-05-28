@@ -171,12 +171,6 @@ DependencieSelectionPage::onAddDependencieBtnPressed()
 
     if (name.isEmpty()) return;
 
-    for (auto* widget : m_widgetListView->widgets())
-    {
-        auto* dependencieWidget = dynamic_cast<DependencieSelectionWidget*>(widget);
-
-        if (dependencieWidget == Q_NULLPTR)  continue;
-
     addDependencie( { name, "0.0.1" }, true);
 }
 
