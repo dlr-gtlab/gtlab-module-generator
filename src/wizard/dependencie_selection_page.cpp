@@ -75,7 +75,14 @@ DependencieSelectionPage::initializePage()
 {
     LOG_INSTANCE("dependencie page...");
 
-    m_addDependenciePushBtn->setDefault(true);
+    m_addDependenciePushBtn->setDefault(true);    
+
+    if (m_widgetListView->widgets().isEmpty())
+    {
+        addStandardDependencies();
+    }
+
+    LOG_INFO << "done!";
 }
 
 bool
@@ -126,20 +133,28 @@ DependencieSelectionPage::selectedDependencies() const
 
         if (dependencieWidget->isChecked())
         {
-            QString name    = dependencieWidget->name();
-            QString version = dependencieWidget->version();
-
-            list << DependencieStruct({ name, version });
+            list << dependencieWidget->dependencie();
         }
     }
 
     return list;
 }
 
-
-void DependencieSelectionPage::addDependencie(QString& name)
+void
+DependencieSelectionPage::addStandardDependencies()
 {
-    auto widget = new DependencieSelectionWidget(name);
+    auto list = settings()->availableDependencies();
+
+    for (DependencieStruct dependencie : list)
+    {
+        addDependencie(dependencie, false);
+    }
+}
+
+void DependencieSelectionPage::addDependencie(const DependencieStruct& name,
+                                              bool isEditable)
+{
+    auto widget = new DependencieSelectionWidget(name, isEditable);
 
     connect(widget, SIGNAL(completeChanged()),
             this, SIGNAL(completeChanged()));
@@ -156,7 +171,7 @@ DependencieSelectionPage::onAddDependencieBtnPressed()
 
     if (name.isEmpty()) return;
 
-    addDependencie(name);
+    addDependencie( { name, "0.0.1" }, true);
 }
 
 void

@@ -58,11 +58,11 @@ public:
 
     // interfaces
     inline ClassStructsPtr selectedInterfaces() const { return m_selectedInterfaces; }
-    inline void setSelectedInterfaces(const ClassStructsPtr interfaces) { m_selectedInterfaces = interfaces; }
+    inline void setSelectedInterfaces(const ClassStructsPtr& interfaces) { m_selectedInterfaces = interfaces; }
 
     // dependencies
     inline DependencieStructs selectedDependencies() const { return m_selectedDependencies; }
-    inline void setSelectedDependencies(const DependencieStructs dependencies) { m_selectedDependencies = dependencies; }
+    inline void setSelectedDependencies(const DependencieStructs& dependencies) { m_selectedDependencies = dependencies; }
 
     // signature
     AuthorDetails authorDetails() const { return m_authorDetails; };
@@ -71,12 +71,13 @@ public:
     // PreLoader
     void preLoad();
 
-    QStringList reservedPrefixes() const { return m_preLoader.prefixes(); }
-    ClassStructsPtr availableInterfaces() const { return m_preLoader.interfaceStructs(); }
+    inline QStringList reservedPrefixes() const { return m_preLoader.prefixes(); }
+    inline ClassStructsPtr availableInterfaces() const { return m_preLoader.interfaces(); }
+    inline DependencieStructs availableDependencies() const { return m_preLoader.dependencies(); }
 
-    // serialize
-    void serialize() const;
-    void deserialize();
+    // serialize user data (name, email, paths etc.)
+    void serializeUserData() const;
+    void deserializeUserData();
 
 private:
 

@@ -22,9 +22,10 @@ public:
     ModuleGeneratorLogger(const QString& text = "", const Type& type = Info);
     ~ModuleGeneratorLogger();
 
-    ModuleGeneratorLogger& operator<<(const QString& text);
-
     inline void setType(const Type& type) { m_type = type; }
+
+    // operators
+    ModuleGeneratorLogger& operator<<(const QString& text);
 
 private:
 

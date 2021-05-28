@@ -51,7 +51,10 @@ private:
 
     WidgetListView* m_widgetListView;
 
-    void addDependencie(QString& name);
+
+    void addStandardDependencies();
+
+    void addDependencie(const DependencieStruct& name, bool isEditable = true);
 
 
 private slots:

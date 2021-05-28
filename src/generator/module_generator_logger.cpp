@@ -1,11 +1,14 @@
 #include "module_generator_logger.h"
 
+
+
 void defaultFunction(QString&, ModuleGeneratorLogger::Type, int);
 
 static const int s_indentSize =  3;
 static       int s_indent     = 0;
 
 static void (*s_loggingFunction)(QString&, ModuleGeneratorLogger::Type, int)(defaultFunction);
+
 
 
 void

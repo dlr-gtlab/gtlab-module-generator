@@ -11,9 +11,6 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 
-
-const QString S_DEFAULT_VERSION = QStringLiteral("1");
-
 const QString S_DELETE_BTN_ICON_PATH = QStringLiteral(":/images/cross.png");
 
 const QString S_DELETE_BTN_TOOLTIP = QStringLiteral("delete");
@@ -21,7 +18,9 @@ const QString S_CHECKBOX_TOOLTIP = QStringLiteral("select dependencie");
 const QString S_SPINBOX_TOOLTIP = QStringLiteral("version of dependencie");
 
 
-DependencieSelectionWidget::DependencieSelectionWidget(QString& name, QWidget* parent) :
+DependencieSelectionWidget::DependencieSelectionWidget(const DependencieStruct& dependencie,
+                                                       const bool isEditable,
+                                                       QWidget* parent) :
     QWidget(parent)
 {
     m_versionValidator = new QRegularExpressionValidator(ModuleGeneratorSettings::REG_VERSION, this);
@@ -37,15 +36,20 @@ DependencieSelectionWidget::DependencieSelectionWidget(QString& name, QWidget* p
 
     m_versionEdit->setFixedWidth(120);
     m_versionEdit->setFixedWidth(120);
-    m_versionEdit->setText(S_DEFAULT_VERSION);
+    m_versionEdit->setText(dependencie.version);
     m_versionEdit->setValidator(m_versionValidator);
 
-    m_isActivCheckBox->setText(name);
-    m_isActivCheckBox->setChecked(true);
+    m_isActivCheckBox->setText(dependencie.name);
+    m_isActivCheckBox->setChecked(isEditable);
 
     m_deletePushBtn->setIcon(QIcon(S_DELETE_BTN_ICON_PATH));
-
     m_deletePushBtn->setToolTip(S_DELETE_BTN_TOOLTIP);
+
+    if (!isEditable)
+    {
+        m_deletePushBtn->setEnabled(false);
+        m_versionEdit->setEnabled(false);
+    }
 
     m_baseLayout->setSpacing(0);
     m_baseLayout->setContentsMargins(5, 2, 5, 2);
@@ -69,16 +73,10 @@ DependencieSelectionWidget::DependencieSelectionWidget(QString& name, QWidget* p
             this,  SIGNAL(completeChanged()));
 }
 
-QString
-DependencieSelectionWidget::name() const
+DependencieStruct
+DependencieSelectionWidget::dependencie() const
 {
-    return m_isActivCheckBox->text();
-}
-
-QString
-DependencieSelectionWidget::version() const
-{
-    return m_versionEdit->text();
+    return { m_isActivCheckBox->text(), m_versionEdit->text() };
 }
 
 bool
