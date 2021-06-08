@@ -31,8 +31,6 @@ private:
 
     FunctionStructs searchForFunctions(const QJsonArray& functionsJArray);
 
-
-
     void clearInterfaceStructs();
 };
 
