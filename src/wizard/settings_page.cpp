@@ -25,11 +25,11 @@ const QString S_INFO_TEXT =
         QStringLiteral("Enter the output directory, in which the module should "
                        "be generated. Select the path to the parent "
                        "directory of your local GTlab and "
-                       "Dev-Tools installation. ");
+                       "DevTools installation. ");
 const QString S_OUTPUT_LABEL =
         QStringLiteral("Output Directory:");
 const QString S_DEVTOOLS_LABEL =
-        QStringLiteral("Dev-Tools Directory:");
+        QStringLiteral("DevTools Directory:");
 const QString S_GTLAB_LABEL =
         QStringLiteral("GTlab Directory:");
 

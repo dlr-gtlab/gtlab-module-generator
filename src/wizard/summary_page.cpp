@@ -143,7 +143,7 @@ SummaryPage::createSummary()
     content << "Output directory:\t" + outputPath;
     content << "";
     content << "GTLab directory:\t" + settings()->gtlabPath();
-    content << "Dev-Tools directory:\t" + settings()->devToolsPath();
+    content << "DevTools directory:\t" + settings()->devToolsPath();
 
     content << "";
     content << selectedInterfaces();

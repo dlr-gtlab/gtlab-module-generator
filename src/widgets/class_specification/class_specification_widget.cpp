@@ -31,9 +31,9 @@ ClassSpecificationWidget::ClassSpecificationWidget(const FunctionStruct& functio
 
     m_baseLayout = new QGridLayout();
 
+    m_objectNamelabel = new QLabel(S_OBJECT_NAME_LABEL);
     m_classNameLabel = new QLabel(S_CLASS_NAME_LABEL);
-    m_objectNamelabel = new QLabel(S_FILE_NAME_LABEL);
-    m_fileNameLabel = new QLabel(S_OBJECT_NAME_LABEL);
+    m_fileNameLabel = new QLabel(S_FILE_NAME_LABEL);
 
     m_classNameEdit = new QLineEdit();
     m_objectNameEdit = new QLineEdit();
