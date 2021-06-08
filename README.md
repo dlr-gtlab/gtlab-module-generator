@@ -29,7 +29,7 @@ This tool generates a basic module for GTlab (v1.7)
 4. **Interface Selection**: select the desired interfaces to extend 
 
 
-5. **Interface Specifications**: depending on the previous interface selection different tabs are generated, in which interface specific data and classes can be generated and registered. The function name and the return value are displayed on the left, while data can be entered on the right. For example: generating a custom `Exporter` class:
+5. **Interface Specifications**: depending on the previous interface selection different tabs are generated, in which interface specific data and classes can be registered. The function name and the return value are displayed on the left, while data can be entered on the right. Example for generating a custom `Exporter` class:
 
     <figure class="image">
         <img src="/images/add_class_example.jpg" alt="Adding a custom exporter class">
@@ -51,7 +51,9 @@ This tool generates a basic module for GTlab (v1.7)
 
 ## Finally
 
-The module should now be generated. Open the project in QtCreator and select the desired build kit. Set GTlab as an executable and add `-dev` to the command line arguments.
+* Open the generated module in QtCreator and select the desired build kit. 
+* Set `GTlab` as an executable and add `-dev` to the command line arguments.
+* build and run
 
 <figure class="image">
     <img src="/images/set_gtlab_executable.jpg" alt="Set GTlab as the executable">
