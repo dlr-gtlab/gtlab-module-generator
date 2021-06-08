@@ -120,14 +120,18 @@ ModuleGeneratorSettings::fileNamingScheme(const QString& name) const
 void
 ModuleGeneratorSettings::preLoad()
 {
-    m_preLoader.searchForPrefixes(devToolsPath());
+    if (m_preLoader.prefixes().isEmpty())
+    {
+        m_preLoader.searchForPrefixes(devToolsPath());
+    }
+
+    if (!m_preLoader.dependencies().isEmpty()) return;
 
     // load dependencies in a separate thread
     auto function = [](PreLoader* loader, QString path) -> void
     {
         loader->searchForDependencies(path);
     };
-
     QFuture<void> future = QtConcurrent::run(function, &m_preLoader, gtlabPath());
 }
 
