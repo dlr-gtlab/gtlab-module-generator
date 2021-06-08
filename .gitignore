@@ -9,3 +9,8 @@ release/
 *.qmake.stash
 *.o
 *.pyc
+moc_*.cpp
+moc_*.h
+
+
+module_generator.json

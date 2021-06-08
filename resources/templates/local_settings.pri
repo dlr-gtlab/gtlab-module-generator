@@ -16,6 +16,10 @@ GTLAB_LOGGING_PATH = $${DEV_TOOLS}
 GTLAB_NUMERICS_PATH = $${DEV_TOOLS}
 
 # Third Party
+MINPACK_PATH = $${DEV_TOOLS}\ThirdPartyLibraries\minpack
+SPLINE_LIB_PATH = $${DEV_TOOLS}\ThirdPartyLibraries\SplineLib
+QWT_PATH = $${DEV_TOOLS}\ThirdPartyLibraries\Qwt
+NLOPT_PATH = $${DEV_TOOLS}\ThirdPartyLibraries\NLopt
 
 # Deployment
 GTLAB_ENVIRONMENT_PATH =

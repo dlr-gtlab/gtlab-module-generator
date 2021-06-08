@@ -22,10 +22,10 @@ const QString S_INCLUDE_CORE_PATH = QStringLiteral("core");
 const QString S_INCLUDE_PATH      = QStringLiteral("include");
 
 const QString S_GTLAB_PATH        = QStringLiteral("bin");
-const QString S_GTLAB_CONSOLE_EXE = QStringLiteral("GTlabConsole.exe");
-const QStringList S_GTLAB_CONSOLE_EXE_ARGS = QStringList(QStringLiteral("--footprint"));
+const QString S_GTLAB_CONSOLE     = QStringLiteral("GTlabConsole");
+const QStringList S_GTLAB_CONSOLE_ARGS = QStringList(QStringLiteral("--footprint"));
 
-const int I_PROCESS_TIMEOUT_MS = 6000;
+const int I_PROCESS_TIMEOUT_MS = 15000;
 
 /*
 // intended for auto detecting interfaces and functions
@@ -241,16 +241,17 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
 
     QDir gtlabDir(gtlabPath + QDir::separator() + S_GTLAB_PATH);
 
-    if (!gtlabDir.exists(S_GTLAB_CONSOLE_EXE))
+    if (!gtlabDir.exists(S_GTLAB_CONSOLE))
     {
         LOG_ERR << "invlaid path to GTlabConsole.exe!";
         return;
     }
 
     // start process
+    QString  processName = S_GTLAB_CONSOLE + QString(QSysInfo::productType() == "windows" ? ".exe":"");
     QProcess process;
-    process.start(gtlabDir.absoluteFilePath(S_GTLAB_CONSOLE_EXE),
-                  S_GTLAB_CONSOLE_EXE_ARGS);
+    process.start(gtlabDir.absoluteFilePath(processName),
+                  S_GTLAB_CONSOLE_ARGS);
 
     if (!process.waitForFinished(I_PROCESS_TIMEOUT_MS))
     {
