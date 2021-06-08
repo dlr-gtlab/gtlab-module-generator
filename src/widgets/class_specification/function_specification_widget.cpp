@@ -101,11 +101,11 @@ FunctionSpecificationWidget::setContent()
 
         returnTypeLabel->setMinimumHeight(20);
         returnTypeLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
-        returnTypeLabel->setStyleSheet("color : DarkBlue;");
+        returnTypeLabel->setStyleSheet("QLabel { color : DarkBlue }");
 
         functionLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
         functionLabel->setMinimumHeight(20);
-        functionLabel->setStyleSheet("color : black;");
+        functionLabel->setStyleSheet("QLabel { color : black }");
 
         returnTypeLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
         functionLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);

@@ -20,7 +20,7 @@ const QString
 const QRegularExpression
     ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("[A-Za-z]([\\w\\d]*\\s?)+"));
+    ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("\\s?[A-Za-z]([\\w\\d]*\\s?)+"));
 const QRegularExpression
     ModuleGeneratorSettings::REG_VERSION(QStringLiteral("\\d+(.\\d+)?(.\\d+)?(-\\w+)?"));
 const QRegularExpression

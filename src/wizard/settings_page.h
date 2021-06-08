@@ -28,25 +28,6 @@ public:
      */
     explicit SettingsPage(ModuleGeneratorSettings* settings,
                           QWidget* parent = nullptr);
-    /// getter
-
-    /**
-     * @brief get_dirOutput - gets text of line edit
-     * @return
-     */
-    QString outputPath() const;
-
-    /**
-     * @brief get_dirDevTools - gets text of line edit
-     * @return
-     */
-    QString devToolsPath() const;
-
-    /**
-     * @brief get_dirGTlab - gets text of line edit
-     * @return
-     */
-    QString gtlabPath() const;
 
 protected:
 
@@ -89,6 +70,7 @@ private:
     // file/dir system completer model
     QCompleter* m_fileSystemCompleter;
 
+    void setLineEditColor(QLineEdit* edit) const;
 
 private slots:
 

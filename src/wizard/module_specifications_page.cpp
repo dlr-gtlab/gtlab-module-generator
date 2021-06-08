@@ -150,23 +150,22 @@ ModuleSpecificationsPage::isComplete() const
 
     if (settings()->reservedPrefixes().contains(prefix.toLower()))
     {
-        m_modulePrefixEdit->setStyleSheet("color : red");
+        m_modulePrefixEdit->setStyleSheet("QLineEdit { color : red }");
 
         return false;
     }
 
-    m_modulePrefixEdit->setStyleSheet("color : black");
+    m_modulePrefixEdit->setStyleSheet("QLineEdit { color : black }");
 
     int  pos = 0;
     QString version    = m_versionEdit->text();
-    QString moduleName = m_moduleNameEdit->text();
+    QString moduleName = m_moduleNameEdit->text().simplified();
 
     if (m_versionValidator->validate(version, pos) != QRegExpValidator::Acceptable ||
-        (!prefix.isEmpty() &&
-        m_prefixValidator->validate(prefix, pos) != QRegExpValidator::Acceptable) ||
         m_nameValidator->validate(moduleName, pos) != QRegExpValidator::Acceptable ||
-        moduleName.isEmpty()  ||
-        moduleName.size() < 3)
+        moduleName.size() < 3 ||
+        (!prefix.isEmpty() &&
+         m_prefixValidator->validate(prefix, pos) != QRegExpValidator::Acceptable))
     {
         return false;
     }
@@ -249,11 +248,11 @@ ModuleSpecificationsPage::onEditedVersion(QString content)
 
     if (m_versionValidator->validate(content, pos) == QRegExpValidator::Intermediate)
     {
-        m_versionEdit->setStyleSheet("color : red");
+        m_versionEdit->setStyleSheet("QLineEdit { color : red }");
     }
     else
     {
-        m_versionEdit->setStyleSheet("color : black");
+        m_versionEdit->setStyleSheet("QLineEdit { color : black }");
     }
 }
 
