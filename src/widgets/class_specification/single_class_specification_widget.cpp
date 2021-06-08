@@ -195,8 +195,6 @@ void
 SingleClassSpecificationWidget::onSpecificationsBtnPressed()
 {
     m_specificationsWidget->show();
-    m_specificationsWidget->activateWindow();
-    m_specificationsWidget->raise();
 }
 
 void

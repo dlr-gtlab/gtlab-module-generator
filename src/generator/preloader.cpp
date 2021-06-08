@@ -241,14 +241,15 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
 
     QDir gtlabDir(gtlabPath + QDir::separator() + S_GTLAB_PATH);
 
-    if (!gtlabDir.exists(S_GTLAB_CONSOLE))
+    QString  processName = S_GTLAB_CONSOLE + QString(QSysInfo::productType() == "windows" ? ".exe":"");
+
+    if (!gtlabDir.exists(processName))
     {
-        LOG_ERR << "invlaid path to GTlabConsole.exe!";
+        LOG_ERR << "invlaid path to GTlabConsole (" << gtlabDir.absolutePath() << processName << ")!";
         return;
     }
 
     // start process
-    QString  processName = S_GTLAB_CONSOLE + QString(QSysInfo::productType() == "windows" ? ".exe":"");
     QProcess process;
     process.start(gtlabDir.absoluteFilePath(processName),
                   S_GTLAB_CONSOLE_ARGS);
