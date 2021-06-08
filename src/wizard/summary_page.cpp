@@ -20,10 +20,6 @@ void updateSummary(QString&, ModuleGeneratorLogger::Type, int);
 
 const char* C_SUMMARY_PAGE_TITLE = "Summary";
 
-const QFont F_LABEL_FONT = QFont(QStringLiteral("Consolas"), 9);
-
-const QString S_CHECKBOX_TEXT =
-        QStringLiteral("WIP: Open the project in Qt Creator (this may take a moment)");
 const QString S_GENERATE_BUTTON_TEXT =
         QStringLiteral("Generate");
 const QString S_DONE_BUTTON_TEXT =
@@ -35,23 +31,17 @@ SummaryPage::SummaryPage(ModuleGeneratorSettings *settings, QWidget *parent) :
     AbstractWizardPage(settings, parent)
 {
     // initializations
-    m_checkBox = new QCheckBox;
     m_summaryTextEdit = new QTextEdit;
     m_vLayout = new QVBoxLayout(this);
 
     // page gui
     setTitle(tr(C_SUMMARY_PAGE_TITLE));
 
-    m_summaryTextEdit->setFont(F_LABEL_FONT);
+    m_summaryTextEdit->setFont(ModuleGeneratorSettings::F_MONO_FONT);
     m_summaryTextEdit->setReadOnly(true);
     m_summaryTextEdit->setWordWrapMode(QTextOption::NoWrap);
 
-    m_checkBox->setText(S_CHECKBOX_TEXT);
-    m_checkBox->setChecked(false);
-    m_checkBox->setEnabled(false);
-
     m_vLayout->addWidget(m_summaryTextEdit );
-    m_vLayout->addWidget(m_checkBox);
 
     setLayout(m_vLayout);
 
@@ -110,8 +100,6 @@ SummaryPage::validatePage()
     printSummary();
 
     m_summaryTextEdit->clear();
-
-    m_checkBox->setDisabled(true);
 
     wizard()->setButtonText(QWizard::FinishButton, S_DONE_BUTTON_TEXT);
 

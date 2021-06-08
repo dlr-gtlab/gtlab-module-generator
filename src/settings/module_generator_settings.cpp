@@ -13,6 +13,7 @@
 
 #include <QFuture>
 #include <QtConcurrent>
+#include <QFont>
 
 const QString
     ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0"));
@@ -26,6 +27,7 @@ const QRegularExpression
     ModuleGeneratorSettings::REG_AUTHOR(QStringLiteral("[A-Za-z].*"));
 const QRegularExpression
     ModuleGeneratorSettings::REG_AUTHOR_EMAIL(QStringLiteral(".*"));
+const QFont ModuleGeneratorSettings::F_MONO_FONT = QFont(QStringLiteral("Consolas"), 9);
 
 const QString S_YEAR = QDate::currentDate().toString("yyyy");
 const QString S_DATE = QDate::currentDate().toString("dd.MM.yyyy");

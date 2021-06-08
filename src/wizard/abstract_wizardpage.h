@@ -1,7 +1,7 @@
 #ifndef ABSTRACTWIZARDPAGE_H
 #define ABSTRACTWIZARDPAGE_H
 
-
+#include <QFont>
 #include <QWizardPage>
 
 class ModuleGeneratorSettings;

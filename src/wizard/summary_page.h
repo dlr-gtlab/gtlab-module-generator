@@ -44,8 +44,6 @@ private:
     QTextEdit* m_summaryTextEdit;
     /// vertical layout
     QVBoxLayout* m_vLayout;
-    /// check box to set open qtcreator
-    QCheckBox* m_checkBox;
 
     bool m_isComplete;
 

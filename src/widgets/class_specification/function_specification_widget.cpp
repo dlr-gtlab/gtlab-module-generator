@@ -6,6 +6,7 @@
 #include "single_class_specification_widget.h"
 #include "multiple_class_specification_widget.h"
 #include "module_generator_logger.h"
+#include "module_generator_settings.h"
 
 #include <QGridLayout>
 #include <QLineEdit>
@@ -13,8 +14,6 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QSpacerItem>
-
-const QFont F_LABEL_FONT = QFont(QStringLiteral("Consolas"), 9);
 
 
 FunctionSpecificationWidget::FunctionSpecificationWidget(const FunctionStructs& functions,
@@ -101,10 +100,10 @@ FunctionSpecificationWidget::setContent()
         QLabel* functionLabel   = new QLabel(function.name);
 
         returnTypeLabel->setMinimumHeight(20);
-        returnTypeLabel->setFont(F_LABEL_FONT);
+        returnTypeLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
         returnTypeLabel->setStyleSheet("color : DarkBlue;");
 
-        functionLabel->setFont(F_LABEL_FONT);
+        functionLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
         functionLabel->setMinimumHeight(20);
         functionLabel->setStyleSheet("color : black;");
 

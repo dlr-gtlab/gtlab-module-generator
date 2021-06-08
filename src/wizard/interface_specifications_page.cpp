@@ -14,9 +14,10 @@ const char* C_TITLE_INTERFACE_SPECIFICATIONS_PAGE = "Interface Specifications";
 
 const QString S_INFO_TEXT = QStringLiteral(
     "Most interfaces require additional data and classes to be registered. "
-    "This process can be automate by filling out the required fields below. "
-    "If not filled out fully the module may not be able to compile and must "
-    "be fixed manually. Reverting to the previous page may delete all changes.");
+    "This process can be automated by filling out the required fields below. "
+    "If not filled out correctly the module may not be able to compile and must "
+    "be fixed manually. Changing the interface selection on the previous page "
+    "may reset all changes.");
 
 InterfaceSpecificationsPage::InterfaceSpecificationsPage(ModuleGeneratorSettings* settings,
                                                         QWidget* parent) :
