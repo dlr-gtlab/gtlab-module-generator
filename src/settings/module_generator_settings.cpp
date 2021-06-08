@@ -20,7 +20,7 @@ const QString
 const QRegularExpression
     ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("[A-Za-z]([\\w\\d]*\\s?)+"));
+    ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("\\s?[A-Za-z]([\\w\\d]*\\s?)+"));
 const QRegularExpression
     ModuleGeneratorSettings::REG_VERSION(QStringLiteral("\\d+(.\\d+)?(.\\d+)?(-\\w+)?"));
 const QRegularExpression
@@ -140,9 +140,9 @@ ModuleGeneratorSettings::serializeUserData() const
 {
     LOG_INSTANCE("serializing wizard data to json...");
 
-    QJsonObject contactObject;
-    contactObject["author"] = m_authorDetails.name;
-    contactObject["email"]  = m_authorDetails.email;
+    QJsonObject userObject;
+    userObject["author"] = m_authorDetails.name;
+    userObject["email"]  = m_authorDetails.email;
 
     QJsonObject pathsObject;
     pathsObject["output"]   = m_outputPath;
@@ -156,7 +156,7 @@ ModuleGeneratorSettings::serializeUserData() const
 //    moduleObject["description"] = m_moduleClass.description;
 
     QJsonObject rootObject;
-    rootObject["contact"] = contactObject;
+    rootObject["user"] = userObject;
     rootObject["paths"]  = pathsObject;
 //    rootObject["lastModule"] = moduleObject;
 
@@ -188,9 +188,9 @@ ModuleGeneratorSettings::deserializeUserData()
         return;
     }
 
-    QJsonObject contactObject = document["contact"].toObject();
-    m_authorDetails.name  = contactObject["author"].toString();
-    m_authorDetails.email = contactObject["email"].toString();
+    QJsonObject userObject = document["user"].toObject();
+    m_authorDetails.name  = userObject["author"].toString();
+    m_authorDetails.email = userObject["email"].toString();
 
     QJsonObject pathsObject = document["paths"].toObject();
     m_outputPath   = pathsObject["output"].toString();

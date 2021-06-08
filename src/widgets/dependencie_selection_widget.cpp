@@ -109,10 +109,10 @@ DependencieSelectionWidget::onEditedVersion(QString content)
 
     if (m_versionValidator->validate(content, pos) == QRegExpValidator::Intermediate)
     {
-        m_versionEdit->setStyleSheet("color : red");
+        m_versionEdit->setStyleSheet("QLineEdit { color : red }");
     }
     else
     {
-        m_versionEdit->setStyleSheet("color : black");
+        m_versionEdit->setStyleSheet("QLineEdit { color : black }");
     }
 }
