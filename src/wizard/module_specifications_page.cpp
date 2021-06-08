@@ -11,13 +11,13 @@
 #include "module_generator_logger.h"
 
 
-const char* C_TITLE_SPECIFICATIONS_PAGE = "Specifications";
+const char* C_TITLE_SPECIFICATIONS_PAGE = "Module Specifications";
 
 const QString S_INFO_TEXT =
-        QStringLiteral("Enter the name and the version of the module. "
+        QStringLiteral("Enter a name and the version of the module. "
                        "Add a short description and "
                        "optionally define a prefix, which will be placed "
-                       "infront of each file- and classname.");
+                       "in front of each file- and classname.");
 const QString S_MODULE_PREFIX_LABEL =
         QStringLiteral("Prefix:");
 const QString S_CLASS_NAME_LABEL =

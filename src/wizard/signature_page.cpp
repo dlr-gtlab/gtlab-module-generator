@@ -14,7 +14,7 @@
 const char* C_TITLE_SIGNATURE_PAGE = "File Signature";
 
 const QString S_INFO_TEXT =
-        QStringLiteral("add a signature");
+        QStringLiteral("Enter your user details to generate a file signature");
 const QString S_AUTHOR_LABEL =
         QStringLiteral("Author Name:");
 const QString S_EMAIL_LABEL =
@@ -31,7 +31,8 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
     m_signatureLabel = new QLabel(S_SIGNATURE_LABEL);
     m_authorEdit = new QLineEdit;
     m_emailEdit = new QLineEdit;
-    m_signatureTextEdit = new QTextEdit;    
+    m_signatureTextEdit = new QTextEdit;
+
     m_authorValdidator = new QRegularExpressionValidator(
                 ModuleGeneratorSettings::REG_AUTHOR, this);
     m_emailValdidator = new QRegularExpressionValidator(
@@ -51,7 +52,7 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
 
     m_signatureLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     m_signatureTextEdit->setReadOnly(true);
-    m_signatureTextEdit->setFont(QFont("Consolas", 9));
+    m_signatureTextEdit->setFont(ModuleGeneratorSettings::F_MONO_FONT);
 
     m_baseLayout->addWidget(m_infoTextLabel, 0, 0, 1, 3);
     m_baseLayout->addWidget(m_authorLabel, 1, 0);

@@ -13,7 +13,7 @@ const int I_SPECIFICATIONS_PUSHBTN_WIDTH = 40;
 const QString S_CLASS_NAME_PLACEHOLDER =
         QStringLiteral("Class name");
 const QString S_LINKED_CLASS_PLACEHOLDER =
-        QStringLiteral("Linked class");
+        QStringLiteral("Linked class name");
 
 const QString S_SPECIFICATIONS_BTN_TEXT = QStringLiteral("...");
 const QString S_DELETE_BTN_ICON_PATH = QStringLiteral(":/images/cross.png");

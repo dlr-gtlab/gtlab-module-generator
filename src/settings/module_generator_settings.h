@@ -21,6 +21,7 @@ public:
     const static QRegularExpression REG_AUTHOR;
     const static QRegularExpression REG_AUTHOR_EMAIL;
 
+    const static QFont F_MONO_FONT;
     const static QString S_SIGNATURE;
 
     /**

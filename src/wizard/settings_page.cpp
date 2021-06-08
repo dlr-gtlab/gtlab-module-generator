@@ -40,8 +40,8 @@ const QString S_DEVTOOLS_TOOLTIP =
         QStringLiteral("This directory should contain the 'include', 'lib' \n"
                        "and 'ThirdPartyLibraries' subfolders");
 const QString S_GTLAB_TOOLTIP =
-        QStringLiteral("This directory should contain the 'bin' folder,\n"
-                       "which in turn should contain the 'GTlab.exe'");
+        QStringLiteral("This directory must contain the 'bin' folder,\n"
+                       "which in turn must contain the GTlab application");
 
 const QString S_DIR_BTN_TOOLTIP =
         QStringLiteral("select directory");
