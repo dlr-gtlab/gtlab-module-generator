@@ -1,6 +1,6 @@
 # GTlab Module Generator
 
-This tool generates a basic module for GTlab (v1.7.)
+This tool generates a basic module for GTlab (v1.7)
 
 
 ## Usage
@@ -32,28 +32,29 @@ This tool generates a basic module for GTlab (v1.7.)
 5. **Interface Specifications**: depending on the previous interface selection different tabs are generated, in which interface specific data and classes can be generated and registered. The function name and the return value are displayed on the left, while data can be entered on the right. For example: generating a custom `Exporter` class:
 
     <figure class="image">
-        <img src="/images/add_class_example_1.jpg" alt="Adding a new exporter class" width="600" height="450">
-        <figcaption> <i>Fig. 1: Adding a new exporter class</i></figcaption>
-    </figure>
-    <figure class="image">
-        <img src="/images/add_class_example_2.jpg" alt="Setting the data of the exporter class" width="600" height="450">
-        <figcaption> <i>Fig. 2: Setting the data of the exporter class</i></figcaption>
+        <img src="/images/add_class_example.jpg" alt="Adding a custom exporter class">
+        <figcaption> <i>Fig. 1: Adding a custom exporter class</i></figcaption>
     </figure>
 
     Some functions require the name of a 'linked class' (eg. uiItems - Mdi Interface). The name of the linked class can be entered in the lineedit accordingly.
 
-    _**Note**: depending on the linked class entered, the module may not be able to compile, as the include statement for that class is not added automatically! (eg. defining a ui item for `GtProject` may fail, as `gt_project.h` is not included automatically)_
+    _Note: depending on the linked class entered, the module may not be able to compile, as the include statement for that class is not added automatically! (eg. defining a ui item for `GtProject` may fail, as `gt_project.h` is not included automatically)_
 
 6. **Module Dependencies**: select or enter the desired module dependencies. A list of avaibale modules is created automatically at runtime (this process may take a few seconds and is run concurrently). 
+
+</p>
 
 7. **File Signature**: Enter your name and email address to create a file signature
 
 8. **Summary**: Displays an overview about the files to generate and the module specifications. Click on `Generate` to generate the module at the ouput directory
 
+
+## Finally
+
 The module should now be generated. Open the project in QtCreator and select the desired build kit. Set GTlab as an executable and add `-dev` to the command line arguments.
 
 <figure class="image">
     <img src="/images/set_gtlab_executable.jpg" alt="Set GTlab as the executable">
-    <figcaption> <i>Fig. 3: Set GTlab as the executable</i></figcaption>
+    <figcaption> <i>Fig. 2: Set GTlab as the executable</i></figcaption>
 </figure>
 
