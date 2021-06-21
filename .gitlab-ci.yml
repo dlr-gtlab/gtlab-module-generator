@@ -55,8 +55,8 @@ copyForDeploymentWin:
     - windowsBuild
   tags:
     - Win10
-#  only:
-#    - tags
+  only:
+    - tags
   variables:
     PLATFORMNAME:  windows
     RELEASESTATUS: stable
@@ -72,8 +72,8 @@ copyForDeploymentLinux:
     - linuxBuild
   tags:
     - Win10
-#  only:
-#    - tags
+  only:
+    - tags
   variables:
     PLATFORMNAME:  linux
     RELEASESTATUS: stable
