@@ -9,6 +9,7 @@ class QGridLayout;
 class QPushButton;
 class QLineEdit;
 class QLabel;
+class QCheckBox;
 class FunctionSpecificationWidget;
 class ModuleGeneratorSettings;
 class QRegularExpressionValidator;
@@ -35,7 +36,8 @@ private:
     QLineEdit* m_objectNameEdit;
     QLabel* m_objectNamelabel;
     QLineEdit* m_fileNameEdit;
-    QLabel* m_fileNameLabel;
+    QLabel* m_fileNameLabel;    
+    QCheckBox* m_autoEditCheckBox;
 
     /// module name validator
     QRegularExpressionValidator* m_nameValidator;
@@ -44,6 +46,7 @@ private:
 
     QGridLayout* m_baseLayout;
 
+    void autoComplete();
 
 protected:
 
@@ -52,6 +55,8 @@ protected:
 private slots:
 
     void onEditedObjectName(QString string);
+
+    void onAutoCompleteChanged(int state);
 
 signals:
 

@@ -21,7 +21,7 @@ This tool generates a basic module for GTlab (v1.7)
 3. **Module Specifications**:
     * define an optional prefix for all file and class names
     * enter the name of the module to generate
-    * file and class name are auto generated using the module name
+    * file and class name are auto generated using the module name, but their values can be locked
     * set the desired module description 
 
 </p>
