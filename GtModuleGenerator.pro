@@ -6,6 +6,22 @@ CONFIG += c++11
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
+BUILD_DEST = ./build
+
+CONFIG(debug, debug|release){
+    OBJECTS_DIR = $${BUILD_DEST}/debug-app/obj
+    MOC_DIR = $${BUILD_DEST}/debug-app/moc
+    RCC_DIR = $${BUILD_DEST}/debug-app/rcc
+    UI_DIR = $${BUILD_DEST}/debug-app/ui
+} else {
+    OBJECTS_DIR = $${BUILD_DEST}/release-app/obj
+    MOC_DIR = $${BUILD_DEST}/release-app/moc
+    RCC_DIR = $${BUILD_DEST}/release-app/rcc
+    UI_DIR = $${BUILD_DEST}/release-app/ui
+}
+
+DESTDIR = $${BUILD_DEST}
+
 INCLUDEPATH += . \
         src \
         src/wizard \

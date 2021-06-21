@@ -1,0 +1,19 @@
+@echo off
+
+SET SERVERPATH=C:\deployment\%PLATFORMNAME%\%CATEGORY%\%CI_PROJECT_NAME%\%RELEASESTATUS%\%CI_COMMIT_TAG%
+
+SET BINDIRECTORY=%SERVERPATH%
+
+if not exist "%BINDIRECTORY%" mkdir %BINDIRECTORY%\
+
+if %PLATFORMNAME%==windows (
+
+	copy /y .\build\%TARGETNAME%.exe %BINDIRECTORY%\
+)
+
+if %PLATFORMNAME%==linux (
+
+	copy /y .\build\%TARGETNAME% %BINDIRECTORY%\
+)
+
+
