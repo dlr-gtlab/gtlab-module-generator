@@ -8,8 +8,6 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QMessageBox>
-#include <QCompleter>
-#include <QFileSystemModel>
 
 #include "settings_page.h"
 
@@ -23,15 +21,14 @@ const char* C_SETTINGS_PAGE_TITLE = "Settings";
 
 const QString S_INFO_TEXT =
         QStringLiteral("Enter the output directory, in which the module should "
-                       "be generated. Select the path to the parent "
-                       "directory of your local GTlab and "
-                       "DevTools installation. ");
+                       "be generated. Select GTlab and enter the path to your "
+                       "local DevTools installation.");
 const QString S_OUTPUT_LABEL =
-        QStringLiteral("Output Directory:");
+        QStringLiteral("Output directory:");
 const QString S_DEVTOOLS_LABEL =
-        QStringLiteral("DevTools Directory:");
+        QStringLiteral("DevTools directory:");
 const QString S_GTLAB_LABEL =
-        QStringLiteral("GTlab Directory:");
+        QStringLiteral("GTlab application:");
 
 const QString S_OUTPUT_TOOLTIP =
         QStringLiteral("All module files will be placed in a separate subfolder.\n"
@@ -40,7 +37,7 @@ const QString S_DEVTOOLS_TOOLTIP =
         QStringLiteral("This directory should contain:\n"
                        "include/ lib/ ThirdPartyLibraries/");
 const QString S_GTLAB_TOOLTIP =
-        QStringLiteral("This directory must contain: bin/GTlab(.exe)");
+        QStringLiteral("This must point to GTlab");
 
 const QString S_DIR_BTN_TOOLTIP =
         QStringLiteral("select directory");
@@ -56,9 +53,6 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
     // initializations
-    m_fileSystemCompleter = new QCompleter(this);
-    m_fileSystemModel     = new QFileSystemModel(this);
-
     m_infoTextLabel      = new QLabel(S_INFO_TEXT);
 
     m_outputDirLabel     = new QLabel(S_OUTPUT_LABEL);
@@ -74,13 +68,6 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     m_devToolsDirPushBtn = new QPushButton(S_DIR_BTN_TEXT);
     m_baseGridLayout     = new QGridLayout;
 
-
-    // file system setup
-    m_fileSystemModel->setRootPath("/");
-
-    m_fileSystemCompleter->setWrapAround(false);
-    m_fileSystemCompleter->setModel(m_fileSystemModel);
-
     // page gui
     setTitle(tr(C_SETTINGS_PAGE_TITLE));
 
@@ -89,19 +76,14 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);    
 
     m_outputDirEdit->setToolTip(S_OUTPUT_TOOLTIP);
-    m_outputDirEdit->setCompleter(m_fileSystemCompleter);
     m_outputDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
-    m_gtlabDirEdit->setCompleter(m_fileSystemCompleter);
     m_gtlabDirEdit->setToolTip(S_GTLAB_TOOLTIP);
     m_gtlabDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
-    m_devToolsDirEdit->setCompleter(m_fileSystemCompleter);
     m_devToolsDirEdit->setToolTip(S_DEVTOOLS_TOOLTIP);
     m_devToolsDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
-    m_fileSystemModel->setFilter(QDir::Dirs | QDir::Drives |
-                                 QDir::NoDotAndDotDot | QDir::AllDirs);
 
 
     // layout
@@ -149,8 +131,11 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     m_devToolsDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
 
     // defaults
+    QString gtlabPath(settings->gtlabPath());
+    gtlabPath += QStringLiteral("/") + ModuleGeneratorSettings::S_GTLAB_APP;
+
     m_outputDirEdit->setText(QDir::toNativeSeparators(settings->outputPath()));
-    m_gtlabDirEdit->setText(QDir::toNativeSeparators(settings->gtlabPath()));
+    m_gtlabDirEdit->setText(QDir::toNativeSeparators(gtlabPath));
     m_devToolsDirEdit->setText(QDir::toNativeSeparators(settings->devToolsPath()));
 }
 
@@ -166,20 +151,21 @@ SettingsPage::initializePage()
 
 bool
 SettingsPage::isComplete() const
-{    
-    setLineEditColor(m_outputDirEdit);
-    setLineEditColor(m_gtlabDirEdit);
-    setLineEditColor(m_devToolsDirEdit);
+{
+    bool retVal(true);
 
-    if (m_devToolsDirEdit->text().isEmpty() ||
+    setLineEditColor(m_outputDirEdit);
+    retVal &= setLineEditColor(m_gtlabDirEdit, true);
+    retVal &= setLineEditColor(m_devToolsDirEdit);
+
+    if (m_outputDirEdit->text().isEmpty() ||
         m_gtlabDirEdit->text().isEmpty() ||
-        m_outputDirEdit->text().isEmpty())
+        m_devToolsDirEdit->text().isEmpty())
     {
         return false;
     }
 
-    return QFileInfo(QFile(m_gtlabDirEdit->text())).isDir() &&
-           QFileInfo(QFile(m_devToolsDirEdit->text())).isDir();
+    return retVal;
 }
 
 bool
@@ -189,12 +175,16 @@ SettingsPage::validatePage()
     {
         LOG_INSTANCE("validated!");
 
+        QFileInfo gtlabApp(m_gtlabDirEdit->text());
+        QString path(gtlabApp.path());
+        path = QDir::toNativeSeparators(path);
+
         LOG_INFO << "output path " << m_outputDirEdit->text() << ENDL;
-        LOG_INFO << "path to GTlab " << m_gtlabDirEdit->text() << ENDL;
+        LOG_INFO << "path to GTlab " << path << ENDL;
         LOG_INFO << "path to DevTools " << m_devToolsDirEdit->text() << ENDL;
 
         settings()->setOutputPath(m_outputDirEdit->text());
-        settings()->setGTlabPath(m_gtlabDirEdit->text());
+        settings()->setGTlabPath(path);
         settings()->setDevToolsPath(m_devToolsDirEdit->text());
     }
 
@@ -203,20 +193,24 @@ SettingsPage::validatePage()
     return true;
 }
 
-void
-SettingsPage::setLineEditColor(QLineEdit* edit) const
+bool
+SettingsPage::setLineEditColor(QLineEdit* edit, bool isExec) const
 {
-    QString text = edit->text();
+    QString path(edit->text());
+    QFileInfo fileInfo(path);
 
-    if (!text.isEmpty() && !QFileInfo(QFile(text)).isDir())
+    bool isValid(isExec ? fileInfo.isFile() &&
+                          fileInfo.fileName() == ModuleGeneratorSettings::S_GTLAB_APP:
+                          fileInfo.isDir());
+
+    if (!path.isEmpty() && !isValid)
     {
         edit->setStyleSheet("QLineEdit { color : red }");
+        return false;
+    }
 
-    }
-    else
-    {
-        edit->setStyleSheet("QLineEdit { color : black }");
-    }
+    edit->setStyleSheet("QLineEdit { color : black }");
+    return true;
 }
 
 
@@ -257,7 +251,7 @@ SettingsPage::onPressedOutputDirPushBtn()
     QString dirOutput;
 
     dirOutput = QFileDialog::getExistingDirectory(
-                this, tr("Open Directory"), m_outputDirEdit->text(),
+                this, tr("Select target directory"), m_outputDirEdit->text(),
                 QFileDialog::DontResolveSymlinks);
 
     if(!dirOutput.isEmpty())
@@ -271,9 +265,11 @@ SettingsPage::onPressedGTlabDirPushBtn()
 {
     QString dirGTlab;
 
-    dirGTlab = QFileDialog::getExistingDirectory(
-                this, tr("Open Directory"), m_gtlabDirEdit->text(),
-                QFileDialog::DontResolveSymlinks);
+    dirGTlab = QFileDialog::getOpenFileName(
+                this, tr("Select the GTlab application"), m_gtlabDirEdit->text(),
+                QStringLiteral("GTlab application (") +
+                ModuleGeneratorSettings::S_GTLAB_APP +
+                QStringLiteral(")"));
 
     if (dirGTlab.isEmpty() == false)
     {
@@ -287,8 +283,8 @@ SettingsPage::onPressedDevToolsDirPushBtn()
     QString dirDevTools;
 
     dirDevTools = QFileDialog::getExistingDirectory(
-                this, tr("Open Directory"), m_devToolsDirEdit->text(),
-                  QFileDialog::DontResolveSymlinks);
+                this, tr("Select DevTools directory"), m_devToolsDirEdit->text(),
+                QFileDialog::DontResolveSymlinks);
 
     if (dirDevTools.isEmpty() == false)
     {

@@ -24,12 +24,18 @@ public:
     const static QFont F_MONO_FONT;
     const static QString S_SIGNATURE;
 
+    const static QString S_EXEC_SUFFIX;
+    const static QString S_GTLAB_APP;
+    const static QString S_GTLAB_CONSOLE_APP;
+
     /**
      * @brief mode enum - enumerations for the two modes of the wizard
      */
     enum WizardMode { Create = 0, Edit = 1 };
 
     ModuleGeneratorSettings();
+
+    static bool isOsWindows() { return QSysInfo::productType() == "windows"; }
 
     QString classNamingScheme(const QString& name, const QString& prefix) const;
     QString classNamingScheme(const QString& name) const;
