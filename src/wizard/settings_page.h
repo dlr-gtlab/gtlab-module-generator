@@ -65,12 +65,8 @@ private:
 
     /// grid layout
     QGridLayout* m_baseGridLayout;
-    // file/dir system completer model
-    QFileSystemModel* m_fileSystemModel;
-    // file/dir system completer model
-    QCompleter* m_fileSystemCompleter;
 
-    void setLineEditColor(QLineEdit* edit) const;
+    bool setLineEditColor(QLineEdit* edit, bool isExec = false) const;
 
 private slots:
 

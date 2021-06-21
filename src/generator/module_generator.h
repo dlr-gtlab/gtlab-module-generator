@@ -40,6 +40,7 @@ public:
     const static QString S_ID_INTERFACE_MACRO;
 
     const static QString S_ID_GTLAB_INSTALL_DIR;
+    const static QString S_ID_GTLAB_INSTALL_SUB_DIR;
     const static QString S_ID_DEVTOOLS_INSTALL_DIR;
 
     const static QString S_ID_PRO_INCLUDE_PATH;

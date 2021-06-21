@@ -16,7 +16,7 @@
 #include <QFont>
 
 const QString
-    ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.0"));
+    ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.1"));
 const QRegularExpression
     ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
@@ -41,6 +41,16 @@ const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
         " * Author: ") + ModuleGenerator::S_ID_AUTHOR + QStringLiteral("\n"
         " * Email: ") + ModuleGenerator::S_ID_AUTHOR_EMAIL + QStringLiteral("\n"
         " */");
+
+const QString
+    ModuleGeneratorSettings::S_EXEC_SUFFIX(isOsWindows() ? QStringLiteral(".exe"):
+                                                           QStringLiteral(""));
+const QString
+    ModuleGeneratorSettings::S_GTLAB_APP(QStringLiteral("GTlab") +
+                                         S_EXEC_SUFFIX);
+const QString
+    ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP(QStringLiteral("GTlabConsole") +
+                                                 S_EXEC_SUFFIX);
 
 
 ModuleGeneratorSettings::ModuleGeneratorSettings()
@@ -120,19 +130,24 @@ ModuleGeneratorSettings::fileNamingScheme(const QString& name) const
 void
 ModuleGeneratorSettings::preLoad()
 {
-    if (m_preLoader.prefixes().isEmpty())
+    if (m_preLoader.searchPath() != gtlabPath() ||
+        m_preLoader.prefixes().isEmpty())
     {
         m_preLoader.searchForPrefixes(devToolsPath());
     }
 
-    if (!m_preLoader.dependencies().isEmpty()) return;
-
-    // load dependencies in a separate thread
-    auto function = [](PreLoader* loader, QString path) -> void
+    if (m_preLoader.searchPath() != gtlabPath() ||
+        m_preLoader.dependencies().isEmpty())
     {
-        loader->searchForDependencies(path);
-    };
-    QFuture<void> future = QtConcurrent::run(function, &m_preLoader, gtlabPath());
+        // load dependencies in a separate thread
+        auto function = [](PreLoader* loader, QString path) -> void
+        {
+            loader->searchForDependencies(path);
+        };
+        QFuture<void> future = QtConcurrent::run(function,
+                                                 &m_preLoader,
+                                                 gtlabPath());
+    }
 }
 
 void

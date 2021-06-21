@@ -1,6 +1,7 @@
 #include "preloader.h"
 #include "module_generator_utils.h"
 #include "module_generator_logger.h"
+#include "module_generator_settings.h"
 
 #include <QDir>
 #include <QDirIterator>
@@ -21,8 +22,6 @@ PreLoader::~PreLoader()
 const QString S_INCLUDE_CORE_PATH = QStringLiteral("core");
 const QString S_INCLUDE_PATH      = QStringLiteral("include");
 
-const QString S_GTLAB_PATH        = QStringLiteral("bin");
-const QString S_GTLAB_CONSOLE     = QStringLiteral("GTlabConsole");
 const QStringList S_GTLAB_CONSOLE_ARGS = QStringList(QStringLiteral("--footprint"));
 
 const int I_PROCESS_TIMEOUT_MS = 15000;
@@ -229,7 +228,8 @@ PreLoader::searchForPrefixes(const QString& devToolsPath)
         }
     }
 
-    LOG_INFO << QString::number(m_prefixes.count()) << " reserved prefixes found!";
+    LOG_INFO << QString::number(m_prefixes.count())
+             << " reserved prefixes found!";
 }
 
 void
@@ -237,22 +237,25 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
 {    
     LOG_INSTANCE("searching for dependencies...");
 
+    m_searchPath = gtlabPath;
+
     m_dependencies.clear();
 
-    QDir gtlabDir(gtlabPath + QDir::separator() + S_GTLAB_PATH);
+    QDir gtlabDir(gtlabPath);
 
-    QString  processName = S_GTLAB_CONSOLE + QString(QSysInfo::productType() == "windows" ? ".exe":"");
+    QString processName(ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP);
 
     if (!gtlabDir.exists(processName))
     {
-        LOG_ERR << "invlaid path to GTlabConsole (" << gtlabDir.absolutePath() << processName << ")!";
+        LOG_ERR << "invlaid path to GTlabConsole ("
+                << gtlabDir.absolutePath()
+                << processName << ")!";
         return;
     }
 
     // start process
     QProcess process;
-    process.start(gtlabDir.absoluteFilePath(processName),
-                  S_GTLAB_CONSOLE_ARGS);
+    process.start(gtlabDir.absoluteFilePath(processName), S_GTLAB_CONSOLE_ARGS);
 
     if (!process.waitForFinished(I_PROCESS_TIMEOUT_MS))
     {
@@ -311,7 +314,8 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
         LOG_INFO << dependencie.name << ": " << dependencie.version << ENDL;
     }
 
-    LOG_INFO << QString::number(m_dependencies.count()) << " reserved dependencies found!";
+    LOG_INFO << QString::number(m_dependencies.count())
+             << " reserved dependencies found!";
 }
 
 void

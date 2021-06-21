@@ -40,6 +40,7 @@ const QString ModuleGenerator::S_ID_MODULE_VERSION(QStringLiteral("$$MODULE_VERS
 const QString ModuleGenerator::S_ID_INTERFACE_MACRO(QStringLiteral("$$INTERFACE_MACRO$$"));
 
 const QString ModuleGenerator::S_ID_GTLAB_INSTALL_DIR(QStringLiteral("$$GTLAB_INSTALL_DIR$$"));
+const QString ModuleGenerator::S_ID_GTLAB_INSTALL_SUB_DIR(QStringLiteral("$$GTLAB_INSTALL_SUB_DIR$$"));
 const QString ModuleGenerator::S_ID_DEVTOOLS_INSTALL_DIR(QStringLiteral("$$DEVTOOLS_INSTALL_DIR$$"));
 
 const QString ModuleGenerator::S_ID_PRO_INCLUDE_PATH(QStringLiteral("$$PRO_INCLUDEPATH$$"));
@@ -119,7 +120,7 @@ ModuleGenerator::generateModulePath()
 
     if (m_moduleDir.exists() && m_moduleDir.count() > 0)
     {
-        LOG_WARN << "path already exists!" << ENDL;
+        LOG_WARN << "path '" << m_moduleDir.path() << "' already exists!" << ENDL;
 
         QMessageBox msgBox;
         QPushButton* proceedButton = msgBox.addButton(tr("Proceed"), QMessageBox::AcceptRole);
@@ -170,7 +171,17 @@ ModuleGenerator::generateModuleSettingsFiles()
 
     IdentifierPairs identifierPairs;
 
-    identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, m_settings->gtlabPath() });
+    QDir gtlabDir(m_settings->gtlabPath());
+    bool success(gtlabDir.cdUp() && gtlabDir.exists());
+
+    if (!success)
+    {
+        LOG_ERR  << "could not set a valid path to GTlab install dir!" << ENDL;
+        LOG_WARN << "continuing!" << ENDL;
+        // not returning false, as issue can be fixed by hand afterwards
+    }
+
+    identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, gtlabDir.absolutePath() });
     identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR, m_settings->devToolsPath() });
 
     utils::replaceIdentifier(fileString, identifierPairs);
@@ -191,10 +202,12 @@ ModuleGenerator::generateModuleProjectFile()
 
     IdentifierPairs identifierPairs;
 
-    auto moduleClass = m_settings->moduleClass();
+    QDir gtlabDir(m_settings->gtlabPath());
+    auto moduleClass(m_settings->moduleClass());
 
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
+    identifierPairs.append({ S_ID_GTLAB_INSTALL_SUB_DIR, gtlabDir.dirName() });
 
     utils::replaceIdentifier(fileString, identifierPairs);
 

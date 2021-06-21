@@ -17,12 +17,14 @@ public:
 
     void searchForDependencies(const QString& gtlabPath);
 
-    ClassStructsPtr interfaces() const { return m_interfaces; }
-    DependencieStructs dependencies() const { return m_dependencies; }
-    QStringList prefixes() const { return m_prefixes; }
+    inline QString searchPath() const { return m_searchPath; }
+    inline ClassStructsPtr interfaces() const { return m_interfaces; }
+    inline DependencieStructs dependencies() const { return m_dependencies; }
+    inline QStringList prefixes() const { return m_prefixes; }
 
 private:
 
+    QString m_searchPath;
     QStringList m_prefixes;
     ClassStructsPtr m_interfaces;
     DependencieStructs m_dependencies;

@@ -10,7 +10,7 @@
 
 include(settings.pri)
 
-BUILD_DEST = $${GTLAB_DIR}/bin/modules
+BUILD_DEST = $${GTLAB_DIR}/$$GTLAB_INSTALL_SUB_DIR$$/modules
 
 CONFIG(debug, debug|release) {
     TARGET = $$CLASS_NAME$$-d
@@ -28,7 +28,7 @@ CONFIG += c++11
 INCLUDEPATH += . \
     src $$PRO_INCLUDEPATH$$
 
-DESTDIR = $${GTLAB_DIR}/bin/modules
+DESTDIR = $${GTLAB_DIR}/$$GTLAB_INSTALL_SUB_DIR$$/modules
 
 HEADERS += \
     src/$$FILE_NAME$$.h $$PRO_HEADERPATH$$
@@ -59,7 +59,3 @@ CONFIG(debug, debug|release){
 }
 
 ######################################################################
-
-######################################################################
-
-
