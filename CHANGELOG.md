@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - file system completers (settings page)
 
 ## Fixed
-- `DESTDIR` in module.pro supports custo GTlab builds (eg. $${GTLAB_DIR}/build/GTlab.exe) #10
+- `DESTDIR` in module.pro supports custom GTlab builds (eg. $${GTLAB_DIR}/build/GTlab.exe) #10
 
 ## [1.0.0] - 2021-06-21
 ## Added

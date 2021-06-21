@@ -199,7 +199,8 @@ SettingsPage::setLineEditColor(QLineEdit* edit, bool isExec) const
     QString path(edit->text());
     QFileInfo fileInfo(path);
 
-    bool isValid(isExec ? fileInfo.isFile() && fileInfo.isExecutable():
+    bool isValid(isExec ? fileInfo.isFile() &&
+                          fileInfo.fileName() == ModuleGeneratorSettings::S_GTLAB_APP:
                           fileInfo.isDir());
 
     if (!path.isEmpty() && !isValid)
