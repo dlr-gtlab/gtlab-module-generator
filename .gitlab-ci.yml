@@ -2,6 +2,10 @@
 ############### Pipeline  ############
 ########################################################
 
+#variables:
+#  PROFILENAME: GtModuleGenerator.pro
+#  TARGETNAME: GtModuleGenerator
+
 stages:
   - build
   - copy
@@ -15,13 +19,13 @@ windowsBuild:
     - Win10
   artifacts:
     paths:
-      - release/GtModuleGenerator.exe
+      - build\$TARGETNAME.exe
       - buildLog512.txt
     expire_in: 1 week
     when: always
   variables:
     BUILDMODE: release
-    PROFILENAME: GtModuleGenerator.pro
+    #PROFILENAME: GtModuleGenerator.pro
 
 # Linux build
 linuxBuild:
@@ -34,10 +38,43 @@ linuxBuild:
     - make -j 20 |& tee linuxBuild.txt
   artifacts:
     paths:
-      - GtModuleGenerator
+      - build/$TARGETNAME
     when: always
     expire_in: 1 week
   variables:
     BUILDMODE: release
-    PROFILENAME: GtModuleGenerator.pro
+    #PROFILENAME: GtModuleGenerator.pro
  
+copyForDeploymentWin:
+  stage: copy
+  script:
+    - .\ci\copyExecutable.bat
+  needs:
+    - windowsBuild
+  dependencies:
+    - windowsBuild
+  tags:
+    - Win10
+#  only:
+#    - tags
+  variables:
+    PLATFORMNAME:  windows
+    RELEASESTATUS: stable
+#    CATEGORY: 06_module_generator
+
+copyForDeploymentLinux:
+  stage: copy
+  script:
+    - .\ci\copyExecutable.bat
+  needs:
+    - linuxBuild
+  dependencies:
+    - linuxBuild
+  tags:
+    - Win10
+#  only:
+#    - tags
+  variables:
+    PLATFORMNAME:  linux
+    RELEASESTATUS: stable
+#    CATEGORY: 06_module_generator
