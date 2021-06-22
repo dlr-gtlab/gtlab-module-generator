@@ -9,7 +9,7 @@
 #include "summary_page.h"
 #include "interface_selection_page.h"
 #include "interface_specifications_page.h"
-#include "dependencie_selection_page.h"
+#include "dependency_selection_page.h"
 #include "signature_page.h"
 
 
@@ -30,7 +30,7 @@ ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent)
     m_moduleSpecificationPage = new ModuleSpecificationsPage(&m_settings, this);
     m_interfaceSelectionPage = new InterfaceSelectionPage(&m_settings, this);
     m_interfaceSpecificationsPage = new InterfaceSpecificationsPage(&m_settings, this);
-    m_dependencieSelectionPage = new DependencieSelectionPage(&m_settings, this);
+    m_dependencySelectionPage = new DependencySelectionPage(&m_settings, this);
     m_signaturePage = new SignaturePage(&m_settings, this);
     m_summaryPage = new SummaryPage(&m_settings, this);
 
@@ -40,7 +40,7 @@ ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent)
     setPage(PAGE::SPECIFICATIONS_PAGE, m_moduleSpecificationPage);
     setPage(PAGE::INTERFACE_SELECTION_PAGE, m_interfaceSelectionPage);
     setPage(PAGE::INTERFACE_SPECIFICATION_PAGE, m_interfaceSpecificationsPage);
-    setPage(PAGE::DEPENDENCIE_SELECTION_PAGE, m_dependencieSelectionPage);
+    setPage(PAGE::DEPENDENCY_SELECTION_PAGE, m_dependencySelectionPage);
     setPage(PAGE::SIGNATURE_PAGE, m_signaturePage);
     setPage(PAGE::SUMMARY_PAGE, m_summaryPage);
 
@@ -72,7 +72,7 @@ ModuleWizard::nextId() const
         {
             return QWizard::nextId();
         }
-        return ModuleWizard::DEPENDENCIE_SELECTION_PAGE;
+        return ModuleWizard::DEPENDENCY_SELECTION_PAGE;
     case ModuleWizard::INTERFACE_SPECIFICATION_PAGE:
         return QWizard::nextId();
     default:

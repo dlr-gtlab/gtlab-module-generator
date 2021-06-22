@@ -8,7 +8,7 @@ struct ImplementationStruct;
 struct ClassStruct;
 struct FunctionStruct;
 
-struct DependencieStruct
+struct DependencyStruct
 {
     QString name;
     QString version;
@@ -81,7 +81,7 @@ struct FunctionStruct
 
 //    ~FunctionStruct();
 };
-using DependencieStructs = QList<DependencieStruct>;
+using DependencyStructs = QList<DependencyStruct>;
 using IdentifierPairs    = QList<IdentifierPair>;
 using FunctionStructsPtr = QList<FunctionStruct*>;
 using FunctionStructs    = QList<FunctionStruct>;

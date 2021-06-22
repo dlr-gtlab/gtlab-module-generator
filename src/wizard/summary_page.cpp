@@ -142,7 +142,7 @@ SummaryPage::createSummary()
     content << "";
     content << "Output directory:\t" + outputPath;
     content << "";
-    content << "GTLab directory:\t" + settings()->gtlabPath();
+    content << "GTlab directory:\t" + settings()->gtlabPath();
     content << "DevTools directory:\t" + settings()->devToolsPath();
 
     content << "";
@@ -182,9 +182,9 @@ SummaryPage::selectedDependencies()
 {
     QStringList content;
 
-    for (auto dependencie : settings()->selectedDependencies())
+    for (auto dependency : settings()->selectedDependencies())
     {
-        content << QString(dependencie.name + " (" + dependencie.version + ")");
+        content << QString(dependency.name + " (" + dependency.version + ")");
     }
 
     if (content.isEmpty())

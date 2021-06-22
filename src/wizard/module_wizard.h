@@ -11,7 +11,7 @@ class SettingsPage;
 class ModuleSpecificationsPage;
 class InterfaceSelectionPage;
 class InterfaceSpecificationsPage;
-class DependencieSelectionPage;
+class DependencySelectionPage;
 class SignaturePage;
 class SummaryPage;
 class ModuleWizard : public QWizard
@@ -31,7 +31,7 @@ public:
                SPECIFICATIONS_PAGE = 2,
                INTERFACE_SELECTION_PAGE = 3,
                INTERFACE_SPECIFICATION_PAGE = 5,
-               DEPENDENCIE_SELECTION_PAGE = 6,
+               DEPENDENCY_SELECTION_PAGE = 6,
                SIGNATURE_PAGE = 7,
                SUMMARY_PAGE = 8};
 
@@ -45,7 +45,7 @@ private:
     ModuleSpecificationsPage* m_moduleSpecificationPage;
     InterfaceSelectionPage* m_interfaceSelectionPage;
     InterfaceSpecificationsPage* m_interfaceSpecificationsPage;
-    DependencieSelectionPage* m_dependencieSelectionPage;
+    DependencySelectionPage* m_dependencySelectionPage;
     SignaturePage* m_signaturePage;
     SummaryPage* m_summaryPage;
 

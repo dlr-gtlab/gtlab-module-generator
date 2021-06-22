@@ -206,10 +206,10 @@ checkClassImplementation(const ClassStruct& base, QStringList& classNames)
             if (derived.className.isEmpty() &&
                 function.returnValue == QStringLiteral("QMetaObject"))
             {
-                QMessageBox::warning(0, QStringLiteral("Empty class name"),
-                                     QStringLiteral("The function '") + function.name +
-                                     QStringLiteral("' has an empty class associated!\n"
-                                                    "Please create a valid class name."));
+                QMessageBox::critical(0, QStringLiteral("Empty class name"),
+                                      QStringLiteral("The function '") + function.name +
+                                      QStringLiteral("' has an empty class associated!\n"
+                                                     "Please create a valid class name."));
 
                 return false;
             }
@@ -237,8 +237,8 @@ checkDuplicateClassNames(const QStringList& classNames)
             if (messageBoxDisplayed) continue;
 
             auto ans = QMessageBox::warning(0, QStringLiteral("Empty class name"),
-                                            QStringLiteral("There is an empty class defined.\n"
-                                                           "Empty classes cannot be generated!"),
+                                            QStringLiteral("A function has an empty class associated!\n"
+                                                           "Empty classes will not be generated."),
                                             QMessageBox::Ignore, QMessageBox::Cancel);
             messageBoxDisplayed = true;
 
@@ -249,10 +249,10 @@ checkDuplicateClassNames(const QStringList& classNames)
         }
         else if (classNames.count(className) > 1)
         {
-            QMessageBox::warning(0, QStringLiteral("Duplicate class names"),
-                                 QStringLiteral("The class name '") + className +
-                                 QStringLiteral("' is defined multiple times!\n"
-                                                "Please create a valid class name."));
+            QMessageBox::critical(0, QStringLiteral("Duplicate class names"),
+                                  QStringLiteral("The class name '") + className +
+                                  QStringLiteral("' is defined multiple times!\n"
+                                                 "Please create a valid class name."));
 
             return false;
         }

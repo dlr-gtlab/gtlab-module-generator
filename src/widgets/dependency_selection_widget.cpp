@@ -1,4 +1,4 @@
-#include "dependencie_selection_widget.h"
+#include "dependency_selection_widget.h"
 #include "module_generator_structs.h"
 #include "module_generator_settings.h"
 
@@ -14,13 +14,13 @@
 const QString S_DELETE_BTN_ICON_PATH = QStringLiteral(":/images/cross.png");
 
 const QString S_DELETE_BTN_TOOLTIP = QStringLiteral("delete");
-const QString S_CHECKBOX_TOOLTIP = QStringLiteral("select dependencie");
-const QString S_SPINBOX_TOOLTIP = QStringLiteral("version of dependencie");
+const QString S_CHECKBOX_TOOLTIP = QStringLiteral("use dependency");
+const QString S_SPINBOX_TOOLTIP = QStringLiteral("version of dependency");
 
 
-DependencieSelectionWidget::DependencieSelectionWidget(const DependencieStruct& dependencie,
-                                                       const bool isEditable,
-                                                       QWidget* parent) :
+DependencySelectionWidget::DependencySelectionWidget(const DependencyStruct& dependency,
+                                                     const bool isEditable,
+                                                     QWidget* parent) :
     QWidget(parent)
 {
     m_versionValidator = new QRegularExpressionValidator(ModuleGeneratorSettings::REG_VERSION, this);
@@ -36,10 +36,10 @@ DependencieSelectionWidget::DependencieSelectionWidget(const DependencieStruct& 
 
     m_versionEdit->setFixedWidth(120);
     m_versionEdit->setFixedWidth(120);
-    m_versionEdit->setText(dependencie.version);
+    m_versionEdit->setText(dependency.version);
     m_versionEdit->setValidator(m_versionValidator);
 
-    m_isActivCheckBox->setText(dependencie.name);
+    m_isActivCheckBox->setText(dependency.name);
     m_isActivCheckBox->setChecked(isEditable);
 
     m_deletePushBtn->setIcon(QIcon(S_DELETE_BTN_ICON_PATH));
@@ -73,20 +73,20 @@ DependencieSelectionWidget::DependencieSelectionWidget(const DependencieStruct& 
             this,  SIGNAL(completeChanged()));
 }
 
-DependencieStruct
-DependencieSelectionWidget::dependencie() const
+DependencyStruct
+DependencySelectionWidget::dependency() const
 {
     return { m_isActivCheckBox->text(), m_versionEdit->text() };
 }
 
 bool
-DependencieSelectionWidget::isChecked() const
+DependencySelectionWidget::isChecked() const
 {
     return m_isActivCheckBox->isChecked();
 }
 
 bool
-DependencieSelectionWidget::isComplete() const
+DependencySelectionWidget::isComplete() const
 {
     int  pos = 0;
     auto version = m_versionEdit->text();
@@ -95,7 +95,7 @@ DependencieSelectionWidget::isComplete() const
 }
 
 void
-DependencieSelectionWidget::onDeleteBtnPressed()
+DependencySelectionWidget::onDeleteBtnPressed()
 {
     disconnect(this);
 
@@ -103,7 +103,7 @@ DependencieSelectionWidget::onDeleteBtnPressed()
 }
 
 void
-DependencieSelectionWidget::onEditedVersion(QString content)
+DependencySelectionWidget::onEditedVersion(QString content)
 {
     int pos = 0;
 

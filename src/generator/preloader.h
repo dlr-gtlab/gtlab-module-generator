@@ -19,7 +19,7 @@ public:
 
     inline QString searchPath() const { return m_searchPath; }
     inline ClassStructsPtr interfaces() const { return m_interfaces; }
-    inline DependencieStructs dependencies() const { return m_dependencies; }
+    inline DependencyStructs dependencies() const { return m_dependencies; }
     inline QStringList prefixes() const { return m_prefixes; }
 
 private:
@@ -27,7 +27,7 @@ private:
     QString m_searchPath;
     QStringList m_prefixes;
     ClassStructsPtr m_interfaces;
-    DependencieStructs m_dependencies;
+    DependencyStructs m_dependencies;
 
     ClassStruct searchForClass(const QJsonObject& classJObject);
 
