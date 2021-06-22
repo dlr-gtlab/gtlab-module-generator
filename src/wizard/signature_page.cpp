@@ -16,7 +16,7 @@ const char* C_TITLE_SIGNATURE_PAGE = "File Signature";
 const QString S_INFO_TEXT =
         QStringLiteral("Enter your user details to generate a file signature");
 const QString S_AUTHOR_LABEL =
-        QStringLiteral("Author Name:");
+        QStringLiteral("Author name:");
 const QString S_EMAIL_LABEL =
         QStringLiteral("E-Mail:");
 const QString S_SIGNATURE_LABEL =

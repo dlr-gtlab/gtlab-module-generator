@@ -1,5 +1,5 @@
-#ifndef DEPENDENCIESELECTIONWIDGET_H
-#define DEPENDENCIESELECTIONWIDGET_H
+#ifndef DEPENDENCYSELECTIONWIDGET_H
+#define DEPENDENCYSELECTIONWIDGET_H
 
 #include <QWidget>
 
@@ -9,18 +9,18 @@ class QLineEdit;
 class QCheckBox;
 class QHBoxLayout;
 class QRegularExpressionValidator;
-struct DependencieStruct;
-class DependencieSelectionWidget : public QWidget
+struct DependencyStruct;
+class DependencySelectionWidget : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    DependencieSelectionWidget(const DependencieStruct& dependencie,
-                               const bool isEditable,
-                               QWidget* parent = nullptr);
+    DependencySelectionWidget(const DependencyStruct& dependency,
+                              const bool isEditable,
+                              QWidget* parent = nullptr);
 
-    DependencieStruct dependencie() const;
+    DependencyStruct dependency() const;
 
     bool isChecked() const;
 
@@ -32,7 +32,7 @@ private:
     QPushButton*  m_deletePushBtn;
 
     QLineEdit* m_versionEdit;
-    /// check box to selet the dependencie
+    /// check box to selet the dependency
     QCheckBox* m_isActivCheckBox;
     /// horizontal layout
     QHBoxLayout* m_baseLayout;
@@ -54,4 +54,4 @@ signals:
 
 };
 
-#endif // DEPENDENCIESELECTIONWIDGET_H
+#endif // DEPENDENCYSELECTIONWIDGET_H

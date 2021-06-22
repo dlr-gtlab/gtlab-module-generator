@@ -42,10 +42,10 @@ SOURCES += \
     src/widgets/class_specification/multiple_class_specification_widget.cpp \
     src/widgets/class_specification/class_specification_widget.cpp \
     src/widgets/class_specification/single_class_specification_widget.cpp \
-    src/widgets/dependencie_selection_widget.cpp \
+    src/widgets/dependency_selection_widget.cpp \
     src/widgets/interface_selection_widget.cpp \
     src/widgets/widget_list_view.cpp \
-    src/wizard/dependencie_selection_page.cpp \
+    src/wizard/dependency_selection_page.cpp \
     src/wizard/interface_selection_page.cpp \
     src/wizard/interface_specifications_page.cpp \
     src/wizard/intro_page.cpp \
@@ -68,11 +68,11 @@ HEADERS += \
     src/widgets/class_specification/simple_class_specification_widget.h \
     src/widgets/class_specification/class_specification_widget.h \
     src/widgets/class_specification/single_class_specification_widget.h \
-    src/widgets/dependencie_selection_widget.h \
+    src/widgets/dependency_selection_widget.h \
     src/widgets/interface_selection_widget.h \
     src/widgets/widget_list_view.h \
     src/wizard/abstract_wizardpage.h \
-    src/wizard/dependencie_selection_page.h \
+    src/wizard/dependency_selection_page.h \
     src/wizard/interface_selection_page.h \
     src/wizard/interface_specifications_page.h \
     src/wizard/intro_page.h \

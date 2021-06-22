@@ -126,8 +126,8 @@ ModuleGenerator::generateModulePath()
         QPushButton* proceedButton = msgBox.addButton(tr("Proceed"), QMessageBox::AcceptRole);
         QPushButton* abortButton   = msgBox.addButton(QMessageBox::Abort);
 
-        msgBox.setWindowTitle(QStringLiteral("Output path does already exists"));
-        msgBox.setText(QStringLiteral("The output path does already exists and is not empty!\n"
+        msgBox.setWindowTitle(QStringLiteral("Output path does already exist"));
+        msgBox.setText(QStringLiteral("The output path does already exist and is not empty!\n"
                                       "Please remove all old files and proceed."));
         msgBox.exec();
 
@@ -229,16 +229,16 @@ ModuleGenerator::generateModuleDependencies()
 
         QJsonArray dependenciesJsonArray;
 
-        for (auto dependencie : m_settings->selectedDependencies())
+        for (auto dependency : m_settings->selectedDependencies())
         {
-            LOG_INFO << dependencie.name << ENDL;
+            LOG_INFO << dependency.name << ENDL;
 
-            QJsonObject dependencieJsonObject;
+            QJsonObject dependencyJsonObject;
 
-            dependencieJsonObject["name"] = dependencie.name;
-            dependencieJsonObject["version"] = dependencie.version;
+            dependencyJsonObject["name"] = dependency.name;
+            dependencyJsonObject["version"] = dependency.version;
 
-            dependenciesJsonArray.append(dependencieJsonObject);
+            dependenciesJsonArray.append(dependencyJsonObject);
         }
 
         QJsonObject dependenciesJsonObject;

@@ -293,7 +293,7 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
             LOG_ERR << "invalid subentry!" << ENDL; continue;
         }
 
-        DependencieStruct dependencie;
+        DependencyStruct dependency;
 
         for (int j = 0; j < entries.length(); ++j)
         {
@@ -301,17 +301,17 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
 
             if (entry.tagName() == QStringLiteral("id"))
             {
-                dependencie.name = entry.text();
+                dependency.name = entry.text();
             }
             else
             {
-                dependencie.version = entry.text();
+                dependency.version = entry.text();
             }
         }
 
-        m_dependencies << dependencie;
+        m_dependencies << dependency;
 
-        LOG_INFO << dependencie.name << ": " << dependencie.version << ENDL;
+        LOG_INFO << dependency.name << ": " << dependency.version << ENDL;
     }
 
     LOG_INFO << QString::number(m_dependencies.count())
