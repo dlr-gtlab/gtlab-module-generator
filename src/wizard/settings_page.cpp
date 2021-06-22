@@ -132,7 +132,11 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
 
     // defaults
     QString gtlabPath(settings->gtlabPath());
-    gtlabPath += QStringLiteral("/") + ModuleGeneratorSettings::S_GTLAB_APP;
+
+    if (!gtlabPath.isEmpty())
+    {
+        gtlabPath += QStringLiteral("/") + ModuleGeneratorSettings::S_GTLAB_APP;
+    }
 
     m_outputDirEdit->setText(QDir::toNativeSeparators(settings->outputPath()));
     m_gtlabDirEdit->setText(QDir::toNativeSeparators(gtlabPath));

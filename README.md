@@ -13,7 +13,7 @@ This tool generates a basic module for GTlab (v1.7)
 
 2. **Settings**: 
     * select an ouput path for the module. An additional subfolder will be created using the module name.
-    * enter the path to the GTlab install directory. This directory **must** contain `bin/GTlab(.exe)`
+    * set the path to your local GTlab application `GTlab(.exe)`
     * enter the path to the GTlab-Devtools install directory. This directory should contain `include`, `lib`, and `ThirdPartyLibraries`
 
 </p>
