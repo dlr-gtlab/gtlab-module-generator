@@ -6,24 +6,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Changed
-- Made some labels more descriptive #12
-
-## Fixed
-- Spelling errors #12
-
-
 ## [1.0.1] - 2021-06-22
 ## Added
-- High DPI scaling #11
+- High DPI scaling #11 #13
+- Application icon #13 
 
 ## Changed
+- Made some labels more descriptive #12
 - the path to GTlab must be entered instead of the install directory (settings page) #10
 
 ## Removed
 - file system completers (settings page)
 
 ## Fixed
+- Spelling errors #12
 - `DESTDIR` in module.pro supports custom GTlab builds (eg. $${GTLAB_DIR}/build/GTlab.exe) #10
 
 ## [1.0.0] - 2021-06-21
