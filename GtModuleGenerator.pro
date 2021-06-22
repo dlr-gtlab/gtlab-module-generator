@@ -20,6 +20,10 @@ CONFIG(debug, debug|release){
     UI_DIR = $${BUILD_DEST}/release-app/ui
 }
 
+win32 {
+    RC_FILE = src/app.rc
+}
+
 DESTDIR = $${BUILD_DEST}
 
 INCLUDEPATH += . \
