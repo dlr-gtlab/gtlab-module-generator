@@ -88,3 +88,10 @@ HEADERS += \
 
 RESOURCES += \
     resources/resources.qrc
+
+unix:{
+    # suppress the default RPATH if you wish
+    QMAKE_LFLAGS_RPATH=
+    # add your own with quoting gyrations to make sure $ORIGIN gets to the command line unexpanded
+    QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN\''
+}
