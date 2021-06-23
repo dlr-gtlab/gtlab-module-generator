@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2021-06-23
+- RPath setting for unix build
+
 ## [1.0.1] - 2021-06-22
 ## Added
 - High DPI scaling #11 #13
