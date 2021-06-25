@@ -101,6 +101,13 @@ SingleClassSpecificationWidget::implementationValues()
 //    LOG_INSTANCE("retrieving single class implemenation values...");
 
     ClassStruct implementation = m_specificationsWidget->implementedClass();
+
+    if (!implementation.isValid())
+    {
+        LOG_INSTANCE("invalid implementation!", ModuleGeneratorLogger::Type::Error);
+        return QStringList();
+    }
+
     QString returnValue = m_functionStruct.returnValue;
 
     // QMap<const char*, QMetaObject> -> QMetaObject
@@ -165,7 +172,7 @@ SingleClassSpecificationWidget::implementationValues()
     else
     {
         LOG_INSTANCE("return value not implemented: " + returnValue, ModuleGeneratorLogger::Type::Error);
-        values << QString();
+        return QStringList();
     }
 
     return values;

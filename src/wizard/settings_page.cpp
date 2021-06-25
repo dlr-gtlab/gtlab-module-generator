@@ -183,8 +183,8 @@ SettingsPage::validatePage()
         QString path(gtlabApp.path());
         path = QDir::toNativeSeparators(path);
 
-        LOG_INFO << "output path " << m_outputDirEdit->text() << ENDL;
-        LOG_INFO << "path to GTlab " << path << ENDL;
+        LOG_INFO << "output path      " << m_outputDirEdit->text() << ENDL;
+        LOG_INFO << "path to GTlab    " << path << ENDL;
         LOG_INFO << "path to DevTools " << m_devToolsDirEdit->text() << ENDL;
 
         settings()->setOutputPath(m_outputDirEdit->text());

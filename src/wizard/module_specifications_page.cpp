@@ -191,11 +191,11 @@ ModuleSpecificationsPage::validatePage()
     settings()->setModuleClass(moduleClass);
 
     LOG_INFO << "prefix             " << m_modulePrefixEdit->text() << ENDL;
-    LOG_INFO << "class name         " << moduleClass.ident << ENDL;
-    LOG_INFO << "file name          " << moduleClass.className << ENDL;
-    LOG_INFO << "module name        " << moduleClass.fileName << ENDL;
-    LOG_INFO << "module version     " << moduleClass.description << ENDL;
-    LOG_INFO << "module description " << moduleClass.version << ENDL;
+    LOG_INFO << "module name        " << moduleClass.ident << ENDL;
+    LOG_INFO << "class name         " << moduleClass.className << ENDL;
+    LOG_INFO << "file name          " << moduleClass.fileName << ENDL;
+    LOG_INFO << "module description " << moduleClass.description << ENDL;
+    LOG_INFO << "module version     " << moduleClass.version << ENDL;
 
     return true;
 }

@@ -70,14 +70,16 @@ InterfaceSelectionPage::validatePage()
 
     auto list = selectedInterfaces();
 
-    LOG_INFO << "selected " << QString::number(list.count()) << " interfaces...";
+    LOG_INFO << "selected " << QString::number(list.count()) << " interfaces..." << ENDL;
 
     for (auto* item : list)
     {
-        LOG_INSTANCE(item->className);
+        LOG_INFO << item->className << ENDL;
     }
 
     settings()->setSelectedInterfaces(list);
+
+    LOG_INFO << "done!";
 
     return true;
 }
