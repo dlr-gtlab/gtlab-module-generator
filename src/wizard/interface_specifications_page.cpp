@@ -177,7 +177,7 @@ InterfaceSpecificationsPage::setInterfaceImplementation()
 
         if (widget == Q_NULLPTR)
         {
-            LOG_ERR << "null widget!";
+            LOG_ERR << "null widget!" << ENDL;
             continue;
         }
 
@@ -185,13 +185,15 @@ InterfaceSpecificationsPage::setInterfaceImplementation()
         {
             if (interfaces[j]->objectName == m_interfaceTabBar->tabText(i))
             {
-                qDebug() << "here" << interfaces[j]->className << m_interfaceTabBar->tabText(i);
+                LOG_INFO << m_interfaceTabBar->tabText(i) << ENDL;
                 interfaces[j]->functions = widget->implementedFunctions();
 
                 break;
             }
         }
     }
+
+    LOG_INFO << "done!";
 }
 
 bool

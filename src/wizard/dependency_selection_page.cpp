@@ -106,16 +106,16 @@ DependencySelectionPage::validatePage()
 
     auto list = selectedDependencies();
 
-    {
-        LOG_INSTANCE("selected " + QString::number(list.count()) + " dependencies...");
+    LOG_INFO << "selected " + QString::number(list.count()) + " dependencies..." << ENDL;
 
-        for (auto dependency : list)
-        {
-            LOG_INFO << dependency.name << ENDL;
-        }
+    for (auto dependency : list)
+    {
+        LOG_INFO << dependency.name << ENDL;
     }
 
     settings()->setSelectedDependencies(list);
+
+    LOG_INFO << "done!";
 
     return true;
 }
