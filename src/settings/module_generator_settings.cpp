@@ -11,7 +11,6 @@
 #include <QJsonDocument>
 #include <QApplication>
 
-#include <QFuture>
 #include <QtConcurrent>
 #include <QFont>
 
@@ -61,7 +60,9 @@ ModuleGeneratorSettings::ModuleGeneratorSettings()
 
     // defaults
     if (m_moduleClass.version.isEmpty())
+    {
         m_moduleClass.version = QStringLiteral("0.0.1");
+    }
 }
 
 QString
@@ -140,14 +141,32 @@ ModuleGeneratorSettings::preLoad()
         m_preLoader.dependencies().isEmpty())
     {
         // load dependencies in a separate thread
-        auto function = [](PreLoader* loader, QString path) -> void
+        auto function = [](PreLoader* loader, QString path) -> int
         {
-            loader->searchForDependencies(path);
+            int status = -1;
+            loader->searchForDependencies(path, &status);
+            return status;
         };
-        QFuture<void> future = QtConcurrent::run(function,
+
+        m_futureDependencies = QtConcurrent::run(function,
                                                  &m_preLoader,
                                                  gtlabPath());
     }
+}
+
+int
+ModuleGeneratorSettings::dependencyResolveStatus() const
+{
+    if (m_futureDependencies.isRunning())
+    {
+        return 2;
+    }
+    if (m_futureDependencies.isFinished())
+    {
+        return m_futureDependencies.result();
+    }
+
+    return -1;
 }
 
 void

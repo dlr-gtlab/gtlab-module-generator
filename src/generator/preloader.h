@@ -15,7 +15,7 @@ public:
 
     void searchForPrefixes(const QString& devToolsPath);
 
-    void searchForDependencies(const QString& gtlabPath);
+    void searchForDependencies(const QString& gtlabPath, int* status = Q_NULLPTR);
 
     inline QString searchPath() const { return m_searchPath; }
     inline ClassStructsPtr interfaces() const { return m_interfaces; }

@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## Added
+- status label on the dependency page to inform the user about the status of the gtlabconsole process #18
+
 ## Fixed
-- Empty classes are no longer generated (eg. classes with no name)
+- Empty classes are no longer generated (eg. classes with no name) #17
 - Minor issues in console output
 
 ## [1.0.2] - 2021-06-23

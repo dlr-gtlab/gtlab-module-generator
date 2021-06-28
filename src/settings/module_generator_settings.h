@@ -5,6 +5,7 @@
 #include <QString>
 #include <QRegularExpression>
 #include <QList>
+#include <QFuture>
 
 #include "preloader.h"
 
@@ -82,6 +83,8 @@ public:
     inline ClassStructsPtr availableInterfaces() const { return m_preLoader.interfaces(); }
     inline DependencyStructs availableDependencies() const { return m_preLoader.dependencies(); }
 
+    int dependencyResolveStatus() const;
+
     // serialize user data (name, email, paths etc.)
     void serializeUserData() const;
     void deserializeUserData();
@@ -104,6 +107,8 @@ private:
     AuthorDetails m_authorDetails;
 
     PreLoader m_preLoader;
+
+    QFuture<int> m_futureDependencies;
 };
 
 #endif // MODULEGENERATORSETTINGS_H

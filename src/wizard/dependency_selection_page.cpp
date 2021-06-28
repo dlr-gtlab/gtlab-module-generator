@@ -16,7 +16,9 @@
 const char* C_DEPENDENCY_PAGE_TITLE = "Module Dependencies";
 
 const QString S_INFO_TEXT =
-        QStringLiteral("Select or add any module dependencies.");
+        QStringLiteral("Select or add module dependencies. The list of "
+                       "available modules is based on the GTlab environment "
+                       "set in the settings page.");
 const QString S_DEPENDENCY_BTN_TEXT =
         QStringLiteral("Add");
 const QString S_DEPENDENCY_ADD_LABEL =
@@ -31,6 +33,7 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
     m_infoTextLabel = new QLabel(S_INFO_TEXT);
     m_addDependencyLabel = new QLabel(S_DEPENDENCY_ADD_LABEL);
     m_dependenciesLabel = new QLabel(S_DEPENDENCY_LABEL);
+    m_resolveStatusLabel = new QLabel;
     m_addDependencyEdit = new QLineEdit;
     m_addDependencyPushBtn = new QPushButton;
 
@@ -40,6 +43,10 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
 
     // page gui
     setTitle(tr(C_DEPENDENCY_PAGE_TITLE));
+
+    m_resolveStatusLabel->setStyleSheet("QLabel { color : red }");
+    m_resolveStatusLabel->setVisible(false);
+    m_resolveStatusLabel->setWordWrap(true);
 
     m_infoTextLabel->setWordWrap(true);
     m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
@@ -56,6 +63,7 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
     m_baseLayout->addWidget(m_addDependencyPushBtn, 1, 2);
     m_baseLayout->addWidget(m_dependenciesLabel, 2, 0);
     m_baseLayout->addWidget(m_widgetListView, 2, 1, 1, 2);
+    m_baseLayout->addWidget(m_resolveStatusLabel, 3, 1, 1, 2);
     m_baseLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
     setLayout(m_baseLayout);
@@ -143,12 +151,55 @@ DependencySelectionPage::selectedDependencies() const
 void
 DependencySelectionPage::addStandardDependencies()
 {
-    auto list = settings()->availableDependencies();
+    LOG_INSTANCE("adding standard dependencies...");
+    auto list  = settings()->availableDependencies();
+    int status = settings()->dependencyResolveStatus();
+
+    LOG_INFO << "dependeny resolve status: " << QString::number(status) << ENDL;
+
+    if (list.isEmpty())
+    {
+        QString statusText;
+
+        switch (status)
+        {
+        case -1:
+            statusText = QStringLiteral("Process of retrieving "
+                                        "dependencies failed to start!");
+            break;
+        case 0:
+            statusText = QStringLiteral("Process of retrieving dependencies "
+                                        "timed out!");
+            break;
+        case 1:
+            statusText = QStringLiteral("Process of retrieving dependencies "
+                                        "failed! Could not parse xml output! "
+                                        "(The GTlab version may be incompatible "
+                                        "with this feature)");
+            break;
+        case 2:
+            statusText = QStringLiteral("Process of retrieving dependencies is "
+                                        "still in progress! (Reload this page "
+                                        "to update the list)");
+            break;
+        default:
+            LOG_ERR << "invalid dependency resolve status!";
+            return;
+        }
+
+        m_resolveStatusLabel->setText(statusText);
+        m_resolveStatusLabel->setVisible(true);
+        return;
+    }
+
+    m_resolveStatusLabel->setVisible(false);
 
     for (DependencyStruct dependency : list)
     {
         addDependency(dependency, false);
     }
+
+    LOG_INFO << "done!";
 }
 
 void DependencySelectionPage::addDependency(const DependencyStruct& name,
