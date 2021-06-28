@@ -39,6 +39,8 @@ private:
     QLabel* m_infoTextLabel;
     /// add dependency label
     QLabel* m_addDependencyLabel;
+
+    QLabel* m_resolveStatusLabel;
     /// add dependency edit
     QLineEdit* m_addDependencyEdit;
     /// add dependency push button

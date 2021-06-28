@@ -233,9 +233,17 @@ PreLoader::searchForPrefixes(const QString& devToolsPath)
 }
 
 void
-PreLoader::searchForDependencies(const QString& gtlabPath)
+PreLoader::searchForDependencies(const QString& gtlabPath, int* status)
 {    
     LOG_INSTANCE("searching for dependencies...");
+
+    int _status;
+    if (status == Q_NULLPTR)
+    {
+        status = &_status;
+    }
+
+    *status = -1;
 
     m_searchPath = gtlabPath;
 
@@ -260,9 +268,11 @@ PreLoader::searchForDependencies(const QString& gtlabPath)
     if (!process.waitForFinished(I_PROCESS_TIMEOUT_MS))
     {
         LOG_ERR << "process timeout!";
-        process.terminate();
+        *status = process.exitCode();
         return;
     }
+
+    *status = process.exitCode();
 
     QString output = process.readAllStandardOutput();
 
