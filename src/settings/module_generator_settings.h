@@ -76,6 +76,10 @@ public:
     AuthorDetails authorDetails() const { return m_authorDetails; };
     inline void setAuthorDetails(const AuthorDetails& details) { m_authorDetails = details; };
 
+    // summary
+    inline void setCreateGitFiles(const bool value) { m_createGitFiles = value; }
+    inline bool createGitFiles() const { return m_createGitFiles; }
+
     // PreLoader
     void preLoad();
 
@@ -92,6 +96,8 @@ public:
 private:
 
     WizardMode m_wizardMode;
+
+    bool m_createGitFiles;
 
     QString m_outputPath;
     QString m_gtlabPath;

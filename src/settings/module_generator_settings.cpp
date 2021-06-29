@@ -52,7 +52,8 @@ const QString
                                                  S_EXEC_SUFFIX);
 
 
-ModuleGeneratorSettings::ModuleGeneratorSettings()
+ModuleGeneratorSettings::ModuleGeneratorSettings() :
+    m_createGitFiles(true)
 {
     deserializeUserData();
 

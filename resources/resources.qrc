@@ -22,5 +22,8 @@
         <file>interfaces/network.json</file>
         <file>interfaces/process.json</file>
         <file>interfaces/property.json</file>
+        <file>templates/.gitignore</file>
+        <file>templates/CHANGELOG.md</file>
+        <file>templates/README.md</file>
     </qresource>
 </RCC>

@@ -27,6 +27,7 @@ public:
     const static QString S_ID_BASE_FILE_NAME;
     const static QString S_ID_DERIVE_BASE_CLASS;
 
+    const static QString S_ID_PREFIX;
     const static QString S_ID_CLASS_NAME;
     const static QString S_ID_OBJECT_NAME;
     const static QString S_ID_FILE_NAME;
@@ -66,8 +67,9 @@ private:
     ModuleGeneratorSettings* m_settings;
 
     QStringList m_proFileIncludePaths;
-    QDir m_outputDir;
+    QDir m_srcDir;
     QDir m_moduleDir;
+    QDir m_featuresDir;
 
     int generate();
 
@@ -76,6 +78,8 @@ private:
     bool generateModuleSettingsFiles();
 
     bool generateModuleProjectFile();
+
+    bool generateGitFiles();
 
     bool generateModuleDependencies();
 
