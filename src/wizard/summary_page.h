@@ -45,6 +45,8 @@ private:
     /// vertical layout
     QVBoxLayout* m_vLayout;
 
+    QCheckBox* m_generateGitFilesCheckBox;
+
     bool m_isComplete;
 
     /**

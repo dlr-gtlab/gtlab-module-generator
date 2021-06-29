@@ -14,7 +14,9 @@
 #include <QPushButton>
 
 const QString S_TEMPLATES_PATH = QStringLiteral(":/templates/");
-const QString S_SUB_DIR_PATH   = QStringLiteral("src");
+
+const QString S_SRC_DIR      = QStringLiteral("src");
+const QString S_FEATURES_DIR = QStringLiteral("features");
 
 const QString ModuleGenerator::S_ID_SIGNATURE(QStringLiteral("$$SIGNATURE$$"));
 const QString ModuleGenerator::S_ID_GENERATOR_VERSION(QStringLiteral("$$GENERATOR_VERSION$$"));
@@ -27,6 +29,7 @@ const QString ModuleGenerator::S_ID_BASE_CLASS(QStringLiteral("$$BASE_CLASS$$"))
 const QString ModuleGenerator::S_ID_BASE_FILE_NAME(QStringLiteral("$$BASE_FILE_NAME$$"));
 const QString ModuleGenerator::S_ID_DERIVE_BASE_CLASS(QStringLiteral("$$DERIVE_BASE_CLASS$$"));
 
+const QString ModuleGenerator::S_ID_PREFIX(QStringLiteral("$$PREFIX$$"));
 const QString ModuleGenerator::S_ID_CLASS_NAME(QStringLiteral("$$CLASS_NAME$$"));
 const QString ModuleGenerator::S_ID_OBJECT_NAME(QStringLiteral("$$OBJECT_NAME$$"));
 const QString ModuleGenerator::S_ID_FILE_NAME(QStringLiteral("$$FILE_NAME$$"));
@@ -79,7 +82,7 @@ ModuleGenerator::onGenerate()
 
 int ModuleGenerator::generate()
 {
-    bool result = generateModulePath();
+    bool result(generateModulePath());
 
     if (!result) return false;
 
@@ -89,6 +92,9 @@ int ModuleGenerator::generate()
 
     result = generateModuleProjectFile();
 
+    if (!result) return false;
+
+    result = generateGitFiles();
     if (!result) return false;
 
     result = generateModuleDependencies();
@@ -114,10 +120,12 @@ ModuleGenerator::generateModulePath()
     path += m_settings->outputPath() + QDir::separator();
     path += subFolder + QDir::separator();
 
-    m_outputDir = QDir::cleanPath(path);
-    m_moduleDir = m_outputDir;
-    m_outputDir = QDir::cleanPath(path + QDir::separator() + S_SUB_DIR_PATH);
+    m_srcDir = QDir::cleanPath(path);
+    m_moduleDir = m_srcDir;
+    m_srcDir = QDir::cleanPath(path + QDir::separator() + S_SRC_DIR);
+    m_featuresDir = QDir::cleanPath(path + QDir::separator() + S_FEATURES_DIR);
 
+    // module dir
     if (m_moduleDir.exists() && m_moduleDir.count() > 0)
     {
         LOG_WARN << "path '" << m_moduleDir.path() << "' already exists!" << ENDL;
@@ -144,18 +152,28 @@ ModuleGenerator::generateModulePath()
         LOG_INFO << "continued!" << ENDL;
     }
 
-    m_outputDir.mkpath(m_outputDir.absolutePath());
+    // src dir
+    m_srcDir.mkpath(m_srcDir.absolutePath());
 
-    if (!m_outputDir.exists())
+    if (!m_srcDir.exists())
     {
-        LOG_ERR << "could not create src path!";
+        LOG_ERR << "could not create '" << S_SRC_DIR << "/' path!" << ENDL;
 
         return false;
     }
 
+    // features dir
+    m_featuresDir.mkpath(m_featuresDir.absolutePath());
+
+    if (!m_featuresDir.exists())
+    {
+        LOG_ERR << "could not create '" << S_FEATURES_DIR << "/' path!" << ENDL;
+        // not returning false, as issue can be fixed by hand afterwards
+    }
+
     LOG_INFO << "done!";
 
-    return m_moduleDir.exists();
+    return m_srcDir.exists();
 }
 
 bool
@@ -163,12 +181,20 @@ ModuleGenerator::generateModuleSettingsFiles()
 {
     LOG_INSTANCE("generating .pri files...");
 
+    // settings.pri
     auto fileString = utils::readFile(S_TEMPLATES_PATH + "settings.pri");
 
     utils::writeStringToFile(fileString, m_moduleDir, "settings.pri");
 
+    // features/local_setting.pri
     fileString = utils::readFile(S_TEMPLATES_PATH + "local_settings.pri");
 
+    QString featuresString(fileString);
+    clearIdentifiers(featuresString);
+
+    utils::writeStringToFile(featuresString, m_featuresDir, "local_settings.pri");
+
+    // local_setting.pri
     IdentifierPairs identifierPairs;
 
     QDir gtlabDir(m_settings->gtlabPath());
@@ -182,7 +208,7 @@ ModuleGenerator::generateModuleSettingsFiles()
     }
 
     identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, gtlabDir.absolutePath() });
-    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR, m_settings->devToolsPath() });
+    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR, QDir::cleanPath(m_settings->devToolsPath()) });
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
@@ -212,6 +238,51 @@ ModuleGenerator::generateModuleProjectFile()
     utils::replaceIdentifier(fileString, identifierPairs);
 
     utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
+
+    LOG_INFO << "done!";
+
+    return true;
+}
+
+bool
+ModuleGenerator::generateGitFiles()
+{
+    if (!m_settings->createGitFiles())
+    {
+        return true;
+    }
+
+    LOG_INSTANCE("generating git files...");
+
+    // gitignore
+    LOG_INFO << ".gitignore" << ENDL;
+    auto fileString = utils::readFile(S_TEMPLATES_PATH + ".gitignore");
+
+    utils::writeStringToFile(fileString, m_moduleDir, ".gitignore");
+
+    // changelog
+    LOG_INFO << "CHANGELOG.md" << ENDL;
+    fileString = utils::readFile(S_TEMPLATES_PATH + "CHANGELOG.md");
+
+    utils::writeStringToFile(fileString, m_moduleDir, "CHANGELOG.md");
+
+    // readme
+    LOG_INFO << "README.md" << ENDL;
+    fileString = utils::readFile(S_TEMPLATES_PATH + "README.md");
+    IdentifierPairs identifierPairs;
+
+    QDir gtlabDir(m_settings->gtlabPath());
+    auto moduleClass(m_settings->moduleClass());
+
+    identifierPairs.append({ S_ID_PREFIX, m_settings->modulePrefix() });
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
+    identifierPairs.append({ S_ID_MODULE_DESCRIPTION, moduleClass.description });
+    identifierPairs.append({ S_ID_MODULE_VERSION, moduleClass.version });
+    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
+
+    utils::replaceIdentifier(fileString, identifierPairs);
+
+    utils::writeStringToFile(fileString, m_moduleDir, "README.md");
 
     LOG_INFO << "done!";
 
@@ -249,7 +320,7 @@ ModuleGenerator::generateModuleDependencies()
 
         QString fileString = document.toJson(QJsonDocument::Indented);
 
-        utils::writeStringToFile(fileString, m_outputDir,
+        utils::writeStringToFile(fileString, m_srcDir,
                                  m_settings->moduleClass().fileName + ".json");
 
         LOG_INFO << "done!";
@@ -350,8 +421,8 @@ ModuleGenerator::generateModule()
     clearTabulators(headerString);
     clearTabulators(sourceString);
 
-    utils::writeStringToFile(headerString, m_outputDir, moduleClass.fileName + ".h");
-    utils::writeStringToFile(sourceString, m_outputDir, moduleClass.fileName + ".cpp");
+    utils::writeStringToFile(headerString, m_srcDir, moduleClass.fileName + ".h");
+    utils::writeStringToFile(sourceString, m_srcDir, moduleClass.fileName + ".cpp");
 
     LOG_INFO << "done!";
 
@@ -526,7 +597,7 @@ ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
 
     LOG_INFO << "writing files..." << ENDL;
 
-    QDir targetDir = m_outputDir.cleanPath(m_outputDir.absolutePath() +
+    QDir targetDir = m_srcDir.cleanPath(m_srcDir.absolutePath() +
                                            QDir::separator() +
                                            base.outputPath);
 
@@ -624,7 +695,7 @@ ModuleGenerator::appendProjectFile(QString& fileName, const QString& path)
 
     IdentifierPairs identifierPairs;
 
-    QString includePath(S_SUB_DIR_PATH + "/" + path);
+    QString includePath(S_SRC_DIR + "/" + path);
 
     if (!m_proFileIncludePaths.contains(includePath))
     {

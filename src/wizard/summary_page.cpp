@@ -24,6 +24,10 @@ const QString S_GENERATE_BUTTON_TEXT =
         QStringLiteral("Generate");
 const QString S_DONE_BUTTON_TEXT =
         QStringLiteral("Done");
+const QString S_GIT_CHECK_BOX_TEXT =
+        QStringLiteral("generate additional git files");
+const QString S_GIT_CHECK_BOX_TOOLTIP =
+        QStringLiteral("README.md, CHANGELOG.md and .gitignore");
 /*
  * constructor
  */
@@ -32,6 +36,7 @@ SummaryPage::SummaryPage(ModuleGeneratorSettings *settings, QWidget *parent) :
 {
     // initializations
     m_summaryTextEdit = new QTextEdit;
+    m_generateGitFilesCheckBox = new QCheckBox(S_GIT_CHECK_BOX_TEXT);
     m_vLayout = new QVBoxLayout(this);
 
     // page gui
@@ -41,7 +46,11 @@ SummaryPage::SummaryPage(ModuleGeneratorSettings *settings, QWidget *parent) :
     m_summaryTextEdit->setReadOnly(true);
     m_summaryTextEdit->setWordWrapMode(QTextOption::NoWrap);
 
-    m_vLayout->addWidget(m_summaryTextEdit );
+    m_generateGitFilesCheckBox->setChecked(true);
+    m_generateGitFilesCheckBox->setToolTip(S_GIT_CHECK_BOX_TOOLTIP);
+
+    m_vLayout->addWidget(m_summaryTextEdit);
+    m_vLayout->addWidget(m_generateGitFilesCheckBox);
 
     setLayout(m_vLayout);
 
@@ -94,6 +103,9 @@ SummaryPage::validatePage()
     LOG_INSTANCE("validated!");
 
     m_isComplete = false;
+
+    settings()->setCreateGitFiles(m_generateGitFilesCheckBox->isChecked());
+    m_generateGitFilesCheckBox->setEnabled(false);
 
     settings()->serializeUserData();
 
@@ -207,9 +219,10 @@ SummaryPage::filesToGenerate()
 
     auto moduleClass = settings()->moduleClass();
 
-    content << "local_settings.pri";
-    content << "settings.pri";
     content << moduleClass.fileName + ".pro";
+    content << "settings.pri";
+    content << "local_settings.pri";
+    content << "features" + QString(QDir::separator()) + "local_settings.pri";
     content << baseFolder + moduleClass.fileName + ".h";
     content << baseFolder + moduleClass.fileName + ".cpp";
     content << baseFolder + moduleClass.fileName + ".json";
@@ -220,12 +233,7 @@ SummaryPage::filesToGenerate()
 
         for (const auto& function : interface->functions)
         {
-//            if (function == Q_NULLPTR) continue;
-
             const auto& baseClass  = function.baseClass;
-
-//            if (baseClass == Q_NULLPTR) continue;
-
 
             for (auto derivedClass : function.implementation.derivedClasses)
             {

@@ -218,7 +218,8 @@ void DependencySelectionPage::addDependency(const DependencyStruct& name,
 void
 DependencySelectionPage::onAddDependencyBtnPressed()
 {
-    auto name = m_addDependencyEdit->text();
+    auto name = m_addDependencyEdit->text().simplified();
+    m_addDependencyEdit->clear();
 
     if (name.isEmpty()) return;
 
