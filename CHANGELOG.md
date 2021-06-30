@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ## Added
 - status label on the dependency page to inform the user about the status of the gtlabconsole process #18
+- libraries of selected dependencies are automatically added to the .pro #16
 - possibility to generate git files (README, CHANGELOG and .gitignore) #15
 - generating features/local_settings.pri #15
 
