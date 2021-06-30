@@ -48,7 +48,8 @@ PreLoader::searchForInterfaces()
 
     clearInterfaceStructs();
 
-    QDirIterator iterator(":/interfaces/", QStringList() << "*.json", QDir::Files, QDirIterator::NoIteratorFlags);
+    QDirIterator iterator(":/interfaces/", QStringList() << "*.json",
+                          QDir::Files, QDirIterator::NoIteratorFlags);
 
     while (iterator.hasNext())
     {

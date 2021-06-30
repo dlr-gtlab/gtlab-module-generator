@@ -6,6 +6,7 @@
 
 #include <QTime>
 #include <QDir>
+#include <QDirIterator>
 #include <QRegularExpression>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -49,6 +50,8 @@ const QString ModuleGenerator::S_ID_DEVTOOLS_INSTALL_DIR(QStringLiteral("$$DEVTO
 const QString ModuleGenerator::S_ID_PRO_INCLUDE_PATH(QStringLiteral("$$PRO_INCLUDEPATH$$"));
 const QString ModuleGenerator::S_ID_PRO_HEADER_PATH(QStringLiteral("$$PRO_HEADERPATH$$"));
 const QString ModuleGenerator::S_ID_PRO_SOURCE_PATH(QStringLiteral("$$PRO_SOURCEPATH$$"));
+const QString ModuleGenerator::S_ID_PRO_LIBS(QStringLiteral("$$PRO_LIBS$$"));
+const QString ModuleGenerator::S_ID_PRO_LIBS_D(QStringLiteral("$$PRO_LIBS_D$$"));
 
 const QString ModuleGenerator::S_ID_AUTHOR(QStringLiteral("$$AUTHOR$$"));
 const QString ModuleGenerator::S_ID_AUTHOR_EMAIL(QStringLiteral("$$AUTHOR_EMAIL$$"));
@@ -163,7 +166,7 @@ ModuleGenerator::generateModulePath()
     }
 
     // features dir
-    m_featuresDir.mkpath(m_featuresDir.absolutePath());
+    m_moduleDir.mkdir(m_featuresDir.absolutePath());
 
     if (!m_featuresDir.exists())
     {
@@ -271,7 +274,6 @@ ModuleGenerator::generateGitFiles()
     fileString = utils::readFile(S_TEMPLATES_PATH + "README.md");
     IdentifierPairs identifierPairs;
 
-    QDir gtlabDir(m_settings->gtlabPath());
     auto moduleClass(m_settings->moduleClass());
 
     identifierPairs.append({ S_ID_PREFIX, m_settings->modulePrefix() });
@@ -324,6 +326,11 @@ ModuleGenerator::generateModuleDependencies()
                                  m_settings->moduleClass().fileName + ".json");
 
         LOG_INFO << "done!";
+    }
+
+    for (auto dependency : m_settings->selectedDependencies())
+    {
+        appendLibToProjectFile(dependency.name);
     }
 
     LOG_INFO << "done!";
@@ -606,7 +613,7 @@ ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
     utils::writeStringToFile(headerString, targetDir, derived.fileName + ".h");
     utils::writeStringToFile(sourceString, targetDir, derived.fileName + ".cpp");
 
-    appendProjectFile(derived.fileName, base.outputPath);
+    appendFileToProjectFile(derived.fileName, base.outputPath);
 
     LOG_INFO << "done!";
 }
@@ -684,7 +691,7 @@ ModuleGenerator::generateForwardDeclarations(QString& headerString,
 }
 
 void
-ModuleGenerator::appendProjectFile(QString& fileName, const QString& path)
+ModuleGenerator::appendFileToProjectFile(QString& fileName, const QString& path)
 {
     LOG_INSTANCE("adding class to project file...");
 
@@ -718,6 +725,64 @@ ModuleGenerator::appendProjectFile(QString& fileName, const QString& path)
     utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
 
     LOG_INFO << "done!";
+}
+
+void
+ModuleGenerator::appendLibToProjectFile(const QString& name)
+{
+    LOG_INSTANCE("adding lib '" + name + "' to project file...");
+
+    auto moduleClass(m_settings->moduleClass());
+    auto fileString = utils::readFile(
+                m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
+
+    IdentifierPairs identifierPairs;
+
+    QDirIterator iterator(m_settings->gtlabPath() + "/modules",
+                          QDir::Files, QDirIterator::NoIteratorFlags);
+
+    QStringList nameParts(name.split(" ", QString::SkipEmptyParts));
+
+    bool success(false);
+
+    while (iterator.hasNext() && !success)
+    {
+        QFileInfo fileInfo(iterator.next());
+        QString lib(fileInfo.baseName());
+
+        // eg "Post Processing": libname is GTlabPost
+        // 1. check if postprocessing is in libname
+        // 2. check if post is in libname
+        for (int i = nameParts.length(); i > 0; --i)
+        {
+            QString part(nameParts.mid(0, i).join(""));
+
+            if (!lib.contains(part, Qt::CaseInsensitive)) continue;
+
+            if (!ModuleGeneratorSettings::isOsWindows() && lib.startsWith("lib"))
+            {
+                lib = lib.remove(0, 3); // remove lib prefix on unix
+            }
+
+            identifierPairs.append({ S_ID_PRO_LIBS, "\n\tLIBS += -l" + lib +
+                                     S_ID_PRO_LIBS});
+            identifierPairs.append({ S_ID_PRO_LIBS_D, "\n\tLIBS += -l" + lib + "-d" +
+                                     S_ID_PRO_LIBS_D});
+
+            success = true;
+            break;
+        }
+    }
+
+    if (!success)
+    {
+        LOG_WARN << "could not find library file!";
+        return;
+    }
+
+    utils::replaceIdentifier(fileString, identifierPairs);
+
+    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
 }
 
 void

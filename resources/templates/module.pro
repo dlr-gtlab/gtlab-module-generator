@@ -10,7 +10,8 @@
 
 include(settings.pri)
 
-BUILD_DEST = $${GTLAB_DIR}/$$GTLAB_INSTALL_SUB_DIR$$/modules
+BUILD_DEST     = $${GTLAB_DIR}/$$GTLAB_INSTALL_SUB_DIR$$/modules
+MOC_BUILD_DEST = ./build
 
 CONFIG(debug, debug|release) {
     TARGET = $$CLASS_NAME$$-d
@@ -25,10 +26,22 @@ CONFIG += plugin
 CONFIG += silent
 CONFIG += c++11
 
+CONFIG(debug, debug|release) {
+    OBJECTS_DIR = $${MOC_BUILD_DEST}/debug-app/obj
+    MOC_DIR = $${MOC_BUILD_DEST}/debug-app/moc
+    RCC_DIR = $${MOC_BUILD_DEST}/debug-app/rcc
+    UI_DIR  = $${MOC_BUILD_DEST}/debug-app/ui
+} else {
+    OBJECTS_DIR = $${MOC_BUILD_DEST}/release-app/obj
+    MOC_DIR = $${MOC_BUILD_DEST}/release-app/moc
+    RCC_DIR = $${MOC_BUILD_DEST}/release-app/rcc
+    UI_DIR  = $${MOC_BUILD_DEST}/release-app/ui
+}
+
+DESTDIR = $${BUILD_DEST}
+
 INCLUDEPATH += . \
     src $$PRO_INCLUDEPATH$$
-
-DESTDIR = $${GTLAB_DIR}/$$GTLAB_INSTALL_SUB_DIR$$/modules
 
 HEADERS += \
     src/$$FILE_NAME$$.h $$PRO_HEADERPATH$$
@@ -45,7 +58,7 @@ CONFIG(debug, debug|release){
     LIBS += -lGTlabCore-d
     LIBS += -lGTlabMdi-d
     LIBS += -lGTlabNetwork-d
-    # THIRD PARTY
+    # MODULES$$PRO_LIBS_D$$
 } else {
     # GTLAB CORE
     LIBS += -lGTlabLogging
@@ -55,7 +68,14 @@ CONFIG(debug, debug|release){
     LIBS += -lGTlabCore
     LIBS += -lGTlabMdi
     LIBS += -lGTlabNetwork
-    # THIRD PARTY
+    # MODULES$$PRO_LIBS$$
+}
+
+unix:{
+    # suppress the default RPATH if you wish
+    QMAKE_LFLAGS_RPATH=
+    # add your own with quoting gyrations to make sure $ORIGIN gets to the command line unexpanded
+    QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN\''
 }
 
 ######################################################################

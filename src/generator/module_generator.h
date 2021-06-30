@@ -47,6 +47,8 @@ public:
     const static QString S_ID_PRO_INCLUDE_PATH;
     const static QString S_ID_PRO_HEADER_PATH;
     const static QString S_ID_PRO_SOURCE_PATH;
+    const static QString S_ID_PRO_LIBS;
+    const static QString S_ID_PRO_LIBS_D;
 
     const static QString S_ID_AUTHOR;
     const static QString S_ID_AUTHOR_EMAIL;
@@ -102,8 +104,10 @@ private:
     void generateForwardDeclarations(QString& headerString,
                                      QStringList& forwardDecls);
 
-    void appendProjectFile(QString& fileName,
-                           const QString& path);
+    void appendFileToProjectFile(QString& fileName,
+                                 const QString& path);
+
+    void appendLibToProjectFile(const QString& name);
 
     void clearIdentifiers(QString& fileString);
 

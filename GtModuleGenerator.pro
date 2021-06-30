@@ -27,12 +27,12 @@ win32 {
 DESTDIR = $${BUILD_DEST}
 
 INCLUDEPATH += . \
-        src \
-        src/wizard \
-        src/settings \
-        src/generator \
-        src/widgets \
-        src/widgets/class_specification
+    src \
+    src/wizard \
+    src/settings \
+    src/generator \
+    src/widgets \
+    src/widgets/class_specification
 
 SOURCES += \
     src/generator/module_generator.cpp \
