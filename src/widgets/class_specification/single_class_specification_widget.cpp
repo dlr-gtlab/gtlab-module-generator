@@ -207,7 +207,7 @@ SingleClassSpecificationWidget::onSpecificationsBtnPressed()
 void
 SingleClassSpecificationWidget::onHideSpecficationsWidget()
 {
-    if (!m_editable || m_nameLineEdit->text().isEmpty())
+    if (!m_editable && m_nameLineEdit->text().isEmpty())
     {
         m_nameLineEdit->setText(m_specificationsWidget->implementedClass().className);
     }
