@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - generating features/local_settings.pri #15
 
 ## Fixed
+- lineedits that can be edited are left blank when setting the class name (return type QMap<...>) #19
 - Empty classes are no longer generated (eg. classes with no name) #17
 - Minor issues in console output
 
