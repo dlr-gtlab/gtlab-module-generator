@@ -6,7 +6,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.4] - 2021-07-06
 ## Added
 - status label on the dependency page to inform the user about the status of the gtlabconsole process #18
 - libraries of selected dependencies are automatically added to the .pro #16
