@@ -31,6 +31,11 @@
             ]
           },
           {
+            "name": "extension",
+            "returnValue": "QString",
+            "qualifier": "const"
+          },
+          {
             "name": "doExport",
             "returnValue": "bool",
             "parameter": "GtObject* data, QFile& file"

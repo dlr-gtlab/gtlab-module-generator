@@ -85,7 +85,8 @@ DependencySelectionPage::initializePage()
 
     m_addDependencyPushBtn->setDefault(true);
 
-    if (m_widgetListView->widgets().isEmpty())
+    if (m_widgetListView->widgets().isEmpty() ||
+        !m_resolveStatusLabel->isHidden())
     {
         addStandardDependencies();
     }
@@ -164,21 +165,21 @@ DependencySelectionPage::addStandardDependencies()
         switch (status)
         {
         case -1:
-            statusText = QStringLiteral("Process of retrieving "
+            statusText = QStringLiteral("The process of retrieving "
                                         "dependencies failed to start!");
             break;
         case 0:
-            statusText = QStringLiteral("Process of retrieving dependencies "
+            statusText = QStringLiteral("The process of retrieving dependencies "
                                         "timed out!");
             break;
         case 1:
-            statusText = QStringLiteral("Process of retrieving dependencies "
+            statusText = QStringLiteral("The process of retrieving dependencies "
                                         "failed! Could not parse xml output! "
                                         "(The GTlab version may be incompatible "
                                         "with this feature)");
             break;
         case 2:
-            statusText = QStringLiteral("Process of retrieving dependencies is "
+            statusText = QStringLiteral("The process of retrieving dependencies is "
                                         "still in progress! (Reload this page "
                                         "to update the list)");
             break;
