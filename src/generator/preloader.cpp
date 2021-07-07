@@ -89,7 +89,8 @@ PreLoader::searchForClass(const QJsonObject& classJObject)
     QString outputPath = classJObject["outputPath"].toString();
     QString objectName = classJObject["shortName"].toString();
 
-    auto functionsJArray = classJObject["functions"].toArray();
+    auto functionsJArray   = classJObject["functions"].toArray();
+    auto constructorJArray = classJObject["constructors"].toArray();
 
     LOG_INSTANCE("className  " + className);
 
@@ -102,9 +103,43 @@ PreLoader::searchForClass(const QJsonObject& classJObject)
     classStruct.outputPath = outputPath;
     classStruct.functions  = functions;
 
+    classStruct.constructors = searchForConstructors(constructorJArray);
+
     LOG_INFO << "done!";
 
     return classStruct;
+}
+
+Constructors
+PreLoader::searchForConstructors(const QJsonArray& constructorJObject)
+{
+    Constructors constructors;
+
+    if (constructorJObject.isEmpty()) return constructors;
+
+    LOG_INSTANCE("adding custom constructors...");
+
+    for (auto jsonValueRef : constructorJObject)
+    {
+        auto constructorJObject = jsonValueRef.toObject();
+
+        if (constructorJObject.isEmpty())
+        {
+            LOG_WARN << "empty constructor!";
+            continue;
+        }
+
+        QString header = constructorJObject["header"].toString();
+        QString source = constructorJObject["source"].toString();
+
+        LOG_INFO << "..." << ENDL;
+
+        constructors << Constructor({ header, source });
+    }
+
+    LOG_INFO << "done!";
+
+    return constructors;
 }
 
 FunctionStructs
@@ -135,13 +170,13 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
         QString qualifier   = functionJObject["qualifier"].toString();
         QString parameter   = functionJObject["parameter"].toString();
         QString tooltip     = functionJObject["tooltip"].toString();
+
         QJsonArray includes     = functionJObject["includes"].toArray();
         QJsonArray forwardDecls = functionJObject["forwardDecl"].toArray();
         QJsonArray descriptionArray = functionJObject["description"].toArray();
 
-        auto baseClassJObject = functionJObject["baseClass"].toObject();
-
-        LOG_INFO << returnValue << " " << name << ENDL;
+        auto baseClassJObject   = functionJObject["baseClass"].toObject();
+        auto linkedClassJObject = functionJObject["linkedClass"].toObject();
 
         // description
         QString description;
@@ -155,6 +190,8 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
             description += "\n\t" + line;
         }
 
+        LOG_INFO << returnValue << " " << name << ENDL;
+
         FunctionStruct function;
 
         function.name = name;
@@ -164,6 +201,7 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
         function.description = description;
         function.tooltip     = tooltip;
         function.baseClass   = searchForClass(baseClassJObject);
+        function.linkedClass = searchForClass(linkedClassJObject);
 
         // includes
         for (auto jsonValueRef : includes)

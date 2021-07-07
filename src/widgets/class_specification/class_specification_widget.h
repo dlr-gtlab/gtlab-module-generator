@@ -21,6 +21,7 @@ public:
 
     ClassSpecificationWidget(const FunctionStruct& function,
                              ModuleGeneratorSettings* settings,
+                             bool isLinked = false,
                              QWidget* parent = nullptr);
 
     ClassStruct implementedClass();

@@ -32,6 +32,7 @@ public:
     const static QString S_ID_OBJECT_NAME;
     const static QString S_ID_FILE_NAME;
     const static QString S_ID_HEADER_NAME;
+    const static QString S_ID_CONSTRUCTOR;
     const static QString S_ID_FUNCTION;
     const static QString S_ID_IMPLEMENTATION;
 
@@ -95,6 +96,10 @@ private:
                                 QString& sourceString,
                                 FunctionStruct& function);
 
+    void generateImplementationHelper(QString& sourceString,
+                                      ClassStruct& baseClass,
+                                      QList<ClassStruct>& classes);
+
     void generateBasicClass(ClassStruct& base,
                             ClassStruct& derived);
 
@@ -103,6 +108,10 @@ private:
 
     void generateForwardDeclarations(QString& headerString,
                                      QStringList& forwardDecls);
+
+    void generateConstructors(QString& headerString,
+                              QString& sourceString,
+                              ClassStruct& base);
 
     void appendFileToProjectFile(QString& fileName,
                                  const QString& path);

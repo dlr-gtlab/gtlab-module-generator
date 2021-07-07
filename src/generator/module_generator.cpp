@@ -35,6 +35,7 @@ const QString ModuleGenerator::S_ID_CLASS_NAME(QStringLiteral("$$CLASS_NAME$$"))
 const QString ModuleGenerator::S_ID_OBJECT_NAME(QStringLiteral("$$OBJECT_NAME$$"));
 const QString ModuleGenerator::S_ID_FILE_NAME(QStringLiteral("$$FILE_NAME$$"));
 const QString ModuleGenerator::S_ID_HEADER_NAME(QStringLiteral("$$HEADER_NAME$$"));
+const QString ModuleGenerator::S_ID_CONSTRUCTOR(QStringLiteral("$$CONSTRUCTOR$$"));
 const QString ModuleGenerator::S_ID_FUNCTION(QStringLiteral("$$FUNCTION$$"));
 const QString ModuleGenerator::S_ID_IMPLEMENTATION(QStringLiteral("$$IMPLEMENTATION$$"));
 
@@ -64,6 +65,11 @@ const QString S_DERIVE_BASE_CLASS(
 
 const QString S_PRO_ENDL(QStringLiteral("\\\n\t"));
 const QString S_Q_DECL_OVERRIDE(QStringLiteral("Q_DECL_OVERRIDE;"));
+
+const QString S_CONSTRUCTOR_H_ENDL(
+        QStringLiteral("\n\n\t") + ModuleGenerator::S_ID_CONSTRUCTOR);
+const QString S_CONSTRUCTOR_CPP_ENDL(
+        QStringLiteral("\n\n") + ModuleGenerator::S_ID_CONSTRUCTOR);
 
 
 void
@@ -529,24 +535,41 @@ ModuleGenerator::generateImplementation(QString& headerString,
     generateIncludes(sourceString, implementation.includes);
     generateForwardDeclarations(headerString, implementation.forwardDeclarations);
 
-    // classes to generate
-    for (ClassStruct& derived : implementation.derivedClasses)
+    LOG_INFO << "generating derived classes..." << ENDL;
+    generateImplementationHelper(sourceString, function.baseClass,
+                                 implementation.derivedClasses);
+    LOG_INFO << "generating linked classes..." << ENDL;
+    generateImplementationHelper(sourceString, function.linkedClass,
+                                 implementation.linkedClasses);
+
+    LOG_INFO << "done!";
+}
+
+void
+ModuleGenerator::generateImplementationHelper(QString& sourceString,
+                                              ClassStruct& baseClass,
+                                              QList<ClassStruct>& classes)
+{
+    // linked classes to generate
+    for (ClassStruct& classStruct : classes)
     {
-        if (!derived.isValid() || !function.baseClass.isValid())
+        if (!baseClass.isValid()) continue;
+
+        if (!classStruct.isValid())
         {
-            LOG_WARN << "skipping invalid class structs!" << ENDL; continue;
+            LOG_INSTANCE("skipping invalid class struct!",
+                         ModuleGeneratorLogger::Warning);
+            continue;
         }
 
         IdentifierPair pair;
         pair.identifier = S_ID_INCLUDE_FILE;
-        pair.value = utils::makeInclude(derived.fileName, S_ID_INCLUDE_FILE);
+        pair.value = utils::makeInclude(classStruct.fileName, S_ID_INCLUDE_FILE);
 
         utils::replaceIdentifier(sourceString, pair);
 
-        generateBasicClass(function.baseClass, derived);
+        generateBasicClass(baseClass, classStruct);
     }
-
-    LOG_INFO << "done!";
 }
 
 void
@@ -561,6 +584,8 @@ ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
 
     // set the filename for the include to the module header file
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME, derived.fileName });
+
+    generateConstructors(headerString, sourceString, base);
 
     IdentifierPairs identifierPairs;
 
@@ -686,6 +711,41 @@ ModuleGenerator::generateForwardDeclarations(QString& headerString,
     }
 
     utils::replaceIdentifier(headerString, identifiers);
+
+    LOG_INFO << "done!";
+}
+
+void
+ModuleGenerator::generateConstructors(QString& headerString,
+                                      QString& sourceString,
+                                      ClassStruct& base)
+{
+    LOG_INSTANCE("generating constructors...");
+
+    if (base.constructors.isEmpty())
+    {
+        base.constructors.append(G_CONSTRUCTOR_DEFAULT);
+    }
+
+    int counter = 0;
+    int length  = base.constructors.length();
+
+    for (Constructor& constructor : base.constructors)
+    {
+        utils::replaceIdentifier(headerString, {
+                                     S_ID_CONSTRUCTOR,
+                                     constructor.header +
+                                     (counter < length - 1 ? S_CONSTRUCTOR_H_ENDL:
+                                                             QString())
+                                 });
+        utils::replaceIdentifier(sourceString, {
+                                     S_ID_CONSTRUCTOR,
+                                     constructor.source +
+                                     (counter < length - 1 ? S_CONSTRUCTOR_CPP_ENDL:
+                                                             QString())
+                                 });
+        counter += 1;
+    }
 
     LOG_INFO << "done!";
 }

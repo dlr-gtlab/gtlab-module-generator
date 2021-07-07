@@ -47,7 +47,22 @@ struct ImplementationStruct
     QStringList includes;
     QStringList forwardDeclarations;
     QList<ClassStruct> derivedClasses;
+    QList<ClassStruct> linkedClasses;
 };
+
+struct Constructor
+{
+    QString header;
+    QString source;
+};
+
+const Constructor G_CONSTRUCTOR_DEFAULT =
+        Constructor({ QStringLiteral("Q_INVOKABLE $$CLASS_NAME$$();"),
+                      QStringLiteral("$$CLASS_NAME$$::$$CLASS_NAME$$()\n"
+                                     "{\n"
+                                     "\tsetObjectName(\"$$OBJECT_NAME$$\");\n"
+                                     "}")
+                    });
 
 struct ClassStruct
 {
@@ -55,6 +70,7 @@ struct ClassStruct
     QString fileName;
     QString objectName;
     QString outputPath;
+    QList<Constructor> constructors;
     QList<FunctionStruct> functions;
 
     bool isValid() const
@@ -73,6 +89,7 @@ struct FunctionStruct
     QString description;
     QString tooltip;
     ClassStruct baseClass;
+    ClassStruct linkedClass;
     ImplementationStruct implementation;
 
     bool isValid() const
@@ -88,6 +105,7 @@ using FunctionStructsPtr = QList<FunctionStruct*>;
 using FunctionStructs    = QList<FunctionStruct>;
 using ClassStructsPtr    = QList<ClassStruct*>;
 using ClassStructs       = QList<ClassStruct>;
+using Constructors       = QList<Constructor>;
 
 
 

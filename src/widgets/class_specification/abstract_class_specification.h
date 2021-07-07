@@ -18,12 +18,14 @@ public:
     {
         m_implementation.values = this->implementationValues();
         m_implementation.derivedClasses = this->derivedClasses();
+        m_implementation.linkedClasses  = this->linkedClasses();
 
         return m_implementation;
     }
 
     virtual QStringList implementationValues() = 0;
     virtual ClassStructs derivedClasses() { return ClassStructs(); }
+    virtual ClassStructs linkedClasses() { return ClassStructs(); }
 
 private:
 

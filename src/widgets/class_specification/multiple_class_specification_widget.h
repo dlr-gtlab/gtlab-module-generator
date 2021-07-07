@@ -23,6 +23,7 @@ public:
 
     QStringList implementationValues() override;
     ClassStructs derivedClasses() override;
+    ClassStructs linkedClasses() override;
 
 private:    
 

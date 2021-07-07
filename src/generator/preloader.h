@@ -31,6 +31,8 @@ private:
 
     ClassStruct searchForClass(const QJsonObject& classJObject);
 
+    Constructors searchForConstructors(const QJsonArray& constructorJObject);
+
     FunctionStructs searchForFunctions(const QJsonArray& functionsJArray);
 
     void clearInterfaceStructs();
