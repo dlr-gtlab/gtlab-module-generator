@@ -457,15 +457,15 @@ ModuleGenerator::generateFunction(QString& headerString,
     }
 
     // HEADER
-    QString functionHeader("\n\n");
+    QString functionHeader("\n");
 
     // description
     if (!f.description.isEmpty())
     {
-        functionHeader = f.description + "\n";
+        functionHeader += f.description;
     }
 
-    functionHeader += "\t" + functionString;
+    functionHeader += "\n\t" + functionString;
     functionHeader += S_Q_DECL_OVERRIDE;
     functionHeader += S_ID_FUNCTION;
 
@@ -750,7 +750,7 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
         QFileInfo fileInfo(iterator.next());
         QString lib(fileInfo.baseName());
 
-        // eg "Post Processing": libname is GTlabPost
+        // e.g. "Post Processing": libname is GTlabPost
         // 1. check if postprocessing is in libname
         // 2. check if post is in libname
         for (int i = nameParts.length(); i > 0; --i)

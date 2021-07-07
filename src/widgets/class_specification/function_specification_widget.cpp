@@ -96,6 +96,8 @@ FunctionSpecificationWidget::setContent()
             continue;
         }
 
+        inputWidget->setToolTip(function.tooltip);
+
         QLabel* returnTypeLabel = new QLabel(function.returnValue);
         QLabel* functionLabel   = new QLabel(function.name);
 

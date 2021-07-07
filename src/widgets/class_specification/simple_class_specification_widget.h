@@ -39,7 +39,7 @@ public:
 
     QStringList implementationValues() override
     {
-        return QStringList('\"' + text() + '\"');
+        return QStringList("QStringLiteral(\"" + text() + "\")");
     }
 };
 

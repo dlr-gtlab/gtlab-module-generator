@@ -71,6 +71,7 @@ struct FunctionStruct
     QString parameter;
     QString qualifier;
     QString description;
+    QString tooltip;
     ClassStruct baseClass;
     ImplementationStruct implementation;
 
