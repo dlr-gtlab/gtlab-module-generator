@@ -134,13 +134,26 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
         QString returnValue = functionJObject["returnValue"].toString();
         QString qualifier   = functionJObject["qualifier"].toString();
         QString parameter   = functionJObject["parameter"].toString();
-        QString description = functionJObject["description"].toString();
+        QString tooltip     = functionJObject["tooltip"].toString();
         QJsonArray includes     = functionJObject["includes"].toArray();
         QJsonArray forwardDecls = functionJObject["forwardDecl"].toArray();
+        QJsonArray descriptionArray = functionJObject["description"].toArray();
 
         auto baseClassJObject = functionJObject["baseClass"].toObject();
 
         LOG_INFO << returnValue << " " << name << ENDL;
+
+        // description
+        QString description;
+
+        for (auto jsonValueRef : descriptionArray)
+        {
+            QString line = jsonValueRef.toString();
+
+            if (line.isEmpty()) continue;
+
+            description += "\n\t" + line;
+        }
 
         FunctionStruct function;
 
@@ -149,6 +162,7 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
         function.qualifier   = qualifier;
         function.parameter   = parameter;
         function.description = description;
+        function.tooltip     = tooltip;
         function.baseClass   = searchForClass(baseClassJObject);
 
         // includes
