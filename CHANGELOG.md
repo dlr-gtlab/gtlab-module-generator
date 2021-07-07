@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2021-07-07
 ## Added
 - support to generate custom constructors #21
 - widget for `extension` function for `GtAbstractExporter` #20
