@@ -16,7 +16,7 @@ class $$CLASS_NAME$$ : $$BASE_CLASS$$
 	
 public:
 
-    Q_INVOKABLE $$CLASS_NAME$$();$$FUNCTION$$
+    $$CONSTRUCTOR$$ $$FUNCTION$$
 };
 
 #endif // $$HEADER_NAME$$_H

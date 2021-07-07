@@ -32,6 +32,7 @@ public:
 
     QStringList implementationValues() override;
     ClassStructs derivedClasses() override;
+    ClassStructs linkedClasses() override;
 
 private:
 
@@ -40,19 +41,25 @@ private:
     bool m_editable;
 
     QPushButton* m_specificationsButton;
+    QPushButton* m_linkedClassButton;
     QPushButton* m_deleteButton;
-    QLineEdit* m_nameLineEdit;
+    QLineEdit* m_linkedNameLineEdit;
     QHBoxLayout* m_baseLayout;
 
     ClassSpecificationWidget* m_specificationsWidget;
+    ClassSpecificationWidget* m_linkedSpecificationsWidget;
+
+    void setupSpecificationsWidget(ClassSpecificationWidget* widget);
 
 private slots:
 
     void onDeleteBtnPressed();
 
     void onSpecificationsBtnPressed();
-
     void onHideSpecficationsWidget();
+
+    void onLinkedSpecificationsBtnPressed();
+    void onHideLinkedSpecficationsWidget();
 
 signals:
 

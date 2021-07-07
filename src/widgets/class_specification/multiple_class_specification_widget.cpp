@@ -100,6 +100,23 @@ MultipleClassSpecificationWidget::derivedClasses()
     return classes;
 }
 
+ClassStructs
+MultipleClassSpecificationWidget::linkedClasses()
+{
+    ClassStructs classes;
+
+    for (auto* w : m_widgetListView->widgets())
+    {
+        auto* widget = dynamic_cast<SingleClassSpecificationWidget*>(w);
+
+        if (widget == Q_NULLPTR) continue;
+
+        classes << widget->linkedClasses(); // may have one entry
+    }
+
+    return classes;
+}
+
 void
 MultipleClassSpecificationWidget::onAddButtonPressed()
 {

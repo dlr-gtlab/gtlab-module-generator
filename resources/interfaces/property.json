@@ -7,6 +7,45 @@
     {
       "name": "propertyItems",
       "returnValue": "QMap<const char*, QMetaObject>",
+      "includes":
+      [
+        "QMap"
+      ],
+      "linkedClass":
+      {
+        "name": "GtProperty<QString>",
+        "fileName": "gt_property",
+        "outputPath": "property",
+        "constructors":
+        [
+          {
+            "header":"Q_INVOKABLE $$CLASS_NAME$$(const QString& ident, const QString& name);",
+            "source":"$$CLASS_NAME$$::$$CLASS_NAME$$(const QString& ident, const QString& name)\n{\n\tsetObjectName(name);\n\n\tm_id = ident;\n\tm_brief = QString();\n\tm_unitCategory = GtUnit::Category::None;\n\tm_value = QString();\n\tm_initValue = QString();\n}"
+          },
+          {
+            "header":"Q_INVOKABLE $$CLASS_NAME$$(const QString& ident, const QString& name, const QString& brief, const QString& value = QString());",
+            "source":"$$CLASS_NAME$$::$$CLASS_NAME$$(const QString& ident, const QString& name, const QString& brief, const QString& value)\n{\n\tsetObjectName(name);\n\n\tm_id = ident;\n\tm_brief = brief;\n\tm_unitCategory = GtUnit::Category::None;\n\tm_value = value;\n\tm_initValue = value;\n}"
+          }
+        ],
+        "functions":
+        [
+          {
+            "name": "valueToVariant",
+            "returnValue": "QVariant",
+            "parameter": "const QString& unit, bool* success = 0",
+            "qualifier": "const",
+            "includes":
+            [
+              "QVariant"
+            ]
+          },
+          {
+            "name": "setValueFromVariant",
+            "returnValue": "bool",
+            "parameter": "const QVariant& val, const QString& unit, bool* success = 0"
+          }
+        ]
+      },
       "baseClass":
       {
         "name": "GtAbstractPropertyItem",

@@ -27,6 +27,7 @@ const QString S_AUTO_GENERATED_ALT_TOOLTIP =
 
 ClassSpecificationWidget::ClassSpecificationWidget(const FunctionStruct& function,
                                                    ModuleGeneratorSettings* settings,
+                                                   bool isLinked,
                                                    QWidget* parent) :
     QWidget(parent),
 //    m_implementationStruct(function.implementation),
@@ -60,11 +61,11 @@ ClassSpecificationWidget::ClassSpecificationWidget(const FunctionStruct& functio
 
     m_functionSpecificationWidget = Q_NULLPTR;
 
-    auto baseClass = function.baseClass;
+    auto classStruct(isLinked ? function.linkedClass : function.baseClass);
 
-    if (baseClass.isValid())
+    if (classStruct.isValid())
     {
-        m_implementedClass.functions = baseClass.functions;
+        m_implementedClass.functions = classStruct.functions;
 
         m_functionSpecificationWidget = new FunctionSpecificationWidget(m_implementedClass.functions, settings);
 
