@@ -182,7 +182,7 @@ SingleClassSpecificationWidget::implementationValues()
         // generate valid variable name
         QString variableName = implementation.objectName;
         variableName.remove(' ');
-        variableName.replace(0, variableName.at(0).toLower());
+        variableName.replace(0, 1, variableName.at(0).toLower());
 
         // create variable
         returnValue.insert(2, "Extended");
@@ -198,6 +198,9 @@ SingleClassSpecificationWidget::implementationValues()
         // author
         values << QString(variableName + "->author = " + "QStringLiteral(\""+
                           ModuleGenerator::S_ID_AUTHOR + "\")");
+        // contact
+        values << QString(variableName + "->contact = " + "QStringLiteral(\""+
+                          ModuleGenerator::S_ID_AUTHOR_EMAIL + "\")");
         // icon
         values << QString(variableName + "->icon = " + "gtApp->icon(QStringLiteral(\"" +
                           QString(isTask ? "taskIcon":"calculatorIcon") + ".png\"))");

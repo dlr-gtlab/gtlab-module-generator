@@ -184,6 +184,8 @@ DependencySelectionPage::addStandardDependencies()
                                         "to update the list)");
             break;
         default:
+            statusText = QStringLiteral("The process of retrieving dependencies "
+                                        "failed!");
             LOG_ERR << "invalid dependency resolve status!";
             return;
         }

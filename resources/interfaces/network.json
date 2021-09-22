@@ -6,11 +6,27 @@
   [
     {
       "name": "accessId",
-      "returnValue": "QString"
+      "returnValue": "QString",
+      "tooltip": "Identification string of access point",
+      "description":
+      [
+        "/**",
+        " * @brief Returns identification string of access point.",
+        " * @return Identification string of access point.",
+        " */"
+      ]
     },
     {
       "name": "accessConnection",
       "returnValue": "QMetaObject",
+      "tooltip": "AccessDataConnection class",
+      "description":
+      [
+        "/**",
+        " * @brief Returns meta object of GtAbstractAccessDataConnection class.",
+        " * @return Meta object of AccessDataConnection class.",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtAbstractAccessDataConnection",
@@ -21,7 +37,17 @@
           {
             "name": "testConnection",
             "returnValue": "bool",
-            "parameter": "const GtAccessData& accessData"
+            "parameter": "const GtAccessData& accessData",
+            "tooltip": "Should the connection test succeed by default?",
+            "description":
+            [
+              "/**",
+              " * @brief Pure virtual test connection method.",
+              " * @param Given access data.",
+              " * @return Returns true if connection test was successful. Otherwise false",
+              " * is returned.",
+              " */"
+            ]
           }
         ]
       }

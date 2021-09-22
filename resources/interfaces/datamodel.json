@@ -7,6 +7,14 @@
     {
       "name": "package",
       "returnValue": "QMetaObject",
+      "tooltip": "Package class",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of datamodel package.",
+        " * @return package meta object",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtPackage",
@@ -17,6 +25,14 @@
     {
       "name": "data",
       "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of data classes",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of datamodel classes.",
+        " * @return list including meta objects",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtObject",
@@ -26,7 +42,18 @@
     },
     {
       "name": "standAlone",
-      "returnValue": "bool"
+      "returnValue": "bool",
+      "tooltip": "is the module standalone and has its own data model structure?",
+      "description":
+      [
+        "/**",
+        " * @brief Returns true if module is a standalone module with own",
+        " * data model structure. Otherwise module only extends the overall",
+        " * application with additional functionalities like classes, calculators",
+        " * or graphical user interfaces.",
+        " * @return Standalone indicator.",
+        " */"
+      ]
     }
   ]
 }

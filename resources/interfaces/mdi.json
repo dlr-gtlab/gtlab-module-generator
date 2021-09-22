@@ -7,6 +7,14 @@
     {
       "name": "mdiItems",
       "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of Mdi items",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of mdi item classes.",
+        " * @return list including meta objects",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtMdiItem",
@@ -17,6 +25,14 @@
     {
       "name": "dockWidgets",
       "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of Dock Widgets",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of dockwidget classes.",
+        " * @return list including meta objects",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtDockWidget",
@@ -26,7 +42,15 @@
         [
           {
             "name": "getDockWidgetArea",
-            "returnValue": "Qt::DockWidgetArea"
+            "returnValue": "Qt::DockWidgetArea",
+            "tooltip": "Recommended position in the main window",
+            "description":
+            [
+              "/**",
+              " * @brief Returns the recommended dock widget area in main windows.",
+              " * @return dock widget area",
+              " */"
+            ]
           }
         ]
       }
@@ -34,6 +58,14 @@
     {
       "name": "uiItems",
       "returnValue": "QMap<const char*, QMetaObject>",
+      "tooltip": "Map of data classes and ui items",
+      "description":
+      [
+        "/**",
+        " * @brief uiItems",
+        " * @return",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtObjectUI",
@@ -44,6 +76,14 @@
     {
       "name": "postItems",
       "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of post items",
+      "description":
+      [
+        "/**",
+        " * @brief postItems",
+        " * @return",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtObject",
@@ -54,6 +94,14 @@
     {
       "name": "postPlots",
       "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of post plots",
+      "description":
+      [
+        "/**",
+        " * @brief postPlots",
+        " * @return",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtPostTemplateItem",
@@ -64,7 +112,14 @@
           {
             "name": "createUI",
             "returnValue": "GtAbstractPostWidget*",
-            "parameter": "GtPostTemplateItem* dm, QWidget* parent"
+            "parameter": "GtPostTemplateItem* dm, QWidget* parent",
+            "description":
+            [
+              "/**",
+              " * @brief createUI",
+              " * @return",
+              " */"
+            ]
           }
         ]
       }

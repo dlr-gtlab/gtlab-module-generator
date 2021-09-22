@@ -37,7 +37,6 @@ INCLUDEPATH += . \
 SOURCES += \
     src/generator/module_generator.cpp \
     src/generator/module_generator_logger.cpp \
-    src/generator/module_generator_structs.cpp \
     src/generator/module_generator_utils.cpp \
     src/generator/preloader.cpp \
     src/main.cpp \

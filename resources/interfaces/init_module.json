@@ -6,7 +6,13 @@
   [
     {
       "name": "init",
-      "returnValue": "void"
+      "returnValue": "void",
+      "description":
+      [
+        "/**",
+        " * @brief Initializes module. Called on application startup.",
+        " */"
+      ]
     }
   ]
 }

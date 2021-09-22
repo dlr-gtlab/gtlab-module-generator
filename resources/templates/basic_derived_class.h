@@ -14,9 +14,7 @@ class $$CLASS_NAME$$ : $$BASE_CLASS$$
 {
 	Q_OBJECT
 	
-public:
-
-    $$CONSTRUCTOR$$ $$FUNCTION$$
+public:$$CONSTRUCTOR$$$$FUNCTION$$
 };
 
 #endif // $$HEADER_NAME$$_H

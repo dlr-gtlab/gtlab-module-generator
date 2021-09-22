@@ -7,6 +7,14 @@
     {
       "name": "propertyItems",
       "returnValue": "QMap<const char*, QMetaObject>",
+      "tooltip": "Map of properties and property items",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of property item classes.",
+        " * @return list of meta objects of property item classes.",
+        " */"
+      ],
       "includes":
       [
         "QMap"
@@ -19,12 +27,30 @@
         "constructors":
         [
           {
-            "header":"Q_INVOKABLE $$CLASS_NAME$$(const QString& ident, const QString& name);",
-            "source":"$$CLASS_NAME$$::$$CLASS_NAME$$(const QString& ident, const QString& name)\n{\n\tsetObjectName(name);\n\n\tm_id = ident;\n\tm_brief = QString();\n\tm_unitCategory = GtUnit::Category::None;\n\tm_value = QString();\n\tm_initValue = QString();\n}"
+            "parameter": "const QString& ident, const QString& name",
+            "source":
+            [
+              "setObjectName(name)",
+              "",
+              "m_id = ident",
+              "m_brief = QString()",
+              "m_unitCategory = GtUnit::Category::None",
+              "m_value = QString()",
+              "m_initValue = QString()"
+            ]
           },
           {
-            "header":"Q_INVOKABLE $$CLASS_NAME$$(const QString& ident, const QString& name, const QString& brief, const QString& value = QString());",
-            "source":"$$CLASS_NAME$$::$$CLASS_NAME$$(const QString& ident, const QString& name, const QString& brief, const QString& value)\n{\n\tsetObjectName(name);\n\n\tm_id = ident;\n\tm_brief = brief;\n\tm_unitCategory = GtUnit::Category::None;\n\tm_value = value;\n\tm_initValue = value;\n}"
+            "parameter": "const QString& ident, const QString& name, const QString& brief, const QString& value = QString()",
+            "source":
+            [
+              "setObjectName(name)",
+              "",
+              "m_id = ident",
+              "m_brief = brief",
+              "m_unitCategory = GtUnit::Category::None",
+              "m_value = value",
+              "m_initValue = value"
+            ]
           }
         ],
         "functions":
@@ -34,6 +60,13 @@
             "returnValue": "QVariant",
             "parameter": "const QString& unit, bool* success = 0",
             "qualifier": "const",
+            "description":
+            [
+              "/**",
+              " * @brief valueToVariant",
+              " * @return",
+              " */"
+            ],
             "includes":
             [
               "QVariant"
@@ -42,7 +75,16 @@
           {
             "name": "setValueFromVariant",
             "returnValue": "bool",
-            "parameter": "const QVariant& val, const QString& unit, bool* success = 0"
+            "parameter": "const QVariant& val, const QString& unit, bool* success = 0",
+            "tooltip": "",
+            "description":
+            [
+              "/**",
+              " * @brief setValueFromVariant",
+              " * @param val",
+              " * @return",
+              " */"
+            ]
           }
         ]
       },
@@ -58,6 +100,14 @@
             "returnValue": "QVariant",
             "parameter": "int column, int role",
             "qualifier": "const",
+            "description":
+            [
+              "/**",
+              " * @brief setValueFromVariant",
+              " * @param val",
+              " * @return",
+              " */"
+            ],
             "includes":
             [
               "QVariant"
@@ -66,7 +116,17 @@
           {
             "name": "setData",
             "returnValue": "bool",
-            "parameter": "int column, const QVariant& value, GtObject* obj, int role = Qt::EditRole"
+            "parameter": "int column, const QVariant& value, GtObject* obj, int role = Qt::EditRole",
+            "tooltip": "",
+            "description":
+            [
+              "/**",
+              " * @brief data",
+              " * @param column",
+              " * @param role",
+              " * @return",
+              " */"
+            ]
           }
         ]
       }
