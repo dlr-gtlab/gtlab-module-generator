@@ -14,11 +14,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-const QString S_TEMPLATES_PATH = QStringLiteral(":/templates/");
-
-const QString S_SRC_DIR      = QStringLiteral("src");
-const QString S_FEATURES_DIR = QStringLiteral("features");
-
 const QString ModuleGenerator::S_ID_SIGNATURE(QStringLiteral("$$SIGNATURE$$"));
 const QString ModuleGenerator::S_ID_GENERATOR_VERSION(QStringLiteral("$$GENERATOR_VERSION$$"));
 const QString ModuleGenerator::S_ID_INCLUDE_FILE(QStringLiteral("$$INCLUDE_FILE$$"));
@@ -57,19 +52,22 @@ const QString ModuleGenerator::S_ID_PRO_LIBS_D(QStringLiteral("$$PRO_LIBS_D$$"))
 const QString ModuleGenerator::S_ID_AUTHOR(QStringLiteral("$$AUTHOR$$"));
 const QString ModuleGenerator::S_ID_AUTHOR_EMAIL(QStringLiteral("$$AUTHOR_EMAIL$$"));
 
+// paths
+const QString S_TEMPLATES_PATH = QStringLiteral(":/templates/");
+const QString S_SRC_DIR      = QStringLiteral("src");
+const QString S_FEATURES_DIR = QStringLiteral("features");
+
+// qt makros
 const QString S_INTERFACE_MACRO(
         QStringLiteral("Q_INTERFACES(") + ModuleGenerator::S_ID_BASE_CLASS +
         QStringLiteral(")\n\t"));
+const QString S_Q_DECL_OVERRIDE(QStringLiteral(" Q_DECL_OVERRIDE;"));
+const QString S_Q_INVOKABLE(QStringLiteral("Q_INVOKABLE "));
+
+// helper strings
 const QString S_DERIVE_BASE_CLASS(
         QStringLiteral(",\n\t\tpublic ") + ModuleGenerator::S_ID_BASE_CLASS);
-
 const QString S_PRO_ENDL(QStringLiteral("\\\n\t"));
-const QString S_Q_DECL_OVERRIDE(QStringLiteral("Q_DECL_OVERRIDE;"));
-
-const QString S_CONSTRUCTOR_H_ENDL(
-        QStringLiteral("\n\n\t") + ModuleGenerator::S_ID_CONSTRUCTOR);
-const QString S_CONSTRUCTOR_CPP_ENDL(
-        QStringLiteral("\n\n") + ModuleGenerator::S_ID_CONSTRUCTOR);
 
 
 void
@@ -92,22 +90,18 @@ ModuleGenerator::onGenerate()
 int ModuleGenerator::generate()
 {
     bool result(generateModulePath());
-
     if (!result) return false;
 
     result = generateModuleSettingsFiles();
-
     if (!result) return false;
 
     result = generateModuleProjectFile();
-
     if (!result) return false;
 
     result = generateGitFiles();
     if (!result) return false;
 
     result = generateModuleDependencies();
-
     if (!result) return false;
 
     result = generateModule();
@@ -445,21 +439,22 @@ ModuleGenerator::generateModule()
 void
 ModuleGenerator::generateFunction(QString& headerString,
                                   QString& sourceString,
-                                  FunctionStruct& f)
+                                  FunctionStruct& f,
+                                  bool isConstructor)
 {
     LOG_INSTANCE("generating function '" + f.name + "'...");
 
     LOG_INFO << "building header function definition..." << ENDL;
 
     // Build basic function string
+    QString indentifier(isConstructor ? S_ID_CONSTRUCTOR : S_ID_FUNCTION);
     QString functionString;
-    functionString  = f.returnValue + " ";
     functionString += f.name;
-    functionString += "(" + f.parameter + ") ";
+    functionString += "(" + f.parameter + ")";
 
     if (!f.qualifier.isEmpty())
     {
-        functionString += f.qualifier + " ";
+        functionString += " " + f.qualifier;
     }
 
     // HEADER
@@ -471,28 +466,43 @@ ModuleGenerator::generateFunction(QString& headerString,
         functionHeader += f.description;
     }
 
-    functionHeader += "\n\t" + functionString;
-    functionHeader += S_Q_DECL_OVERRIDE;
-    functionHeader += S_ID_FUNCTION;
+    functionHeader += "\n\t";
 
-    utils::replaceIdentifier(headerString, { S_ID_FUNCTION, functionHeader});
+    if (!isConstructor) {
+        functionHeader += f.returnValue + " ";
+        functionHeader += functionString;
+        functionHeader += S_Q_DECL_OVERRIDE;
+    }
+    else {
+        functionHeader += S_Q_INVOKABLE;
+        functionHeader += functionString +";";
+    }
+
+    functionHeader += indentifier;
+
+    utils::replaceIdentifier(headerString, { indentifier, functionHeader});
 
     LOG_INFO << "building cpp function definition..." << ENDL;
 
     // CPP
     // remove default parameters in the cpp function declaration
-    QRegularExpression defaultparamRegExp(QStringLiteral("\\s?=\\s?[\\w|:\\d]+"));
+    QRegularExpression defaultparamRegExp(QStringLiteral("\\s?=\\s?(\\w|:|\\d|\\(\\))+"));
     functionString.remove(defaultparamRegExp);
 
-    functionString.insert(f.returnValue.length() + 1,
-                          "\n" + S_ID_CLASS_NAME + "::");
+    if (!isConstructor) {
+        functionString.prepend(f.returnValue + "\n" + S_ID_CLASS_NAME + "::");
+    }
+    else {
+        functionString.prepend(S_ID_CLASS_NAME + "::");
+    }
+
     functionString += "\n{\n\t" + S_ID_IMPLEMENTATION + "\n}";
-    functionString += S_ID_FUNCTION;
+    functionString += indentifier;
     functionString.prepend("\n\n");
 
-    utils::replaceIdentifier(sourceString, { S_ID_FUNCTION, functionString});
+    utils::replaceIdentifier(sourceString, { indentifier, functionString});
 
-    generateImplementation(headerString, sourceString, f);
+    generateImplementation(headerString, sourceString, f, isConstructor);
 
     LOG_INFO << "done!";
 }
@@ -500,7 +510,8 @@ ModuleGenerator::generateFunction(QString& headerString,
 void
 ModuleGenerator::generateImplementation(QString& headerString,
                                         QString& sourceString,
-                                        FunctionStruct& function)
+                                        FunctionStruct& function,
+                                        bool isConstructor)
 {
     LOG_INSTANCE("generating implementation...");
 
@@ -514,23 +525,31 @@ ModuleGenerator::generateImplementation(QString& headerString,
         return;
     }
 
-    LOG_INFO << "creating return values..." << ENDL;
+    LOG_INFO << "creating implemetnation string..." << ENDL;
 
     QString implementationString;
 
     QStringList list = implementation.values;
 
-    list.last().prepend("return ");
+    if (!isConstructor)
+    {
+        list.last().prepend("return ");
+    }
+
     list.last().append(';');
 
     implementationString = list.join(";\n\t");
     // remove empty statements
     implementationString.remove("\t;");
 
-    LOG_INFO << "setting return values..." << ENDL;
+    LOG_INFO << "setting implemetnation string..." << ENDL;
 
     utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION,
                                              implementationString });
+
+    if (isConstructor) {
+        LOG_INFO << "done!"; return;
+    }
 
     generateIncludes(sourceString, implementation.includes);
     generateForwardDeclarations(headerString, implementation.forwardDeclarations);
@@ -727,24 +746,13 @@ ModuleGenerator::generateConstructors(QString& headerString,
         base.constructors.append(G_CONSTRUCTOR_DEFAULT);
     }
 
-    int counter = 0;
-    int length  = base.constructors.length();
-
     for (Constructor& constructor : base.constructors)
     {
-        utils::replaceIdentifier(headerString, {
-                                     S_ID_CONSTRUCTOR,
-                                     constructor.header +
-                                     (counter < length - 1 ? S_CONSTRUCTOR_H_ENDL:
-                                                             QString())
-                                 });
-        utils::replaceIdentifier(sourceString, {
-                                     S_ID_CONSTRUCTOR,
-                                     constructor.source +
-                                     (counter < length - 1 ? S_CONSTRUCTOR_CPP_ENDL:
-                                                             QString())
-                                 });
-        counter += 1;
+        FunctionStruct fConstructor( {S_ID_CLASS_NAME, "", constructor.parameter });
+
+        fConstructor.implementation.values = constructor.implementation;
+
+        generateFunction(headerString, sourceString, fConstructor, true);
     }
 
     LOG_INFO << "done!";
@@ -872,25 +880,3 @@ ModuleGenerator::clearProjectFileIdentifiers()
 
     utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

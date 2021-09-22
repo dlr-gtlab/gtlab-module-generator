@@ -6,33 +6,73 @@
   [
     {
       "name": "executorId",
-      "returnValue": "QString"
+      "returnValue": "QString",
+      "tooltip": "Executor identification string",
+      "description":
+      [
+        "/**",
+        " * @brief Returns executor identification string.",
+        " * @return Executor identification string.",
+        " */"
+      ]
     },
     {
       "name": "executorDescription",
-      "returnValue": "QString"
+      "returnValue": "QString",
+      "tooltip": "Executor description",
+      "description":
+      [
+        "/**",
+        " * @brief Returns executor description.",
+        " * @return Executor description.",
+        " */"
+      ]
     },
     {
       "name": "executor",
       "returnValue": "QMetaObject",
+      "tooltip": "Executor class",
+      "description":
+      [
+        "/**",
+        " * @brief Returns meta object of executor.",
+        " * @return Meta object of executor.",
+        " */"
+      ],
       "baseClass":
-        {
-            "name": "GtAbstractCalculatorExecutor",
-            "fileName": "gt_abstractcalculatorexecutor",
-            "outputPath": "exec",
-            "functions":
+      {
+        "name": "GtAbstractCalculatorExecutor",
+        "fileName": "gt_abstractcalculatorexecutor",
+        "outputPath": "exec",
+        "functions":
+        [
+          {
+            "name": "exec",
+            "returnValue": "bool",
+            "parameter": "GtCalculator* calculator",
+            "tooltip": "",
+            "description":
             [
-              {
-                "name": "exec",
-                "returnValue": "bool",
-                "parameter": "GtCalculator* calculator"
-              }
+              "/**",
+              " * @brief exec",
+              " * @return",
+              " */"
             ]
-        }
+          }
+        ]
+      }
     },
     {
       "name": "executorSettings",
       "returnValue": "QList<GtAbstractProperty*>",
+      "tooltip": "List of Executor settings",
+      "description":
+      [
+        "/**",
+        " * @brief Returns list of executor settings.",
+        " * @return Executor settings.",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtAbstractProperty",
@@ -45,6 +85,13 @@
             "returnValue": "QVariant",
             "parameter": "const QString& unit, bool* success = 0",
             "qualifier": "const",
+            "description":
+            [
+              "/**",
+              " * @brief valueToVariant",
+              " * @return",
+              " */"
+            ],
             "includes":
             [
               "QVariant"
@@ -53,7 +100,16 @@
           {
             "name": "setValueFromVariant",
             "returnValue": "bool",
-            "parameter": "const QVariant& val, const QString& unit, bool* success = 0"
+            "parameter": "const QVariant& val, const QString& unit, bool* success = 0",
+            "tooltip": "",
+            "description":
+            [
+              "/**",
+              " * @brief setValueFromVariant",
+              " * @param val",
+              " * @return",
+              " */"
+            ]
           }
         ]
       }

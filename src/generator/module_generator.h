@@ -90,11 +90,13 @@ private:
 
     void generateFunction(QString& headerString,
                           QString& sourceString,
-                          FunctionStruct& f);
+                          FunctionStruct& f,
+                          bool isConstructor = false);
 
     void generateImplementation(QString& headerString,
                                 QString& sourceString,
-                                FunctionStruct& function);
+                                FunctionStruct& function,
+                                bool isConstructor = false);
 
     void generateImplementationHelper(QString& sourceString,
                                       ClassStruct& baseClass,

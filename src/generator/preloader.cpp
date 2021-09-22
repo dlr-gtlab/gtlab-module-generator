@@ -129,12 +129,20 @@ PreLoader::searchForConstructors(const QJsonArray& constructorJObject)
             continue;
         }
 
-        QString header = constructorJObject["header"].toString();
-        QString source = constructorJObject["source"].toString();
+        QString parameter = constructorJObject["parameter"].toString();
+        auto sourceArray  = constructorJObject["source"].toArray();
 
-        LOG_INFO << "..." << ENDL;
+        // constructor implementation
+        QStringList source;
 
-        constructors << Constructor({ header, source });
+        for (auto jsonValueRef : sourceArray)
+        {
+            source << jsonValueRef.toString();
+        }
+
+        LOG_INFO << "..." << source.join("; ") << ENDL;
+
+        constructors << Constructor({ parameter, source });
     }
 
     LOG_INFO << "done!";

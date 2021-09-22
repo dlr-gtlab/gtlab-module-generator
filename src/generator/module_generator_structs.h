@@ -4,7 +4,10 @@
 #include <QList>
 
 class QString;
+struct ModuleClass;
+struct AuthorDetails;
 struct ImplementationStruct;
+struct Constructor;
 struct ClassStruct;
 struct FunctionStruct;
 
@@ -52,16 +55,13 @@ struct ImplementationStruct
 
 struct Constructor
 {
-    QString header;
-    QString source;
+    QString parameter;
+    QStringList implementation;
 };
 
 const Constructor G_CONSTRUCTOR_DEFAULT =
-        Constructor({ QStringLiteral("Q_INVOKABLE $$CLASS_NAME$$();"),
-                      QStringLiteral("$$CLASS_NAME$$::$$CLASS_NAME$$()\n"
-                                     "{\n"
-                                     "\tsetObjectName(\"$$OBJECT_NAME$$\");\n"
-                                     "}")
+        Constructor({ QString(), QStringList() <<
+                      QStringLiteral("setObjectName(\"$$OBJECT_NAME$$\")")
                     });
 
 struct ClassStruct
@@ -77,7 +77,6 @@ struct ClassStruct
     {
         return !className.isEmpty() && !fileName.isEmpty();
     }
-//    ~ClassStruct();
 };
 
 struct FunctionStruct
@@ -96,9 +95,8 @@ struct FunctionStruct
     {
         return !returnValue.isEmpty() && !name.isEmpty();
     }
-
-//    ~FunctionStruct();
 };
+
 using DependencyStructs = QList<DependencyStruct>;
 using IdentifierPairs    = QList<IdentifierPair>;
 using FunctionStructsPtr = QList<FunctionStruct*>;

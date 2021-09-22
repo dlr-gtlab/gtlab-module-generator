@@ -7,6 +7,14 @@
     {
       "name": "calculators",
       "returnValue": "QList<GtCalculatorData>",
+      "tooltip": "List of calculators",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of calculator classes.",
+        " * @return list including meta objects.",
+        " */"
+      ],
       "includes":
       [
         "gt_application",
@@ -21,7 +29,15 @@
         [
           {
             "name": "run",
-            "returnValue": "bool"
+            "returnValue": "bool",
+            "tooltip": "Should the process succeed by default?",
+            "description":
+            [
+              "/**",
+              " * @brief Main run method of the calculator.",
+              " * @return Whether run process was successful or not.",
+              " */"
+            ]
           }
         ]
       }
@@ -29,6 +45,14 @@
     {
       "name": "tasks",
       "returnValue": "QList<GtTaskData>",
+      "tooltip": "List of tasks",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of task classes.",
+        " * @return list including meta objects.",
+        " */"
+      ],
       "includes":
       [
         "gt_application",

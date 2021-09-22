@@ -12,16 +12,34 @@
 class BoolClassSpecificationWidget : public QCheckBox,
         public AbstractClassSpecification
 {
+    Q_OBJECT
+
 public:
 
     BoolClassSpecificationWidget(const ImplementationStruct& implementation,
                                  QWidget* parent = nullptr) :
-      QCheckBox(parent),
-      AbstractClassSpecification(implementation) { }
+        QCheckBox(parent),
+        AbstractClassSpecification(implementation)
+    {
+        connect(this, SIGNAL(stateChanged(int)), this, SLOT(onStateChanged()));
+        onStateChanged();
+    }
 
     QStringList implementationValues() override
     {
-        return QStringList(QString(isChecked() ? "true":"false"));
+        return QStringList(stateToString());
+    }
+
+    QString stateToString()
+    {
+        return isChecked() ? QStringLiteral("true") : QStringLiteral("false");
+    }
+
+private slots:
+
+    void onStateChanged()
+    {
+        setText(this->stateToString());
     }
 };
 
@@ -30,6 +48,8 @@ public:
 class StringClassSpecificationWidget : public QLineEdit,
         public AbstractClassSpecification
 {
+    Q_OBJECT
+
 public:
 
     StringClassSpecificationWidget(const ImplementationStruct& implementation,
@@ -48,6 +68,8 @@ public:
 class ComboClassSpecificationWidget : public QComboBox,
         public AbstractClassSpecification
 {
+    Q_OBJECT
+
 public:
 
     /**

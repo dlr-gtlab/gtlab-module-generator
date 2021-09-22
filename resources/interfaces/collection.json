@@ -8,6 +8,14 @@
       "name": "collectionIcon",
       "returnValue": "QIcon",
       "qualifier": "const",
+      "tooltip": "Collection specific icon",
+      "description":
+      [
+        "/**",
+        " * @brief Returns collection specific icon.",
+        " * @return Collection specific icon.",
+        " */"
+      ],
       "includes":
       [
         "gt_application",
@@ -17,12 +25,29 @@
     {
       "name": "collectionId",
       "returnValue": "QString",
-      "qualifier": "const"
+      "qualifier": "const",
+      "tooltip": "Identification string of the collection.\nId is used to generate access point data within the network interface",
+      "description":
+      [
+        "/**",
+        " * @brief Returns identification string of collection. Same id",
+        " * is used to generate access point data within the netowrk interface.",
+        " * @return Identification string of collection.",
+        " */"
+      ]
     },
     {
       "name": "collectionSettings",
       "returnValue": "QMetaObject",
       "qualifier": "const",
+      "tooltip": "Collection settings",
+      "description":
+      [
+        "/**",
+        " * @brief Returns meta object of GtAbstractCollectionSettings class.",
+        " * @return Meta object of GtAbstractCollectionSettings class.",
+        " */"
+      ],
       "includes":
       [
         "gt_object"
@@ -41,12 +66,27 @@
           {
             "name": "localCollectionWidget",
             "returnValue": "QWidget*",
-            "parameter": "QWidget* parent"
+            "parameter": "QWidget* parent",
+            "description":
+            [
+              "/**",
+              " * @brief localCollectionWidget",
+              " * @param parent",
+              " */"
+            ]
           },
           {
             "name": "setLocalCollectionData",
             "returnValue": "void",
             "parameter": "QWidget* widget, QList<GtCollectionItem> items",
+            "description":
+            [
+              "/**",
+              " * @brief setLocalCollectionData",
+              " * @param editor",
+              " * @param items",
+              " */"
+            ],
             "includes":
             [
               "gt_collectionitem"
@@ -59,12 +99,27 @@
           {
             "name": "browserWidget",
             "returnValue": "GtAbstractBrowserWidget*",
-            "parameter": "QWidget* parent"
+            "parameter": "QWidget* parent",
+            "description":
+            [
+              "/**",
+              " * @brief browseCollectionWidget",
+              " * @param parent",
+              " */"
+            ]
           },
           {
             "name": "setBrowserWidgetData",
             "returnValue": "void",
             "parameter": "GtAbstractBrowserWidget* widget, QList<GtCollectionNetworkItem> installedItems, QList<GtCollectionNetworkItem> availableItems, QList<GtCollectionNetworkItem> updataAvailableItems",
+            "description":
+            [
+              "/**",
+              " * @brief setBrowserWidgetData",
+              " * @param editor",
+              " * @param items",
+              " */"
+            ],
             "includes":
             [
               "gt_collectionnetworkitem"
@@ -81,6 +136,13 @@
       "name": "collectionStructure",
       "returnValue": "QMap<QString, QMetaType::Type>",
       "qualifier": "const",
+      "description":
+      [
+        "/**",
+        " * @brief Returns structure of collection items.",
+        " * @param Sturcture of collection items.",
+        " */"
+      ],
       "includes":
       [
         "QMap"

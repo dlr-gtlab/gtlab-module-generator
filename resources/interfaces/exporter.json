@@ -8,6 +8,14 @@
       "name": "exporter",
       "returnValue": "QList<QMetaObject>",
       "qualifier": "const",
+      "tooltip": "List of exporters",
+      "description":
+      [
+        "/**",
+        " * @brief Returns static meta objects of exporter classes.",
+        " * @return List including meta objects of exporter classes.",
+        " */"
+      ],
       "baseClass":
       {
         "name": "GtAbstractExporter",
@@ -19,7 +27,6 @@
             "name": "targets",
             "returnValue": "QStringList",
             "qualifier": "const",
-            "tooltip": "List of allowed target exporter",
             "description":
             [
               "/**",
@@ -32,7 +39,7 @@
             "name": "icon",
             "returnValue": "QIcon",
             "qualifier": "const",
-            "tooltip": "Icon of exporter",
+            "tooltip": "Icon of the exporter",
             "description":
             [
               "/**",
@@ -50,7 +57,7 @@
             "name": "extension",
             "returnValue": "QString",
             "qualifier": "const",
-            "tooltip": "File extensions of exporter (e.g.: .txt, .csv, ...)",
+            "tooltip": "File extensions (e.g.: *.txt, *.csv, ...)",
             "description":
             [
               "/**",
@@ -63,7 +70,7 @@
             "name": "doExport",
             "returnValue": "bool",
             "parameter": "GtObject* data, QFile& file",
-            "tooltip": "Main export function",
+            "tooltip": "Should the export succeed by default?",
             "description":
             [
               "/**",

@@ -294,11 +294,3 @@ InterfaceSpecificationsPage::checkInterfaceData()
     return true;
 }
 
-
-
-
-
-
-
-
-
