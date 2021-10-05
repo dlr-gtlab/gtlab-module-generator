@@ -18,7 +18,7 @@ namespace utils
                            const QString& fileName);
 
     QString makeInclude(const QString& inlcude,
-                        const QString& identifier = "",
+                        const QString& identifier = QString(),
                         const bool isQt = false);
 }
 

@@ -70,24 +70,26 @@ const QString S_DERIVE_BASE_CLASS(
 const QString S_PRO_ENDL(QStringLiteral("\\\n\t"));
 
 
-void
-ModuleGenerator::onGenerate()
+bool
+ModuleGenerator::generate()
 {
     QTime time;
-
     time.start();
 
     LOG_INSTANCE("generating...");
 
-    int result = generate();
+    bool result = generateHelper();
 
     LOG_INFO << "time passed: " << QString::number(time.elapsed()) + " (ms)" << ENDL;
     LOG_INFO << "module creation " << (result ? "succeeded!":"failed!");
 
     emit generationFinished();
+
+    return result;
 }
 
-int ModuleGenerator::generate()
+bool
+ModuleGenerator::generateHelper()
 {
     bool result(generateModulePath());
     if (!result) return false;

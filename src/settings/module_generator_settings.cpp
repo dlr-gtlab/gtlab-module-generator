@@ -15,7 +15,7 @@
 #include <QFont>
 
 const QString
-    ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.4"));
+    ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.5"));
 const QRegularExpression
     ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
@@ -33,7 +33,7 @@ const QString S_DATE = QDate::currentDate().toString("dd.MM.yyyy");
 
 const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
         "/* GTlab - Gas Turbine laboratory\n"
-        " * Source File: $$FILE_NAME$$\n"
+//        " * Source File: $$FILE_NAME$$\n"
         " * copyright 2009-") + S_YEAR + QStringLiteral(" by DLR\n"
         " * \n"
         " * Created on: ") + S_DATE + QStringLiteral("\n"

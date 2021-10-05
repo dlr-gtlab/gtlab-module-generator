@@ -45,7 +45,7 @@ ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent)
     setPage(PAGE::SUMMARY_PAGE, m_summaryPage);
 
     connect(m_summaryPage, SIGNAL(validated()),
-            m_generator, SLOT(onGenerate()));
+            m_generator, SLOT(generate()));
     connect(m_generator, SIGNAL(generationFinished()),
             m_summaryPage, SLOT(onGenerationFinished()));
 

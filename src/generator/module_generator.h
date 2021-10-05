@@ -63,7 +63,7 @@ signals:
 
 public slots:
 
-    void onGenerate();
+    bool generate();
 
 private:
 
@@ -74,7 +74,7 @@ private:
     QDir m_moduleDir;
     QDir m_featuresDir;
 
-    int generate();
+    bool generateHelper();
 
     bool generateModulePath();
 

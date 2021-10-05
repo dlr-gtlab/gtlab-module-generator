@@ -20,8 +20,8 @@ const int I_DIR_PUSHBTN_WIDTH = 40;
 const char* C_SETTINGS_PAGE_TITLE = "Settings";
 
 const QString S_INFO_TEXT =
-        QStringLiteral("Enter the output directory, in which the module should "
-                       "be generated. Select the GTlab application and enter "
+        QStringLiteral("Enter the output directory for the generated module. "
+                       "Select the GTlab application and enter "
                        "the path to your local DevTools installation.");
 const QString S_OUTPUT_LABEL =
         QStringLiteral("Output directory:");

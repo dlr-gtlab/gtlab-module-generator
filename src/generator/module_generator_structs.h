@@ -98,12 +98,11 @@ struct FunctionStruct
 };
 
 using DependencyStructs = QList<DependencyStruct>;
-using IdentifierPairs    = QList<IdentifierPair>;
-using FunctionStructsPtr = QList<FunctionStruct*>;
-using FunctionStructs    = QList<FunctionStruct>;
-using ClassStructsPtr    = QList<ClassStruct*>;
-using ClassStructs       = QList<ClassStruct>;
-using Constructors       = QList<Constructor>;
+using IdentifierPairs   = QList<IdentifierPair>;
+using FunctionStructs   = QList<FunctionStruct>;
+using ClassStructsPtr   = QList<ClassStruct*>;
+using ClassStructs      = QList<ClassStruct>;
+using Constructors      = QList<Constructor>;
 
 
 

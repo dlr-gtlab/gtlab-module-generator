@@ -15,8 +15,10 @@ public:
         Error = 2
     };
 
+    using LogFunction = void (*)(QString&, Type, int);
+
     static void unregisterLoggingFunction();
-    static void registerLoggingFunction(void (*)(QString&, Type, int));    
+    static void registerLoggingFunction(LogFunction function);
     static QString typeName(Type type);
 
     ModuleGeneratorLogger(const QString& text = "", const Type& type = Info);

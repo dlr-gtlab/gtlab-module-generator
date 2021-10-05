@@ -2,14 +2,12 @@
 
 
 
-void defaultFunction(QString&, ModuleGeneratorLogger::Type, int);
+void consoleLog(QString&, ModuleGeneratorLogger::Type, int);
 
 static const int s_indentSize =  3;
 static       int s_indent     = 0;
 
-static void (*s_loggingFunction)(QString&, ModuleGeneratorLogger::Type, int)(defaultFunction);
-
-
+static ModuleGeneratorLogger::LogFunction s_loggingFunction(consoleLog);
 
 void
 ModuleGeneratorLogger::unregisterLoggingFunction()
@@ -17,11 +15,11 @@ ModuleGeneratorLogger::unregisterLoggingFunction()
     // reset indent
     s_indent = 0;
     // register default function
-    s_loggingFunction = defaultFunction;
+    s_loggingFunction = consoleLog;
 }
 
 void
-ModuleGeneratorLogger::registerLoggingFunction(void(*function)(QString&, Type, int))
+ModuleGeneratorLogger::registerLoggingFunction(LogFunction function)
 {
     if (function != Q_NULLPTR)
     {
@@ -100,7 +98,7 @@ ModuleGeneratorLogger::operator<<(const QString& text)
 }
 
 void
-defaultFunction(QString& text, ModuleGeneratorLogger::Type type, int indent)
+consoleLog(QString& text, ModuleGeneratorLogger::Type type, int indent)
 {
     QString indendation = text.left(indent > 0 ? indent - 1:0);
     QString actualText  = text.mid(indent > 0 ? indent - 1:0);
