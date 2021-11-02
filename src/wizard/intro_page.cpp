@@ -10,7 +10,7 @@
 const char* C_INTRO_PAGE_TITLE = "Introduction";
 
 const QString S_INFO_TEXT =
-        QStringLiteral("This tool generates a basic module for GTlab (v1.7).");
+        QStringLiteral("This tool generates a basic module for GTlab (v1.7.x).");
 const QString S_CREATE_BUTTON_TEXT =
         QStringLiteral("Create a new module");
 const QString S_EDIT_BUTTON_TEXT =

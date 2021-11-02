@@ -133,7 +133,6 @@ FunctionSpecificationWidget::setContent()
 void
 FunctionSpecificationWidget::setStandardImplementation(FunctionStruct& function)
 {
-
     QString returnValue = function.returnValue;
 
     QStringList values;
@@ -231,7 +230,8 @@ FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& functi
         return new MultipleClassSpecificationWidget(function, m_settings);
     }
 
-    LOG_INSTANCE("no specification widget found!", ModuleGeneratorLogger::Type::Warning);
+    LOG_INSTANCE("no specification widget found!",
+                 ModuleGeneratorLogger::Type::Warning);
 
     return Q_NULLPTR;
 }

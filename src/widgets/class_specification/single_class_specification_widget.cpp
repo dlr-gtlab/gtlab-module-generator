@@ -112,6 +112,9 @@ SingleClassSpecificationWidget::SingleClassSpecificationWidget(const FunctionStr
             this, SLOT(onLinkedSpecificationsBtnPressed()));
     connect(m_linkedSpecificationsWidget, SIGNAL(hidden()),
             this, SLOT(onHideLinkedSpecficationsWidget()));
+
+    // if object name is already set
+    onHideSpecficationsWidget();
 }
 
 SingleClassSpecificationWidget::~SingleClassSpecificationWidget()
