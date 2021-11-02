@@ -1,6 +1,7 @@
 #include "class_specification_widget.h"
 
 #include "function_specification_widget.h"
+#include "module_generator.h"
 #include "module_generator_settings.h"
 #include "module_generator_logger.h"
 
@@ -78,7 +79,7 @@ ClassSpecificationWidget::ClassSpecificationWidget(const FunctionStruct& functio
         }
         else
         {
-            QFrame* line =new QFrame();
+            QFrame* line = new QFrame();
             line->setFrameShape(QFrame::HLine);
             line->setFrameShadow(QFrame::Sunken);
 
@@ -98,6 +99,24 @@ ClassSpecificationWidget::ClassSpecificationWidget(const FunctionStruct& functio
             this, SLOT(onEditedObjectName(QString)));
     connect(m_autoEditCheckBox, SIGNAL(stateChanged(int)),
             this, SLOT(onAutoCompleteChanged(int)));
+
+    // hack for the package naming problem (issue #153 in Core)
+    if (classStruct.className == QStringLiteral("GtPackage"))
+    {
+        // auto generate the package file and class name
+        m_objectNameEdit->setText(QStringLiteral("Package"));
+        m_autoEditCheckBox->setChecked(true);
+        onAutoCompleteChanged(true);
+
+        // set the correct object name
+        m_autoEditCheckBox->setChecked(false);
+        m_autoEditCheckBox->setEnabled(false);
+        m_objectNameEdit->setText(settings->moduleClass().ident);
+        m_objectNameEdit->setEnabled(false);
+        m_objectNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
+        emit hidden();
+        return;
+    }
 
     // defaults
     m_autoEditCheckBox->setChecked(true);
