@@ -99,7 +99,16 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     m_devToolsDirEdit->setToolTip(S_DEVTOOLS_TOOLTIP);
     devToolsDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
-    m_versionBox->addItems(settings->supportedVersions());
+    // register versions
+    auto versions = settings->supportedVersions();
+    auto lastVersion = settings->gtlabVersion();
+    // set last version
+    if (versions.contains(lastVersion))
+    {
+        versions.removeOne(lastVersion);
+        versions.prepend(lastVersion);
+    }
+    m_versionBox->addItems(versions);
     m_versionBox->setMaximumWidth(100);
     m_versionBox->setToolTip(S_VERSION_TOOLTIP);
 

@@ -18,7 +18,7 @@ IntroPage::S_INFO_TEXT{QStringLiteral("This tool generates a basic module for "
 const QString S_CREATE_BUTTON_TEXT =
         QStringLiteral("Create a new module");
 const QString S_EDIT_BUTTON_TEXT =
-        QStringLiteral("Edit an existing module (WIP)");
+        QStringLiteral("Edit an existing module");
 
 /*
  * constructor

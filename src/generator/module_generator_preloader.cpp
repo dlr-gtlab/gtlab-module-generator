@@ -47,7 +47,7 @@ ModuleGeneratorPreLoader::searchForInterfaces()
 
     clearInterfaceStructs();
 
-    QDirIterator iterator(":/interfaces/", QStringList() << "*.json",
+    QDirIterator iterator(":/interfaces/", QStringList{"*.json"},
                           QDir::Files, QDirIterator::NoIteratorFlags);
 
     while (iterator.hasNext())
@@ -79,7 +79,7 @@ ModuleGeneratorPreLoader::searchForInterfaces()
 }
 
 ClassStruct
-ModuleGeneratorPreLoader::searchForClass(const QJsonObject& classJObject)
+ModuleGeneratorPreLoader::searchForClass(QJsonObject const& classJObject)
 {
     if (classJObject.isEmpty()) return ClassStruct();
 
@@ -110,7 +110,7 @@ ModuleGeneratorPreLoader::searchForClass(const QJsonObject& classJObject)
 }
 
 Constructors
-ModuleGeneratorPreLoader::searchForConstructors(const QJsonArray& constructorJObject)
+ModuleGeneratorPreLoader::searchForConstructors(QJsonArray const& constructorJObject)
 {
     Constructors constructors;
 
@@ -150,7 +150,7 @@ ModuleGeneratorPreLoader::searchForConstructors(const QJsonArray& constructorJOb
 }
 
 FunctionStructs
-ModuleGeneratorPreLoader::searchForFunctions(const QJsonArray& functionsJArray)
+ModuleGeneratorPreLoader::searchForFunctions(QJsonArray const& functionsJArray)
 {
     LOG_INDENT("searching for functions...");
 
@@ -245,7 +245,7 @@ ModuleGeneratorPreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 }
 
 void
-ModuleGeneratorPreLoader::searchForPrefixes(const QString& devToolsPath)
+ModuleGeneratorPreLoader::searchForPrefixes(QString const& devToolsPath)
 {
     LOG_INDENT("searching for occupied prefixes...");    
 
@@ -293,12 +293,13 @@ ModuleGeneratorPreLoader::searchForPrefixes(const QString& devToolsPath)
 }
 
 void
-ModuleGeneratorPreLoader::searchForDependencies(const QString& gtlabPath, int* status)
+ModuleGeneratorPreLoader::searchForDependencies(QString const& gtlabPath,
+                                                int* status)
 {    
     LOG_INDENT("searching for dependencies...");
 
     int _status;
-    if (status == Q_NULLPTR)
+    if (!status)
     {
         status = &_status;
     }
@@ -385,7 +386,7 @@ ModuleGeneratorPreLoader::searchForDependencies(const QString& gtlabPath, int* s
     }
 
     LOG_INFO << QString::number(m_dependencies.count())
-             << " reserved dependencies found!";
+             << " dependencies found!";
 }
 
 void

@@ -292,7 +292,8 @@ ModuleGenerator::generateModuleProjectFile()
 {
     LOG_INDENT("generating project file...");
 
-    auto fileString = utils::readFile(S_TEMPLATES_PATH + "module.pro");
+    auto fileStringPro = utils::readFile(S_TEMPLATES_PATH + "module.pro");
+    auto fileStringSrc = utils::readFile(S_TEMPLATES_PATH + "module_src.pro");
 
     IdentifierPairs identifierPairs;
 
@@ -303,10 +304,12 @@ ModuleGenerator::generateModuleProjectFile()
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
     identifierPairs.append({ S_ID_GTLAB_INSTALL_SUB_DIR, gtlabDir.dirName() });
 
-    utils::replaceIdentifier(fileString, identifierPairs);
+    utils::replaceIdentifier(fileStringPro, identifierPairs);
+    utils::replaceIdentifier(fileStringSrc, identifierPairs);
 
-    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName +
-                             ".pro");
+    utils::writeStringToFile(fileStringPro, m_moduleDir,
+                             moduleClass.fileName + ".pro");
+    utils::writeStringToFile(fileStringSrc, m_srcDir, "src.pro");
 
     LOG_INFO << "done!";
 
@@ -841,12 +844,11 @@ ModuleGenerator::appendFileToProjectFile(QString const& fileName,
 
     auto moduleClass = settings()->moduleClass();
 
-    auto fileString = utils::readFile(
-                m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
+    auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
 
     IdentifierPairs identifierPairs;
 
-    QString includePath(S_SRC_DIR + "/" + path);
+    QString includePath = path;
 
     if (!m_proFileIncludePaths.contains(includePath))
     {
@@ -866,7 +868,7 @@ ModuleGenerator::appendFileToProjectFile(QString const& fileName,
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
-    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
+    utils::writeStringToFile(fileString, m_srcDir, "src.pro");
 
     LOG_INFO << "done!";
 }
@@ -877,8 +879,7 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
     LOG_INDENT("adding lib '" + name + "' to project file...");
 
     auto moduleClass(settings()->moduleClass());
-    auto fileString = utils::readFile(
-                m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
+    auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
 
     IdentifierPairs identifierPairs;
 
@@ -927,7 +928,7 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
-    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
+    utils::writeStringToFile(fileString, m_srcDir, "src.pro");
 }
 
 void
@@ -947,13 +948,24 @@ ModuleGenerator::clearTabulators(QString &fileString)
 void
 ModuleGenerator::clearProjectFileIdentifiers()
 {
-    auto moduleClass = settings()->moduleClass();
 
-    auto fileString = utils::readFile(
-                m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
+    // src.pro
+    auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
 
     clearIdentifiers(fileString);
     clearTabulators(fileString);
 
-    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
+    utils::writeStringToFile(fileString, m_srcDir, "src.pro");
+
+    // module.pro
+    auto moduleClass = settings()->moduleClass();
+
+    fileString = utils::readFile(m_moduleDir.absoluteFilePath(
+                                     moduleClass.fileName + ".pro"));
+
+    clearIdentifiers(fileString);
+    clearTabulators(fileString);
+
+    utils::writeStringToFile(fileString, m_moduleDir,
+                             moduleClass.fileName + ".pro");
 }
