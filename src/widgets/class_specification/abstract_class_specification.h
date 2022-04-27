@@ -9,7 +9,7 @@ class AbstractClassSpecification
 
 public:
 
-    AbstractClassSpecification(const ImplementationStruct& implementation) :
+    AbstractClassSpecification(ImplementationStruct const& implementation) :
         m_implementation(implementation) { }
 
     virtual ~AbstractClassSpecification() { }
@@ -24,8 +24,8 @@ public:
     }
 
     virtual QStringList implementationValues() = 0;
-    virtual ClassStructs derivedClasses() { return ClassStructs(); }
-    virtual ClassStructs linkedClasses() { return ClassStructs(); }
+    virtual ClassStructs derivedClasses() { return {}; }
+    virtual ClassStructs linkedClasses() { return {}; }
 
 private:
 

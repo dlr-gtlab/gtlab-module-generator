@@ -16,9 +16,14 @@ class DependencySelectionPage : public AbstractWizardPage
 {
     Q_OBJECT
 
+    static const char* C_DEPENDENCY_PAGE_TITLE;
+
+    static const QString S_INFO_TEXT;
+    static const QString S_DEPENDENCY_BTN_TEXT;
+    static const QString S_DEPENDENCY_ADD_LABEL;
+    static const QString S_DEPENDENCY_LABEL;
 
 public:
-
 
     DependencySelectionPage(ModuleGeneratorSettings* settings,
                             QWidget* parent = nullptr);
@@ -27,36 +32,25 @@ public:
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool isComplete() const Q_DECL_OVERRIDE;
+    bool isComplete() const override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 private:
 
-    /// info text label
-    QLabel* m_infoTextLabel;
-    /// add dependency label
-    QLabel* m_addDependencyLabel;
-
-    QLabel* m_resolveStatusLabel;
+    QLabel* m_resolveStatusLabel{};
     /// add dependency edit
-    QLineEdit* m_addDependencyEdit;
+    QLineEdit* m_addDependencyEdit{};
     /// add dependency push button
-    QPushButton* m_addDependencyPushBtn;
-    /// dependency label
-    QLabel* m_dependenciesLabel;
-    /// grid layout
-    QGridLayout* m_baseLayout;
+    QPushButton* m_addDependencyPushBtn{};
 
-    WidgetListView* m_widgetListView;
-
+    WidgetListView* m_widgetListView{};
 
     void addStandardDependencies();
 
     void addDependency(const DependencyStruct& name, bool isEditable = true);
-
 
 private slots:
 

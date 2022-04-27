@@ -23,17 +23,17 @@ FunctionSpecificationWidget::FunctionSpecificationWidget(const FunctionStructs& 
       m_functions(functions),
       m_settings(settings)
 {
-    m_scrollWidget = new QWidget();
-    m_baseLayout   = new QGridLayout();
+    auto* scrollWidget = new QWidget;
+    m_baseLayout   = new QGridLayout;
 
     setContent();
 
-    m_scrollWidget->setLayout(m_baseLayout);
+    scrollWidget->setLayout(m_baseLayout);
 
     setFrameShape(QFrame::NoFrame);
 
     setWidgetResizable(true);
-    setWidget(m_scrollWidget);
+    setWidget(scrollWidget);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
@@ -54,21 +54,22 @@ FunctionSpecificationWidget::isEmpty() const
 FunctionStructs
 FunctionSpecificationWidget::implementedFunctions()
 {
-    QMapIterator<QString, AbstractClassSpecification*> iterator(m_specificationWidgets);
+    QMapIterator<QString, AbstractClassSpecification*> iterator{
+        m_specificationWidgets
+    };
 
     while (iterator.hasNext())
     {
-        iterator.next();
-        if (iterator.value() == Q_NULLPTR) continue;
+        auto item = iterator.next();
 
-        for (int i = 0; i < m_functions.length(); ++i)
+        if (!item.value()) continue;
+
+        for (auto& f : m_functions)
         {
-            if (m_functions[i].name == iterator.key())
-            {
-                m_functions[i].implementation = iterator.value()->functionImplementation();
+            if (f.name != item.key()) continue;
 
-                break;
-            }
+            f.implementation = item.value()->functionImplementation();
+            break;
         }
     }
 
@@ -78,18 +79,18 @@ FunctionSpecificationWidget::implementedFunctions()
 void
 FunctionSpecificationWidget::setContent()
 {
-    LOG_INSTANCE("setting content...");
+    LOG_INDENT("setting content...");
 
     for (auto& function : m_functions)
     {
-        LOG_INSTANCE("setting specifcation widget for '" +
+        LOG_INDENT("setting specifcation widget for '" +
                      function.returnValue + ' ' +
                      function.name + "'...");
 
-        AbstractClassSpecification* widget = setSpecificationWidget(function);
-        QWidget* inputWidget = dynamic_cast<QWidget*>(widget);
+        auto* widget = setSpecificationWidget(function);
+        auto* inputWidget = dynamic_cast<QWidget*>(widget);
 
-        if (inputWidget == Q_NULLPTR)
+        if (!inputWidget)
         {
             setStandardImplementation(function);
             LOG_INFO << "done!";
@@ -98,8 +99,8 @@ FunctionSpecificationWidget::setContent()
 
         inputWidget->setToolTip(function.tooltip);
 
-        QLabel* returnTypeLabel = new QLabel(function.returnValue);
-        QLabel* functionLabel   = new QLabel(function.name);
+        auto* returnTypeLabel = new QLabel(function.returnValue);
+        auto* functionLabel   = new QLabel(function.name);
 
         returnTypeLabel->setMinimumHeight(20);
         returnTypeLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
@@ -109,21 +110,27 @@ FunctionSpecificationWidget::setContent()
         functionLabel->setMinimumHeight(20);
         functionLabel->setStyleSheet("QLabel { color : black }");
 
-        returnTypeLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-        functionLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+        returnTypeLabel->setSizePolicy(QSizePolicy::Minimum,
+                                       QSizePolicy::Minimum);
+        functionLabel->setSizePolicy(QSizePolicy::Minimum,
+                                     QSizePolicy::Minimum);
 
         int widgetCount = this->count();
 
-        m_baseLayout->addWidget(functionLabel, widgetCount, 0, 1, 1, Qt::AlignTop);
-        m_baseLayout->addWidget(returnTypeLabel, widgetCount, 1, 1, 1, Qt::AlignTop);
-        m_baseLayout->addWidget(inputWidget, widgetCount, 2, 1, 1, Qt::AlignTop);
+        m_baseLayout->addWidget(functionLabel, widgetCount, 0, 1, 1,
+                                Qt::AlignTop);
+        m_baseLayout->addWidget(returnTypeLabel, widgetCount, 1, 1, 1,
+                                Qt::AlignTop);
+        m_baseLayout->addWidget(inputWidget, widgetCount, 2, 1, 1,
+                                Qt::AlignTop);
 
         m_specificationWidgets.insert(function.name, widget);
 
         LOG_INFO << "done!";
     }
 
-    auto* spacer = new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::MinimumExpanding);
+    auto* spacer = new QSpacerItem(1, 1, QSizePolicy::Minimum,
+                                   QSizePolicy::MinimumExpanding);
 
     m_baseLayout->addItem(spacer, this->count() + 1, 0, 1, 1);
 
@@ -137,32 +144,25 @@ FunctionSpecificationWidget::setStandardImplementation(FunctionStruct& function)
 
     QStringList values;
 
-    LOG_INSTANCE("setting standard implementation: " + returnValue);
+    LOG_INDENT("setting standard implementation: " + returnValue);
 
     // simple return types
     if (returnValue == QStringLiteral("void"))
     {
         values << QStringLiteral("/* TODO: add implementation */");
     }
-    else if (returnValue == QStringLiteral("QVariant"))
-    {
-        values << QStringLiteral("QVariant()");
-    }
-    else if (returnValue.endsWith('*'))
-    {
-        values << QStringLiteral("Q_NULLPTR");
-    }
     else if (returnValue == QStringLiteral("QStringList") ||
              returnValue.startsWith(QStringLiteral("QMap<")) ||
              returnValue.startsWith(QStringLiteral("QList<")))
     {
-        values << QString(returnValue + " retVal");
-        values << "";
+        values << QString{returnValue + " retVal"};
+        values << QString{};
         values << QStringLiteral("retVal");
     }
     else
     {
-        LOG_ERR << "no standard implementation set!";
+        values << QStringLiteral("{}");
+//        LOG_ERR << "no standard implementation set!";
     }
 
     function.implementation.values = values;
@@ -213,14 +213,15 @@ FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& functi
 
     if (baseClass.className.isEmpty())
     {
-        LOG_INSTANCE("null base class!", ModuleGeneratorLogger::Type::Warning);
-        return Q_NULLPTR;
+        LOG_INDENT("null base class!", ModuleGeneratorLogger::Type::Warning);
+        return {};
     }
 
     if (returnValue == QStringLiteral("QMetaObject"))
     {
         return new SingleClassSpecificationWidget(function, m_settings, false);
     }
+
     if (returnValue == QStringLiteral("QList<QMetaObject>") ||
         returnValue == QStringLiteral("QList<GtAbstractProperty*>") ||
         returnValue == QStringLiteral("QList<GtCalculatorData>") ||
@@ -230,9 +231,9 @@ FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& functi
         return new MultipleClassSpecificationWidget(function, m_settings);
     }
 
-    LOG_INSTANCE("no specification widget found!",
-                 ModuleGeneratorLogger::Type::Warning);
+    LOG_INDENT("no specification widget found!",
+               ModuleGeneratorLogger::Type::Warning);
 
-    return Q_NULLPTR;
+    return {};
 }
 

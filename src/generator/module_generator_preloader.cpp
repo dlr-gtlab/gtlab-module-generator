@@ -1,4 +1,4 @@
-#include "preloader.h"
+#include "module_generator_preloader.h"
 #include "module_generator_utils.h"
 #include "module_generator_logger.h"
 #include "module_generator_settings.h"
@@ -14,17 +14,16 @@
 #include <QStringList>
 #include <QDomDocument>
 
-PreLoader::~PreLoader()
-{
-    clearInterfaceStructs();
-}
+const QString
+ModuleGeneratorPreLoader::S_INCLUDE_CORE_PATH = QStringLiteral("core");
+const QString
+ModuleGeneratorPreLoader::S_INCLUDE_PATH      = QStringLiteral("include");
 
-const QString S_INCLUDE_CORE_PATH = QStringLiteral("core");
-const QString S_INCLUDE_PATH      = QStringLiteral("include");
+const QStringList
+ModuleGeneratorPreLoader::S_GTLAB_CONSOLE_ARGS{QStringLiteral("--footprint")};
 
-const QStringList S_GTLAB_CONSOLE_ARGS = QStringList(QStringLiteral("--footprint"));
-
-const int I_PROCESS_TIMEOUT_MS = 15000;
+const int
+ModuleGeneratorPreLoader::I_PROCESS_TIMEOUT_MS = 15000;
 
 /*
 // intended for auto detecting interfaces and functions
@@ -42,9 +41,9 @@ const QRegularExpression REGEXP_PREFIX(QStringLiteral("(\\w+?)_\\w+\\.h"));
 
 
 void
-PreLoader::searchForInterfaces()
+ModuleGeneratorPreLoader::searchForInterfaces()
 {
-    LOG_INSTANCE("searching for interfaces...");
+    LOG_INDENT("searching for interfaces...");
 
     clearInterfaceStructs();
 
@@ -55,7 +54,7 @@ PreLoader::searchForInterfaces()
     {
         QString file = iterator.next();
 
-        LOG_INSTANCE(file);
+        LOG_INDENT(file);
 
         auto document = QJsonDocument::fromJson(utils::readFile(file).toUtf8());
 
@@ -71,7 +70,7 @@ PreLoader::searchForInterfaces()
 
         if (!interfaceLocal.isValid()) continue;
 
-        m_interfaces << new ClassStruct(interfaceLocal);
+        m_interfaces << interfaceLocal;
 
         LOG_INFO << "done!";
     }
@@ -80,7 +79,7 @@ PreLoader::searchForInterfaces()
 }
 
 ClassStruct
-PreLoader::searchForClass(const QJsonObject& classJObject)
+ModuleGeneratorPreLoader::searchForClass(const QJsonObject& classJObject)
 {
     if (classJObject.isEmpty()) return ClassStruct();
 
@@ -92,7 +91,7 @@ PreLoader::searchForClass(const QJsonObject& classJObject)
     auto functionsJArray   = classJObject["functions"].toArray();
     auto constructorJArray = classJObject["constructors"].toArray();
 
-    LOG_INSTANCE("className  " + className);
+    LOG_INDENT("className  " + className);
 
     auto functions = searchForFunctions(functionsJArray);
 
@@ -111,13 +110,13 @@ PreLoader::searchForClass(const QJsonObject& classJObject)
 }
 
 Constructors
-PreLoader::searchForConstructors(const QJsonArray& constructorJObject)
+ModuleGeneratorPreLoader::searchForConstructors(const QJsonArray& constructorJObject)
 {
     Constructors constructors;
 
     if (constructorJObject.isEmpty()) return constructors;
 
-    LOG_INSTANCE("adding custom constructors...");
+    LOG_INDENT("adding custom constructors...");
 
     for (auto jsonValueRef : constructorJObject)
     {
@@ -151,9 +150,9 @@ PreLoader::searchForConstructors(const QJsonArray& constructorJObject)
 }
 
 FunctionStructs
-PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
+ModuleGeneratorPreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 {
-    LOG_INSTANCE("searching for functions...");
+    LOG_INDENT("searching for functions...");
 
     FunctionStructs functions;
 
@@ -246,9 +245,9 @@ PreLoader::searchForFunctions(const QJsonArray& functionsJArray)
 }
 
 void
-PreLoader::searchForPrefixes(const QString& devToolsPath)
+ModuleGeneratorPreLoader::searchForPrefixes(const QString& devToolsPath)
 {
-    LOG_INSTANCE("searching for occupied prefixes...");    
+    LOG_INDENT("searching for occupied prefixes...");    
 
     m_prefixes.clear();
 
@@ -294,9 +293,9 @@ PreLoader::searchForPrefixes(const QString& devToolsPath)
 }
 
 void
-PreLoader::searchForDependencies(const QString& gtlabPath, int* status)
+ModuleGeneratorPreLoader::searchForDependencies(const QString& gtlabPath, int* status)
 {    
-    LOG_INSTANCE("searching for dependencies...");
+    LOG_INDENT("searching for dependencies...");
 
     int _status;
     if (status == Q_NULLPTR)
@@ -390,14 +389,7 @@ PreLoader::searchForDependencies(const QString& gtlabPath, int* status)
 }
 
 void
-PreLoader::clearInterfaceStructs()
+ModuleGeneratorPreLoader::clearInterfaceStructs()
 {
-    for (auto interfaceStruct : m_interfaces)
-    {
-        if (interfaceStruct == Q_NULLPTR) continue;
-
-        delete interfaceStruct;
-    }
-
     m_interfaces.clear();
 }

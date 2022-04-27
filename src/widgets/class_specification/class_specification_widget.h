@@ -19,7 +19,7 @@ class ClassSpecificationWidget : public QWidget
 
 public:
 
-    ClassSpecificationWidget(const FunctionStruct& function,
+    ClassSpecificationWidget(FunctionStruct const& function,
                              ModuleGeneratorSettings* settings,
                              bool isLinked = false,
                              QWidget* parent = nullptr);
@@ -51,7 +51,7 @@ private:
 
 protected:
 
-    void closeEvent(QCloseEvent* event) Q_DECL_OVERRIDE;
+    void closeEvent(QCloseEvent* event) override;
 
 private slots:
 

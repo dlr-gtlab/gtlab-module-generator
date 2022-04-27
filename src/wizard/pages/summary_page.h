@@ -16,6 +16,13 @@ class SummaryPage : public AbstractWizardPage
 {
     Q_OBJECT
 
+    static const char* C_SUMMARY_PAGE_TITLE;
+
+    static const QString S_GENERATE_BUTTON_TEXT;
+    static const QString S_DONE_BUTTON_TEXT;
+    static const QString S_GIT_CHECK_BOX_TEXT;
+    static const QString S_GIT_CHECK_BOX_TOOLTIP;
+
 public:
 
     /**
@@ -32,22 +39,20 @@ public slots:
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool isComplete() const Q_DECL_OVERRIDE;
+    bool isComplete() const override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 private:
 
     /// summary text edit
-    QTextEdit* m_summaryTextEdit;
-    /// vertical layout
-    QVBoxLayout* m_vLayout;
+    QTextEdit* m_summaryTextEdit{};
 
-    QCheckBox* m_generateGitFilesCheckBox;
+    QCheckBox* m_generateGitFilesCheckBox{};
 
-    bool m_isComplete;
+    bool m_isComplete{true};
 
     /**
      * @brief createSummary - generates a summary of selections and choices

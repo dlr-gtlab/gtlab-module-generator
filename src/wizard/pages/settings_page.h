@@ -11,6 +11,7 @@ class QGridLayout;
 class QFileSystemModel;
 class QString;
 class QCompleter;
+class QComboBox;
 
 /**
  * @brief to select output path, gtlab path and dev tools path
@@ -18,6 +19,22 @@ class QCompleter;
 class SettingsPage : public AbstractWizardPage
 {
     Q_OBJECT
+
+    static const int I_DIR_PUSHBTN_WIDTH;
+
+    static const char* C_SETTINGS_PAGE_TITLE;
+
+    static const QString S_INFO_TEXT;
+    static const QString S_OUTPUT_LABEL;
+    static const QString S_DEVTOOLS_LABEL;
+    static const QString S_GTLAB_LABEL;
+    static const QString S_OUTPUT_TOOLTIP;
+    static const QString S_DEVTOOLS_TOOLTIP;
+    static const QString S_GTLAB_TOOLTIP;
+    static const QString S_VERSION_LABEL;
+    static const QString S_VERSION_TOOLTIP;
+    static const QString S_DIR_BTN_TOOLTIP;
+    static const QString S_DIR_BTN_TEXT;
 
 public:
 
@@ -31,40 +48,24 @@ public:
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool isComplete() const Q_DECL_OVERRIDE;
+    bool isComplete() const override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 private:
 
-    /// info tet label
-    QLabel* m_infoTextLabel;
-
-    /// output dir label
-    QLabel* m_outputDirLabel;
-    /// gtlab label
-    QLabel* m_gtlabLabel;
-    /// devtools label
-    QLabel* m_devToolsLabel;
-
     /// output line edit
-    QLineEdit* m_outputDirEdit;
+    QLineEdit* m_outputDirEdit{};
     /// gtlab line edit
-    QLineEdit* m_gtlabDirEdit;
+    QLineEdit* m_gtlabDirEdit{};
     /// dev tools line edit
-    QLineEdit* m_devToolsDirEdit;
+    QLineEdit* m_devToolsDirEdit{};
 
-    /// output push button
-    QPushButton* m_outputDirPushBtn;
-    /// gtlab push button
-    QPushButton* m_gtlabDirPushBtn;
-    /// dev tools push button
-    QPushButton* m_devToolsDirPushBtn;
+    QComboBox* m_versionBox{};
 
-    /// grid layout
-    QGridLayout* m_baseGridLayout;
+    static void updateDirEdit(QLineEdit* edit, QString& path);
 
     bool setLineEditColor(QLineEdit* edit, bool isExec = false) const;
 

@@ -11,24 +11,28 @@
 #include <QGridLayout>
 #include <QRegularExpressionValidator>
 
-const char* C_TITLE_SIGNATURE_PAGE = "File Signature";
+const char*
+SignaturePage::C_TITLE_SIGNATURE_PAGE = "File Signature";
 
-const QString S_INFO_TEXT =
-        QStringLiteral("Enter your user details to generate a file signature.");
-const QString S_AUTHOR_LABEL =
-        QStringLiteral("Author name:");
-const QString S_EMAIL_LABEL =
-        QStringLiteral("E-Mail:");
-const QString S_SIGNATURE_LABEL =
-        QStringLiteral("Signature:");
+const QString
+SignaturePage::S_INFO_TEXT = QStringLiteral("Enter your user details to "
+                                            "generate a file signature.");
+const QString
+SignaturePage::S_AUTHOR_LABEL = QStringLiteral("Author name:");
+const QString
+SignaturePage::S_EMAIL_LABEL = QStringLiteral("E-Mail:");
+const QString
+SignaturePage::S_SIGNATURE_LABEL = QStringLiteral("Signature:");
 
 SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
-    m_infoTextLabel = new QLabel(S_INFO_TEXT);
-    m_authorLabel = new QLabel(S_AUTHOR_LABEL);
-    m_emailLabel = new QLabel(S_EMAIL_LABEL);
-    m_signatureLabel = new QLabel(S_SIGNATURE_LABEL);
+    auto* infoLabel = new QLabel(S_INFO_TEXT);
+    auto* authorLabel = new QLabel(S_AUTHOR_LABEL);
+    auto* emailLabel = new QLabel(S_EMAIL_LABEL);
+    auto* signatureLabel = new QLabel(S_SIGNATURE_LABEL);
+    auto* baseLayout = new QGridLayout;
+
     m_authorEdit = new QLineEdit;
     m_emailEdit = new QLineEdit;
     m_signatureTextEdit = new QTextEdit;
@@ -38,32 +42,32 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
     m_emailValdidator = new QRegularExpressionValidator(
                 ModuleGeneratorSettings::REG_AUTHOR_EMAIL, this);
 
-    m_baseLayout = new QGridLayout;
 
     // page gui
     setTitle(C_TITLE_SIGNATURE_PAGE);
 
-    m_infoTextLabel->setWordWrap(true);
-    m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
-    m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    infoLabel->setWordWrap(true);
+    infoLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
+    infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     m_authorEdit->setValidator(m_authorValdidator);
     m_emailEdit->setValidator(m_emailValdidator);
 
-    m_signatureLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    signatureLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     m_signatureTextEdit->setReadOnly(true);
     m_signatureTextEdit->setFont(ModuleGeneratorSettings::F_MONO_FONT);
 
-    m_baseLayout->addWidget(m_infoTextLabel, 0, 0, 1, 3);
-    m_baseLayout->addWidget(m_authorLabel, 1, 0);
-    m_baseLayout->addWidget(m_authorEdit, 1, 1);
-    m_baseLayout->addWidget(m_emailLabel, 2, 0);
-    m_baseLayout->addWidget(m_emailEdit, 2, 1);
-    m_baseLayout->addWidget(m_signatureLabel, 3, 0);
-    m_baseLayout->addWidget(m_signatureTextEdit, 3, 1, 1, 2);
-    m_baseLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
+    baseLayout->addWidget(infoLabel, 0, 0, 1, 3);
+    baseLayout->addWidget(authorLabel, 1, 0);
+    baseLayout->addWidget(m_authorEdit, 1, 1);
+    baseLayout->addWidget(emailLabel, 2, 0);
+    baseLayout->addWidget(m_emailEdit, 2, 1);
+    baseLayout->addWidget(signatureLabel, 3, 0);
+    baseLayout->addWidget(m_signatureTextEdit, 3, 1, 1, 2);
+    baseLayout->setColumnMinimumWidth(0,
+                                      AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
-    setLayout(m_baseLayout);
+    setLayout(baseLayout);
 
     // sginals
     connect(m_authorEdit, SIGNAL(textEdited(QString)),
@@ -83,7 +87,7 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
 void
 SignaturePage::initializePage()
 {
-    LOG_INSTANCE("signature page...");
+    LOG_INDENT("signature page...");
 }
 
 bool
@@ -100,7 +104,7 @@ SignaturePage::isComplete() const
 bool
 SignaturePage::validatePage()
 {
-    LOG_INSTANCE("validated!");
+    LOG_INDENT("validated!");
 
     AuthorDetails details;
 

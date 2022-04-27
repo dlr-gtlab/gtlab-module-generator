@@ -14,6 +14,10 @@ class IntroPage : public AbstractWizardPage
 {
     Q_OBJECT
 
+    static const char* C_INTRO_PAGE_TITLE;
+
+    static const QString S_INFO_TEXT;
+
 public:
 
     /**
@@ -25,20 +29,13 @@ public:
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 private:
 
-    /// info text label
-    QLabel* m_infoTextLabel;
-    /// create radio button
-    QRadioButton* m_createRBtn;
-    /// edit radio button
-    QRadioButton* m_editRBtn;
-    /// vertical layout
-    QVBoxLayout* m_baseLayout;
-
+    QRadioButton* m_createRBtn{};
+    QRadioButton* m_editRBtn{};
 };
 #endif // INTROPAGE_H

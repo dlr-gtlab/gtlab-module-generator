@@ -17,7 +17,7 @@ class MultipleClassSpecificationWidget :
 
 public:
 
-    MultipleClassSpecificationWidget(const FunctionStruct& function,
+    MultipleClassSpecificationWidget(FunctionStruct const& function,
                                      ModuleGeneratorSettings* settings,
                                      QWidget* parent = nullptr);
 

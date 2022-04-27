@@ -3,14 +3,18 @@
 #include <QLabel>
 #include <QRadioButton>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 
 #include "module_generator_settings.h"
 #include "module_generator_logger.h"
 
-const char* C_INTRO_PAGE_TITLE = "Introduction";
+const char*
+IntroPage::C_INTRO_PAGE_TITLE = "Introduction";
 
-const QString S_INFO_TEXT =
-        QStringLiteral("This tool generates a basic module for GTlab (v1.7.x).");
+const QString
+IntroPage::S_INFO_TEXT{QStringLiteral("This tool generates a basic module for "
+                                      "GTlab.")};
+
 const QString S_CREATE_BUTTON_TEXT =
         QStringLiteral("Create a new module");
 const QString S_EDIT_BUTTON_TEXT =
@@ -23,29 +27,29 @@ IntroPage::IntroPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
     // initializations
-    m_infoTextLabel = new QLabel(S_INFO_TEXT);
-    m_createRBtn = new QRadioButton(S_CREATE_BUTTON_TEXT);
-    m_editRBtn = new QRadioButton(S_EDIT_BUTTON_TEXT);
-    m_baseLayout = new QVBoxLayout;
+    auto* infoLabel = new QLabel(S_INFO_TEXT);
+    auto* baseLayout = new QVBoxLayout;
 
 
     // page gui
     setTitle(tr(C_INTRO_PAGE_TITLE));
 
-    m_infoTextLabel->setWordWrap(true);
-    m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
-    m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    infoLabel->setWordWrap(true);
+    infoLabel->setMinimumHeight(
+                AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
+    infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
+    m_createRBtn = new QRadioButton(S_CREATE_BUTTON_TEXT);
+    m_editRBtn = new QRadioButton(S_EDIT_BUTTON_TEXT);
     m_createRBtn->setChecked(true);
-
     m_editRBtn->setDisabled(true);
 
     // layout
-    m_baseLayout->addWidget(m_infoTextLabel);
-    m_baseLayout->addWidget(m_createRBtn);
-    m_baseLayout->addWidget(m_editRBtn);
+    baseLayout->addWidget(infoLabel);
+    baseLayout->addWidget(m_createRBtn);
+    baseLayout->addWidget(m_editRBtn);
 
-    setLayout(m_baseLayout);
+    setLayout(baseLayout);
 }
 
 /*
@@ -54,13 +58,13 @@ IntroPage::IntroPage(ModuleGeneratorSettings* settings, QWidget* parent) :
 void
 IntroPage::initializePage()
 {
-    LOG_INSTANCE("intro page...");
+    LOG_INDENT("intro page...");
 }
 
 bool
 IntroPage::validatePage()
 {
-    LOG_INSTANCE("validated!");
+    LOG_INDENT("validated!");
 
     if(m_createRBtn->isChecked())
     {

@@ -44,8 +44,6 @@ SingleClassSpecificationWidget::SingleClassSpecificationWidget(const FunctionStr
     m_specificationsButton = new QPushButton(S_SPECIFICATIONS_BTN_TEXT);
     m_linkedClassButton    = new QPushButton(S_LINKED_CLASS_BTN_TEXT);
 
-
-
     m_deleteButton->setIconSize(QSize(16, 16));
     m_deleteButton->setFixedSize(16, 16);
     m_deleteButton->setIcon(QIcon(S_DELETE_BTN_ICON_PATH));
@@ -92,14 +90,18 @@ SingleClassSpecificationWidget::SingleClassSpecificationWidget(const FunctionStr
 
     setLayout(m_baseLayout);
 
-    m_specificationsWidget       = new ClassSpecificationWidget(m_functionStruct, settings);
-    m_linkedSpecificationsWidget = new ClassSpecificationWidget(m_functionStruct, settings, true);
+    m_specificationsWidget       = new ClassSpecificationWidget(
+                m_functionStruct, settings);
+    m_linkedSpecificationsWidget = new ClassSpecificationWidget(
+                m_functionStruct, settings, true);
 
     setupSpecificationsWidget(m_specificationsWidget);
     setupSpecificationsWidget(m_linkedSpecificationsWidget);
 
-    m_specificationsWidget->setWindowTitle(m_functionStruct.baseClass.className);
-    m_linkedSpecificationsWidget->setWindowTitle(m_functionStruct.linkedClass.className);
+    m_specificationsWidget->setWindowTitle(
+                m_functionStruct.baseClass.className);
+    m_linkedSpecificationsWidget->setWindowTitle(
+                m_functionStruct.linkedClass.className);
 
     connect(m_deleteButton, SIGNAL(pressed()),
             this, SLOT(onDeleteBtnPressed()));
@@ -147,8 +149,9 @@ SingleClassSpecificationWidget::implementationValues()
 
     if (!implementation.isValid())
     {
-        LOG_INSTANCE("invalid implementation!", ModuleGeneratorLogger::Type::Error);
-        return QStringList();
+        LOG_INDENT("invalid implementation!",
+                   ModuleGeneratorLogger::Type::Error);
+        return {};
     }
 
     QString returnValue = m_functionStruct.returnValue;
@@ -167,7 +170,7 @@ SingleClassSpecificationWidget::implementationValues()
     // simple return types
     if (returnValue == QStringLiteral("QMetaObject"))
     {
-        values << QString("GT_METADATA(" + implementation.className + ")");
+        values << QString{"GT_METADATA(" + implementation.className + ")"};
     }
     else if (returnValue.endsWith('*'))
     {
@@ -183,41 +186,42 @@ SingleClassSpecificationWidget::implementationValues()
                     QStringLiteral("GT_EXTENDED_CALC_DATA");
 
         // generate valid variable name
-        QString variableName = implementation.objectName;
-        variableName.remove(' ');
-        variableName.replace(0, 1, variableName.at(0).toLower());
+        QString varName = implementation.objectName;
+        varName.remove(' ');
+        varName.replace(0, 1, varName.at(0).toLower());
 
         // create variable
         returnValue.insert(2, "Extended");
-        values << QString(returnValue + ' ' + variableName + " = " +
+        values << QString(returnValue + ' ' + varName + " = " +
                           makroName + '(' + implementation.className + ')');
-        values << "";
+        values << QString{};
         // proces id
-        values << QString(variableName + "->id = " + "QStringLiteral(\""+
+        values << QString(varName + "->id = " + "QStringLiteral(\""+
                           implementation.objectName + "\")");
         // process category
-        values << QString(variableName + "->category = " + "QStringLiteral(\""+
+        values << QString(varName + "->category = " + "QStringLiteral(\""+
                           ModuleGenerator::S_ID_MODULE_NAME + "\")");
         // author
-        values << QString(variableName + "->author = " + "QStringLiteral(\""+
+        values << QString(varName + "->author = " + "QStringLiteral(\""+
                           ModuleGenerator::S_ID_AUTHOR + "\")");
         // contact
-        values << QString(variableName + "->contact = " + "QStringLiteral(\""+
+        values << QString(varName + "->contact = " + "QStringLiteral(\""+
                           ModuleGenerator::S_ID_AUTHOR_EMAIL + "\")");
         // icon
-        values << QString(variableName + "->icon = " + "gtApp->icon(QStringLiteral(\"" +
+        values << QString(varName + "->icon = " + "gtApp->icon(QStringLiteral(\"" +
                           QString(isTask ? "taskIcon":"calculatorIcon") + ".png\"))");
         // version
-        if (isTask) values << QString(variableName + "->version = 1");
-        else values << QString(variableName + "->version = GtVersionNumber(0, 0, 1)");
+        if (isTask) values << QString(varName + "->version = 1");
+        else values << QString(varName + "->version = GtVersionNumber(0, 0, 1)");
         // status
-        values << QString(variableName + "->status = GtAbstractProcessData::PROTOTYPE");
+        values << QString(varName + "->status = GtAbstractProcessData::PROTOTYPE");
         // return variable
-        values << variableName;
+        values << varName;
     }
     else
     {
-        LOG_INSTANCE("return value not implemented: " + returnValue, ModuleGeneratorLogger::Type::Error);
+        LOG_INDENT("return value not implemented: " + returnValue,
+                   ModuleGeneratorLogger::Type::Error);
         return QStringList();
     }
 

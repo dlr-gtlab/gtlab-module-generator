@@ -83,7 +83,7 @@
           {
             "name": "valueToVariant",
             "returnValue": "QVariant",
-            "parameter": "const QString& unit, bool* success = 0",
+            "parameter": "const QString& unit, bool* success = {}",
             "qualifier": "const",
             "description":
             [
@@ -100,7 +100,7 @@
           {
             "name": "setValueFromVariant",
             "returnValue": "bool",
-            "parameter": "const QVariant& val, const QString& unit, bool* success = 0",
+            "parameter": "const QVariant& val, const QString& unit, bool* success = {}",
             "tooltip": "",
             "description":
             [

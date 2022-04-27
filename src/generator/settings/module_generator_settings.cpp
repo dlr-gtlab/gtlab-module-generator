@@ -15,18 +15,21 @@
 #include <QFont>
 
 const QString
-    ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.5"));
+ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.5"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
+ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("\\s?[A-Za-z]([\\w\\d]*\\s?)+"));
+ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("\\s?[A-Za-z]"
+                                                        "([\\w\\d]*\\s?)+"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_VERSION(QStringLiteral("\\d+(.\\d+)?(.\\d+)?(-\\w+)?"));
+ModuleGeneratorSettings::REG_VERSION(QStringLiteral("\\d+(.\\d+)?"
+                                                    "(.\\d+)?(-\\w+)?"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_AUTHOR(QStringLiteral("[A-Za-z].*"));
+ModuleGeneratorSettings::REG_AUTHOR(QStringLiteral("[A-Za-z].*"));
 const QRegularExpression
-    ModuleGeneratorSettings::REG_AUTHOR_EMAIL(QStringLiteral(".*"));
-const QFont ModuleGeneratorSettings::F_MONO_FONT = QFont(QStringLiteral("Consolas"), 9);
+ModuleGeneratorSettings::REG_AUTHOR_EMAIL(QStringLiteral(".*"));
+const QFont
+ModuleGeneratorSettings::F_MONO_FONT = QFont(QStringLiteral("Consolas"), 9);
 
 const QString S_YEAR = QDate::currentDate().toString("yyyy");
 const QString S_DATE = QDate::currentDate().toString("dd.MM.yyyy");
@@ -42,19 +45,20 @@ const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
         " */");
 
 const QString
-    ModuleGeneratorSettings::S_EXEC_SUFFIX(isOsWindows() ? QStringLiteral(".exe"):
-                                                           QStringLiteral(""));
+ModuleGeneratorSettings::S_EXEC_SUFFIX(isOsWindows() ? QStringLiteral(".exe"):
+                                                       QStringLiteral(""));
 const QString
-    ModuleGeneratorSettings::S_GTLAB_APP(QStringLiteral("GTlab") +
-                                         S_EXEC_SUFFIX);
+ModuleGeneratorSettings::S_GTLAB_APP(QStringLiteral("GTlab") +
+                                     S_EXEC_SUFFIX);
 const QString
-    ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP(QStringLiteral("GTlabConsole") +
-                                                 S_EXEC_SUFFIX);
+ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP(QStringLiteral("GTlabConsole") +
+                                             S_EXEC_SUFFIX);
 
 
-ModuleGeneratorSettings::ModuleGeneratorSettings() :
-    m_createGitFiles(true)
+ModuleGeneratorSettings::ModuleGeneratorSettings()
 {
+    qDebug() << "here";
+
     deserializeUserData();
 
     m_preLoader.searchForInterfaces();
@@ -66,8 +70,15 @@ ModuleGeneratorSettings::ModuleGeneratorSettings() :
     }
 }
 
+bool
+ModuleGeneratorSettings::isOsWindows()
+{
+    return QSysInfo::productType() == "windows";
+}
+
 QString
-ModuleGeneratorSettings::classNamingScheme(const QString& name, const QString& prefix) const
+ModuleGeneratorSettings::classNamingScheme(const QString& name,
+                                           const QString& prefix) const
 {
     QString retString;
 
@@ -102,7 +113,8 @@ ModuleGeneratorSettings::classNamingScheme(const QString& name) const
 }
 
 QString
-ModuleGeneratorSettings::fileNamingScheme(const QString& name, const QString& prefix) const
+ModuleGeneratorSettings::fileNamingScheme(const QString& name,
+                                          const QString& prefix) const
 {
     QString retString;
 
@@ -129,11 +141,97 @@ ModuleGeneratorSettings::fileNamingScheme(const QString& name) const
     return fileNamingScheme(name, modulePrefix());
 }
 
+int
+ModuleGeneratorSettings::gtlabMajorVersion() const
+{
+    return QVersionNumber::fromString(m_version).majorVersion();
+}
+
+QStringList
+ModuleGeneratorSettings::supportedVersions() const
+{
+    QStringList retVal;
+
+    retVal << QVersionNumber{1,7,0}.toString();
+    retVal << QVersionNumber{2,0,0}.toString() + "-dp4";
+
+    return retVal;
+}
+
+QString const&
+ModuleGeneratorSettings::modulePrefix() const
+{
+    return m_modulePrefix;
+}
+
+void
+ModuleGeneratorSettings::setModulePrefix(QString const& prefix)
+{
+    m_modulePrefix = prefix;
+}
+
+ModuleClass const&
+ModuleGeneratorSettings::moduleClass() const {
+    return m_moduleClass;
+}
+
+void ModuleGeneratorSettings::setModuleClass(const ModuleClass &module) {
+    m_moduleClass = module;
+}
+
+ClassStructs const&
+ModuleGeneratorSettings::selectedInterfaces() const
+{
+    return m_selectedInterfaces;
+}
+
+void
+ModuleGeneratorSettings::setSelectedInterfaces(ClassStructs const& interfaces)
+{
+    m_selectedInterfaces = interfaces;
+}
+
+DependencyStructs const&
+ModuleGeneratorSettings::selectedDependencies() const
+{
+    return m_selectedDependencies;
+}
+
+void
+ModuleGeneratorSettings::setSelectedDependencies(DependencyStructs const&
+                                                 dependencies)
+{
+    m_selectedDependencies = dependencies;
+}
+
+AuthorDetails const& ModuleGeneratorSettings::authorDetails() const
+{
+    return m_authorDetails;
+}
+
+void
+ModuleGeneratorSettings::setAuthorDetails(AuthorDetails const& details)
+{
+    m_authorDetails = details;
+}
+
+void
+ModuleGeneratorSettings::setCreateGitFiles(bool value)
+{
+    m_createGitFiles = value;
+}
+
+bool
+ModuleGeneratorSettings::createGitFiles() const
+{
+    return m_createGitFiles;
+}
+
 void
 ModuleGeneratorSettings::preLoad()
 {
     if (m_preLoader.searchPath() != gtlabPath() ||
-        m_preLoader.prefixes().isEmpty())
+            m_preLoader.prefixes().isEmpty())
     {
         m_preLoader.searchForPrefixes(devToolsPath());
     }
@@ -142,7 +240,7 @@ ModuleGeneratorSettings::preLoad()
         m_preLoader.dependencies().isEmpty())
     {
         // load dependencies in a separate thread
-        auto function = [](PreLoader* loader, QString path) -> int
+        auto function = [](ModuleGeneratorPreLoader* loader, QString path) -> int
         {
             int status = -1;
             loader->searchForDependencies(path, &status);
@@ -153,6 +251,22 @@ ModuleGeneratorSettings::preLoad()
                                                  &m_preLoader,
                                                  gtlabPath());
     }
+}
+
+QStringList const&
+ModuleGeneratorSettings::reservedPrefixes() const {
+    return m_preLoader.prefixes();
+}
+
+ClassStructs const&
+ModuleGeneratorSettings::availableInterfaces() const {
+    return m_preLoader.interfaces();
+}
+
+DependencyStructs const&
+ModuleGeneratorSettings::availableDependencies() const
+{
+    return m_preLoader.dependencies();
 }
 
 int
@@ -173,7 +287,7 @@ ModuleGeneratorSettings::dependencyResolveStatus() const
 void
 ModuleGeneratorSettings::serializeUserData() const
 {
-    LOG_INSTANCE("serializing wizard data to json...");
+    LOG_INDENT("serializing wizard data to json...");
 
     QJsonObject userObject;
     userObject["author"] = m_authorDetails.name;
@@ -209,11 +323,12 @@ ModuleGeneratorSettings::serializeUserData() const
 void
 ModuleGeneratorSettings::deserializeUserData()
 {
-    LOG_INSTANCE("deserializing wizard data from json...");
+    LOG_INDENT("deserializing wizard data from json...");
 
     QDir appDir(QApplication::applicationDirPath());
 
-    QString json = utils::readFile(appDir.absoluteFilePath("module_generator.json"));
+    QString json = utils::readFile(appDir.absoluteFilePath(
+                                   "module_generator.json"));
 
     QJsonDocument document(QJsonDocument::fromJson(json.toUtf8()));
 

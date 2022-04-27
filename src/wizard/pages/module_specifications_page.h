@@ -20,6 +20,19 @@ class ModuleSpecificationsPage : public AbstractWizardPage
 {
     Q_OBJECT
 
+    static const char* C_TITLE_SPECIFICATIONS_PAGE;
+
+    static const QString S_INFO_TEXT;
+    static const QString S_MODULE_PREFIX_LABEL;
+    static const QString S_CLASS_NAME_LABEL;
+    static const QString S_FILE_NAME_LABEL;
+    static const QString S_MODULE_NAME_LABEL;
+    static const QString S_MODULE_VERSION_LABEL;
+    static const QString S_MODULE_DESCRIPTION_LABEL;
+    static const QString S_AUTO_COMPLETE_LABEL;
+    static const QString S_AUTO_GENERATED_TOOLTIP;
+    static const QString S_AUTO_GENERATED_ALT_TOOLTIP;
+
 public:
 
     /**
@@ -33,56 +46,36 @@ public:
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool isComplete() const Q_DECL_OVERRIDE;
+    bool isComplete() const override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 
 private:
 
-    /// info text label
-    QLabel* m_infoTextLabel;
-
-    /// prefix label
-    QLabel* m_modulePrefixLabel;
-    /// module name label
-    QLabel* m_moduleNameLabel;
-
-    QLabel* m_classNameLabel;
-
-    QLabel* m_fileNameLabel;
-    /// version label
-    QLabel* m_versionLabel;
-    /// description label
-    QLabel* m_descriptionLabel;
-
     /// prefix line edit
-    QLineEdit* m_modulePrefixEdit;
+    QLineEdit* m_modulePrefixEdit{};
 
-    QLineEdit* m_classNameEdit;
+    QLineEdit* m_classNameEdit{};
 
-    QLineEdit* m_fileNameEdit;
+    QLineEdit* m_fileNameEdit{};
     /// module name line edit
-    QLineEdit* m_moduleNameEdit;
+    QLineEdit* m_moduleNameEdit{};
     /// version line edit
-    QLineEdit* m_versionEdit;
+    QLineEdit* m_versionEdit{};
     /// description text edit
-    QLineEdit* m_descriptionEdit;
+    QLineEdit* m_descriptionEdit{};
 
-    QCheckBox* m_autoEditCheckBox;
+    QCheckBox* m_autoEditCheckBox{};
 
-    /// grid layout
-    QGridLayout* m_baseLayout;
     /// prefix validator
-    QRegularExpressionValidator* m_prefixValidator;
+    QRegularExpressionValidator* m_prefixValidator{};
     /// module name validator
-    QRegularExpressionValidator* m_nameValidator;
+    QRegularExpressionValidator* m_nameValidator{};
 
-    QRegularExpressionValidator* m_versionValidator;
-    /// spacer between description and wizard bottom
-    QSpacerItem* m_vSpacer;
+    QRegularExpressionValidator* m_versionValidator{};
 
     void autoComplete();
 

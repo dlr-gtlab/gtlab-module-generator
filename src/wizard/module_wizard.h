@@ -2,26 +2,21 @@
 #define MODULEWIZARD_H
 
 #include <QWizard>
+#include <memory>
 
-#include "module_generator_settings.h"
+#include "module_generator.h"
 
-class ModuleGenerator;
-class IntroPage;
-class SettingsPage;
-class ModuleSpecificationsPage;
-class InterfaceSelectionPage;
-class InterfaceSpecificationsPage;
-class DependencySelectionPage;
-class SignaturePage;
-class SummaryPage;
 class ModuleWizard : public QWizard
 {
     Q_OBJECT
 
+    static const QString S_MODULE_GENERATOR_NAME;
+
+    static const QSize S_SIZE_WIZARD;
+
 public:
 
     explicit ModuleWizard(QWidget* parent = nullptr);
-    ~ModuleWizard() override;
 
     /**
      * @brief page enum - enumerates wizard pages
@@ -35,22 +30,11 @@ public:
                SIGNATURE_PAGE = 7,
                SUMMARY_PAGE = 8};
 
-    int nextId() const Q_DECL_OVERRIDE;
+    int nextId() const override;
 
 private:
 
-    /// pointer for intro page
-    IntroPage* m_introPage;
-    SettingsPage* m_settingsPage;
-    ModuleSpecificationsPage* m_moduleSpecificationPage;
-    InterfaceSelectionPage* m_interfaceSelectionPage;
-    InterfaceSpecificationsPage* m_interfaceSpecificationsPage;
-    DependencySelectionPage* m_dependencySelectionPage;
-    SignaturePage* m_signaturePage;
-    SummaryPage* m_summaryPage;
-
-    ModuleGeneratorSettings m_settings;
-    ModuleGenerator* m_generator;
+    std::unique_ptr<ModuleGenerator> m_generator{};
 };
 
 #endif // MODULEWIZARD_H

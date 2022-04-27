@@ -2,7 +2,7 @@ QT       += core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets xml
 
-CONFIG += c++11
+CONFIG += c++14
 
 DEFINES += QT_DEPRECATED_WARNINGS
 
@@ -29,18 +29,19 @@ DESTDIR = $${BUILD_DEST}
 INCLUDEPATH += . \
     src \
     src/wizard \
-    src/settings \
+    src/wizard/pages \
     src/generator \
+    src/generator/settings \
     src/widgets \
     src/widgets/class_specification
 
 SOURCES += \
     src/generator/module_generator.cpp \
     src/generator/module_generator_logger.cpp \
+    src/generator/module_generator_preloader.cpp \
     src/generator/module_generator_utils.cpp \
-    src/generator/preloader.cpp \
     src/main.cpp \
-    src/settings/module_generator_settings.cpp \
+    src/generator/settings/module_generator_settings.cpp \
     src/widgets/class_specification/function_specification_widget.cpp \
     src/widgets/class_specification/multiple_class_specification_widget.cpp \
     src/widgets/class_specification/class_specification_widget.cpp \
@@ -48,23 +49,23 @@ SOURCES += \
     src/widgets/dependency_selection_widget.cpp \
     src/widgets/interface_selection_widget.cpp \
     src/widgets/widget_list_view.cpp \
-    src/wizard/dependency_selection_page.cpp \
-    src/wizard/interface_selection_page.cpp \
-    src/wizard/interface_specifications_page.cpp \
-    src/wizard/intro_page.cpp \
-    src/wizard/module_specifications_page.cpp \
     src/wizard/module_wizard.cpp \
-    src/wizard/settings_page.cpp \
-    src/wizard/signature_page.cpp \
-    src/wizard/summary_page.cpp
+    src/wizard/pages/dependency_selection_page.cpp \
+    src/wizard/pages/interface_selection_page.cpp \
+    src/wizard/pages/interface_specifications_page.cpp \
+    src/wizard/pages/intro_page.cpp \
+    src/wizard/pages/module_specifications_page.cpp \
+    src/wizard/pages/settings_page.cpp \
+    src/wizard/pages/signature_page.cpp \
+    src/wizard/pages/summary_page.cpp
 
 HEADERS += \
     src/generator/module_generator.h \
     src/generator/module_generator_logger.h \
+    src/generator/module_generator_preloader.h \
     src/generator/module_generator_structs.h \
     src/generator/module_generator_utils.h \
-    src/settings/module_generator_settings.h \
-    src/generator/preloader.h \
+    src/generator/settings/module_generator_settings.h \
     src/widgets/class_specification/abstract_class_specification.h \
     src/widgets/class_specification/function_specification_widget.h \
     src/widgets/class_specification/multiple_class_specification_widget.h \
@@ -74,16 +75,16 @@ HEADERS += \
     src/widgets/dependency_selection_widget.h \
     src/widgets/interface_selection_widget.h \
     src/widgets/widget_list_view.h \
-    src/wizard/abstract_wizardpage.h \
-    src/wizard/dependency_selection_page.h \
-    src/wizard/interface_selection_page.h \
-    src/wizard/interface_specifications_page.h \
-    src/wizard/intro_page.h \
-    src/wizard/module_specifications_page.h \
     src/wizard/module_wizard.h \
-    src/wizard/settings_page.h \
-    src/wizard/signature_page.h \
-    src/wizard/summary_page.h
+    src/wizard/pages/abstract_wizardpage.h \
+    src/wizard/pages/dependency_selection_page.h \
+    src/wizard/pages/interface_selection_page.h \
+    src/wizard/pages/interface_specifications_page.h \
+    src/wizard/pages/intro_page.h \
+    src/wizard/pages/module_specifications_page.h \
+    src/wizard/pages/settings_page.h \
+    src/wizard/pages/signature_page.h \
+    src/wizard/pages/summary_page.h
 
 RESOURCES += \
     resources/resources.qrc

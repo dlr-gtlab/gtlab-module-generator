@@ -62,9 +62,9 @@ utils::writeStringToFile(const QString& fileContent,
 QString
 utils::makeInclude(const QString& inlcude,
                    const QString& identifier,
-                   const bool isQt)
+                   const bool isLib)
 {
-    if (isQt)
+    if (isLib)
     {
         return QString("#include <"+ inlcude + ">\n" + identifier);
     }

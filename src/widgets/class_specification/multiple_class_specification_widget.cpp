@@ -40,14 +40,14 @@ MultipleClassSpecificationWidget::implementationValues()
     QStringList values;
 
     // create variable -> QList<...> retVal
-    values << QString(m_functionStruct.returnValue + " retVal");
-    values << "";
+    values << QString{m_functionStruct.returnValue + " retVal"};
+    values << QString{};
 
     for (auto* w : m_widgetListView->widgets())
     {
-        auto* widget = dynamic_cast<SingleClassSpecificationWidget*>(w);
+        auto* widget = qobject_cast<SingleClassSpecificationWidget*>(w);
 
-        if (widget == Q_NULLPTR) continue;
+        if (!widget) continue;
 
         QStringList implementation = widget->implementationValues();
 
@@ -58,7 +58,7 @@ MultipleClassSpecificationWidget::implementationValues()
         {
             if (values.length() > 2) values << ""; // for nicer indent
             values << implementation.mid(0, implementation.length() - 1);
-            values << "";
+            values << QString{};
         }
 
         // append implementation to retVal
@@ -77,7 +77,7 @@ MultipleClassSpecificationWidget::implementationValues()
     }
 
     // return variable
-    if (values.length() > 2) values << ""; // for nicer indent
+    if (values.length() > 2) values << QString{}; // for nicer indent
     values << "retVal";
 
     return values;
@@ -92,7 +92,7 @@ MultipleClassSpecificationWidget::derivedClasses()
     {
         auto* widget = dynamic_cast<SingleClassSpecificationWidget*>(w);
 
-        if (widget == Q_NULLPTR) continue;
+        if (!widget) continue;
 
         classes << widget->derivedClasses()[0]; // must have one entry
     }
@@ -109,7 +109,7 @@ MultipleClassSpecificationWidget::linkedClasses()
     {
         auto* widget = dynamic_cast<SingleClassSpecificationWidget*>(w);
 
-        if (widget == Q_NULLPTR) continue;
+        if (!widget) continue;
 
         classes << widget->linkedClasses(); // may have one entry
     }
@@ -120,7 +120,7 @@ MultipleClassSpecificationWidget::linkedClasses()
 void
 MultipleClassSpecificationWidget::onAddButtonPressed()
 {
-    LOG_INSTANCE("Adding new class for '" + m_functionStruct.name + "'...");
+    LOG_INDENT("Adding new class for '" + m_functionStruct.name + "'...");
 
     bool editable = m_functionStruct.returnValue.startsWith(QStringLiteral("QMap<"));
 
