@@ -57,8 +57,6 @@ ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP(QStringLiteral("GTlabConsole") +
 
 ModuleGeneratorSettings::ModuleGeneratorSettings()
 {
-    qDebug() << "here";
-
     deserializeUserData();
 
     m_preLoader.searchForInterfaces();
@@ -298,6 +296,9 @@ ModuleGeneratorSettings::serializeUserData() const
     pathsObject["devtools"] = m_devToolsPath;
     pathsObject["gtlab"]    = m_gtlabPath;
 
+    QJsonObject moduleObject;
+    moduleObject["target_version"]  = m_version;
+
 //    QJsonObject moduleObject;
 //    moduleObject["prefix"]  = m_modulePrefix;
 //    moduleObject["ident"]  = m_moduleClass.ident;
@@ -305,8 +306,9 @@ ModuleGeneratorSettings::serializeUserData() const
 //    moduleObject["description"] = m_moduleClass.description;
 
     QJsonObject rootObject;
-    rootObject["user"] = userObject;
+    rootObject["user"]   = userObject;
     rootObject["paths"]  = pathsObject;
+    rootObject["module"] = moduleObject;
 //    rootObject["lastModule"] = moduleObject;
 
     QJsonDocument document(rootObject);
@@ -346,6 +348,9 @@ ModuleGeneratorSettings::deserializeUserData()
     m_outputPath   = pathsObject["output"].toString();
     m_devToolsPath = pathsObject["devtools"].toString();
     m_gtlabPath    = pathsObject["gtlab"].toString();
+
+    QJsonObject moduleObject = document["module"].toObject();
+    m_version = moduleObject["target_version"].toString();
 
     LOG_INFO << "done!";
 }

@@ -13,6 +13,8 @@ GTLAB_DIR = $$GTLAB_INSTALL_DIR$$
 # target version
 MAJOR_VERSION = $$GTLAB_MAJOR_VERSION$$
 
+BUILD_MODULE  = true
+
 # First Party
 GTLAB_CORE_PATH                 = $${DEV_TOOLS}
 GTLAB_LOGGING_PATH              = $${DEV_TOOLS}

@@ -25,5 +25,6 @@
         <file>templates/.gitignore</file>
         <file>templates/CHANGELOG.md</file>
         <file>templates/README.md</file>
+        <file>templates/module_src.pro</file>
     </qresource>
 </RCC>
