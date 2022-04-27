@@ -14,34 +14,31 @@ class InterfaceSelectionPage : public AbstractWizardPage
 {
     Q_OBJECT
 
+    static const char* C_INTERFACE_PAGE_TITLE;
+
+    static const QString S_INFO_TEXT;
+    static const QString S_INTERFACE_LABEL;
+
 public:
 
     InterfaceSelectionPage(ModuleGeneratorSettings* settings,
                            QWidget* parent = nullptr);
 
-    ClassStructsPtr selectedInterfaces() const;
+    ClassStructs selectedInterfaces() const;
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool isComplete() const Q_DECL_OVERRIDE;
+    bool isComplete() const override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 private:
 
-    /// info text label
-    QLabel* m_infoTextLabel;
-    /// interface label
-    QLabel* m_interfaceLabel;
-    /// grid layout
-    QGridLayout* m_gridLayout;
+    WidgetListView* m_widgetListView{};
 
-    WidgetListView* m_widgetListView;
-
-
-    void setInterfaces();
+    void initInterfaces();
 };
 
 #endif // INTERFACESELECTIONPAGE_H

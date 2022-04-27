@@ -1,5 +1,5 @@
-#ifndef MODULEGENERATOR_AUX_H
-#define MODULEGENERATOR_AUX_H
+#ifndef MODULEGENERATORUTILS_H
+#define MODULEGENERATORUTILS_H
 
 #include "module_generator_structs.h"
 
@@ -18,9 +18,9 @@ namespace utils
                            const QString& fileName);
 
     QString makeInclude(const QString& inlcude,
-                        const QString& identifier = QString(),
-                        const bool isQt = false);
+                        const QString& identifier = {},
+                        const bool isLib = false);
 }
 
 
-#endif // MODULEGENERATOR_AUX_H
+#endif // MODULEGENERATORUTILS_H

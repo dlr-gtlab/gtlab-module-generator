@@ -1,7 +1,6 @@
 #ifndef INTERFACESPECIFICATIONSWIDGET_H
 #define INTERFACESPECIFICATIONSWIDGET_H
 
-//#include <QWidget>
 #include <QScrollArea>
 
 #include "module_generator_structs.h"
@@ -9,14 +8,13 @@
 class QGridLayout;
 class AbstractClassSpecification;
 class ModuleGeneratorSettings;
-//class FunctionSpecificationWidget : public QWidget
 class FunctionSpecificationWidget : public QScrollArea
 {
     Q_OBJECT
 
 public:
 
-    FunctionSpecificationWidget(const FunctionStructs& functions,
+    FunctionSpecificationWidget(FunctionStructs const& functions,
                                 ModuleGeneratorSettings* settings,
                                 QWidget* parent = nullptr);
 
@@ -27,11 +25,10 @@ public:
 
 private:
 
-    FunctionStructs m_functions;
-    ModuleGeneratorSettings* m_settings;
-    QWidget* m_scrollWidget;
-    QGridLayout* m_baseLayout;
-    QMap<QString, AbstractClassSpecification*> m_specificationWidgets;
+    FunctionStructs m_functions{};
+    ModuleGeneratorSettings* m_settings{};
+    QGridLayout* m_baseLayout{};
+    QMap<QString, AbstractClassSpecification*> m_specificationWidgets{};
 
     void setContent();
 

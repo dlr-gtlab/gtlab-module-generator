@@ -13,62 +13,121 @@
 #include <QJsonArray>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QVersionNumber>
 
-const QString ModuleGenerator::S_ID_SIGNATURE(QStringLiteral("$$SIGNATURE$$"));
-const QString ModuleGenerator::S_ID_GENERATOR_VERSION(QStringLiteral("$$GENERATOR_VERSION$$"));
-const QString ModuleGenerator::S_ID_INCLUDE_FILE(QStringLiteral("$$INCLUDE_FILE$$"));
-const QString ModuleGenerator::S_ID_QT_INCLUDE_FILE(QStringLiteral("$$QT_INCLUDE_FILE$$"));
-const QString ModuleGenerator::S_ID_ADD_INCLUDE_FILE(QStringLiteral("$$ADD_INCLUDE_FILE$$"));
-const QString ModuleGenerator::S_ID_CLASS_FORWARD_DECL(QStringLiteral("$$CLASS_FORWARD_DECL$$"));
+const QString
+ModuleGenerator::S_ID_SIGNATURE(QStringLiteral("$$SIGNATURE$$"));
+const QString
+ModuleGenerator::S_ID_GENERATOR_VERSION(QStringLiteral("$$GENERATOR_VERSION$$"));
+const QString
+ModuleGenerator::S_ID_INCLUDE_FILE(QStringLiteral("$$INCLUDE_FILE$$"));
+const QString
+ModuleGenerator::S_ID_QT_INCLUDE_FILE(QStringLiteral("$$QT_INCLUDE_FILE$$"));
+const QString
+ModuleGenerator::S_ID_ADD_INCLUDE_FILE(QStringLiteral("$$ADD_INCLUDE_FILE$$"));
+const QString
+ModuleGenerator::S_ID_CLASS_FORWARD_DECL(QStringLiteral("$$CLASS_FORWARD_DECL$$"));
 
-const QString ModuleGenerator::S_ID_BASE_CLASS(QStringLiteral("$$BASE_CLASS$$"));
-const QString ModuleGenerator::S_ID_BASE_FILE_NAME(QStringLiteral("$$BASE_FILE_NAME$$"));
-const QString ModuleGenerator::S_ID_DERIVE_BASE_CLASS(QStringLiteral("$$DERIVE_BASE_CLASS$$"));
+const QString
+ModuleGenerator::S_ID_BASE_CLASS(QStringLiteral("$$BASE_CLASS$$"));
+const QString
+ModuleGenerator::S_ID_BASE_FILE_NAME(QStringLiteral("$$BASE_FILE_NAME$$"));
+const QString
+ModuleGenerator::S_ID_DERIVE_BASE_CLASS(QStringLiteral("$$DERIVE_BASE_CLASS$$"));
 
-const QString ModuleGenerator::S_ID_PREFIX(QStringLiteral("$$PREFIX$$"));
-const QString ModuleGenerator::S_ID_CLASS_NAME(QStringLiteral("$$CLASS_NAME$$"));
-const QString ModuleGenerator::S_ID_OBJECT_NAME(QStringLiteral("$$OBJECT_NAME$$"));
-const QString ModuleGenerator::S_ID_FILE_NAME(QStringLiteral("$$FILE_NAME$$"));
-const QString ModuleGenerator::S_ID_HEADER_NAME(QStringLiteral("$$HEADER_NAME$$"));
-const QString ModuleGenerator::S_ID_CONSTRUCTOR(QStringLiteral("$$CONSTRUCTOR$$"));
-const QString ModuleGenerator::S_ID_FUNCTION(QStringLiteral("$$FUNCTION$$"));
-const QString ModuleGenerator::S_ID_IMPLEMENTATION(QStringLiteral("$$IMPLEMENTATION$$"));
+const QString
+ModuleGenerator::S_ID_PREFIX(QStringLiteral("$$PREFIX$$"));
+const QString
+ModuleGenerator::S_ID_CLASS_NAME(QStringLiteral("$$CLASS_NAME$$"));
+const QString
+ModuleGenerator::S_ID_OBJECT_NAME(QStringLiteral("$$OBJECT_NAME$$"));
+const QString
+ModuleGenerator::S_ID_FILE_NAME(QStringLiteral("$$FILE_NAME$$"));
+const QString
+ModuleGenerator::S_ID_HEADER_NAME(QStringLiteral("$$HEADER_NAME$$"));
+const QString
+ModuleGenerator::S_ID_CONSTRUCTOR(QStringLiteral("$$CONSTRUCTOR$$"));
+const QString
+ModuleGenerator::S_ID_FUNCTION(QStringLiteral("$$FUNCTION$$"));
+const QString
+ModuleGenerator::S_ID_IMPLEMENTATION(QStringLiteral("$$IMPLEMENTATION$$"));
 
-const QString ModuleGenerator::S_ID_MODULE_NAME(QStringLiteral("$$MODULE_NAME$$"));
-const QString ModuleGenerator::S_ID_MODULE_DESCRIPTION(QStringLiteral("$$MODULE_DESCRIPTION$$"));
-const QString ModuleGenerator::S_ID_MODULE_VERSION(QStringLiteral("$$MODULE_VERSION$$"));
-const QString ModuleGenerator::S_ID_INTERFACE_MACRO(QStringLiteral("$$INTERFACE_MACRO$$"));
+const QString
+ModuleGenerator::S_ID_MODULE_NAME(QStringLiteral("$$MODULE_NAME$$"));
+const QString
+ModuleGenerator::S_ID_MODULE_DESCRIPTION(QStringLiteral("$$MODULE_DESCRIPTION$$"));
+const QString
+ModuleGenerator::S_ID_MODULE_VERSION(QStringLiteral("$$MODULE_VERSION$$"));
+const QString
+ModuleGenerator::S_ID_INTERFACE_MACRO(QStringLiteral("$$INTERFACE_MACRO$$"));
+const QString
+ModuleGenerator::S_ID_GTLAB_MAJOR_VERSION(QStringLiteral("$$GTLAB_MAJOR_VERSION$$"));
 
-const QString ModuleGenerator::S_ID_GTLAB_INSTALL_DIR(QStringLiteral("$$GTLAB_INSTALL_DIR$$"));
-const QString ModuleGenerator::S_ID_GTLAB_INSTALL_SUB_DIR(QStringLiteral("$$GTLAB_INSTALL_SUB_DIR$$"));
-const QString ModuleGenerator::S_ID_DEVTOOLS_INSTALL_DIR(QStringLiteral("$$DEVTOOLS_INSTALL_DIR$$"));
+const QString
+ModuleGenerator::S_ID_GTLAB_INSTALL_DIR(QStringLiteral("$$GTLAB_INSTALL_DIR$$"));
+const QString
+ModuleGenerator::S_ID_GTLAB_INSTALL_SUB_DIR(QStringLiteral("$$GTLAB_INSTALL_SUB_DIR$$"));
+const QString
+ModuleGenerator::S_ID_DEVTOOLS_INSTALL_DIR(QStringLiteral("$$DEVTOOLS_INSTALL_DIR$$"));
 
-const QString ModuleGenerator::S_ID_PRO_INCLUDE_PATH(QStringLiteral("$$PRO_INCLUDEPATH$$"));
-const QString ModuleGenerator::S_ID_PRO_HEADER_PATH(QStringLiteral("$$PRO_HEADERPATH$$"));
-const QString ModuleGenerator::S_ID_PRO_SOURCE_PATH(QStringLiteral("$$PRO_SOURCEPATH$$"));
-const QString ModuleGenerator::S_ID_PRO_LIBS(QStringLiteral("$$PRO_LIBS$$"));
-const QString ModuleGenerator::S_ID_PRO_LIBS_D(QStringLiteral("$$PRO_LIBS_D$$"));
+const QString
+ModuleGenerator::S_ID_PRO_INCLUDE_PATH(QStringLiteral("$$PRO_INCLUDEPATH$$"));
+const QString
+ModuleGenerator::S_ID_PRO_HEADER_PATH(QStringLiteral("$$PRO_HEADERPATH$$"));
+const QString
+ModuleGenerator::S_ID_PRO_SOURCE_PATH(QStringLiteral("$$PRO_SOURCEPATH$$"));
+const QString
+ModuleGenerator::S_ID_PRO_LIBS(QStringLiteral("$$PRO_LIBS$$"));
+const QString
+ModuleGenerator::S_ID_PRO_LIBS_D(QStringLiteral("$$PRO_LIBS_D$$"));
 
-const QString ModuleGenerator::S_ID_AUTHOR(QStringLiteral("$$AUTHOR$$"));
-const QString ModuleGenerator::S_ID_AUTHOR_EMAIL(QStringLiteral("$$AUTHOR_EMAIL$$"));
+const QString
+ModuleGenerator::S_ID_AUTHOR(QStringLiteral("$$AUTHOR$$"));
+const QString
+ModuleGenerator::S_ID_AUTHOR_EMAIL(QStringLiteral("$$AUTHOR_EMAIL$$"));
 
 // paths
-const QString S_TEMPLATES_PATH = QStringLiteral(":/templates/");
-const QString S_SRC_DIR      = QStringLiteral("src");
-const QString S_FEATURES_DIR = QStringLiteral("features");
+const QString
+S_TEMPLATES_PATH = QStringLiteral(":/templates/");
+const QString
+S_SRC_DIR      = QStringLiteral("src");
+const QString
+S_FEATURES_DIR = QStringLiteral("features");
 
 // qt makros
-const QString S_INTERFACE_MACRO(
+const QString
+S_INTERFACE_MACRO(
         QStringLiteral("Q_INTERFACES(") + ModuleGenerator::S_ID_BASE_CLASS +
         QStringLiteral(")\n\t"));
-const QString S_Q_DECL_OVERRIDE(QStringLiteral(" Q_DECL_OVERRIDE;"));
-const QString S_Q_INVOKABLE(QStringLiteral("Q_INVOKABLE "));
+const QString
+S_OVERRIDE(QStringLiteral(" override;"));
+const QString
+S_Q_INVOKABLE(QStringLiteral("Q_INVOKABLE "));
 
 // helper strings
-const QString S_DERIVE_BASE_CLASS(
+const QString
+S_DERIVE_BASE_CLASS(
         QStringLiteral(",\n\t\tpublic ") + ModuleGenerator::S_ID_BASE_CLASS);
-const QString S_PRO_ENDL(QStringLiteral("\\\n\t"));
+const QString
+S_PRO_ENDL(QStringLiteral("\\\n\t"));
 
+const Constructor
+ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
+    {}, { QStringLiteral("setObjectName(\"") + S_ID_OBJECT_NAME +
+          QStringLiteral("\")") }
+};
+
+ModuleGeneratorSettings const*
+ModuleGenerator::settings() const
+{
+    return &m_settings;
+}
+
+ModuleGeneratorSettings*
+ModuleGenerator::settings()
+{
+    return &m_settings;
+}
 
 bool
 ModuleGenerator::generate()
@@ -76,11 +135,12 @@ ModuleGenerator::generate()
     QTime time;
     time.start();
 
-    LOG_INSTANCE("generating...");
+    LOG_INDENT("generating...");
 
     bool result = generateHelper();
 
-    LOG_INFO << "time passed: " << QString::number(time.elapsed()) + " (ms)" << ENDL;
+    LOG_INFO << "time passed: " << QString::number(time.elapsed()) + " (ms)"
+             << ENDL;
     LOG_INFO << "module creation " << (result ? "succeeded!":"failed!");
 
     emit generationFinished();
@@ -116,13 +176,13 @@ ModuleGenerator::generateHelper()
 bool
 ModuleGenerator::generateModulePath()
 {
-    LOG_INSTANCE("generating module path...");
+    LOG_INDENT("generating module path...");
 
-    QString subFolder = m_settings->moduleClass().ident;
+    QString subFolder = settings()->moduleClass().ident;
     subFolder.replace(" ", "");
 
     QString path;
-    path += m_settings->outputPath() + QDir::separator();
+    path += settings()->outputPath() + QDir::separator();
     path += subFolder + QDir::separator();
 
     m_srcDir = QDir::cleanPath(path);
@@ -136,18 +196,18 @@ ModuleGenerator::generateModulePath()
         LOG_WARN << "path '" << m_moduleDir.path() << "' already exists!" << ENDL;
 
         QMessageBox msgBox;
-        QPushButton* proceedButton = msgBox.addButton(tr("Proceed"), QMessageBox::AcceptRole);
-        QPushButton* abortButton   = msgBox.addButton(QMessageBox::Abort);
+        QScopedPointer<QPushButton> proceedButton{msgBox.addButton(
+                        tr("Proceed"), QMessageBox::AcceptRole)};
+        QScopedPointer<QPushButton> abortButton{msgBox.addButton(
+                        QMessageBox::Abort)};
 
-        msgBox.setWindowTitle(QStringLiteral("Output path does already exist"));
-        msgBox.setText(QStringLiteral("The output path does already exist and is not empty!\n"
-                                      "Please remove all old files and proceed."));
+        msgBox.setWindowTitle(QStringLiteral("Output path already exists"));
+        msgBox.setText(QStringLiteral("The output path already exists and "
+                                      "is not empty!\nPlease remove all old "
+                                      "files and proceed."));
         msgBox.exec();
 
-        delete proceedButton;
-        delete abortButton;
-
-        if (msgBox.clickedButton() == abortButton)
+        if (msgBox.clickedButton() == abortButton.get())
         {
             LOG_ERR << "aborted!";
 
@@ -184,7 +244,7 @@ ModuleGenerator::generateModulePath()
 bool
 ModuleGenerator::generateModuleSettingsFiles()
 {
-    LOG_INSTANCE("generating .pri files...");
+    LOG_INDENT("generating .pri files...");
 
     // settings.pri
     auto fileString = utils::readFile(S_TEMPLATES_PATH + "settings.pri");
@@ -202,7 +262,7 @@ ModuleGenerator::generateModuleSettingsFiles()
     // local_setting.pri
     IdentifierPairs identifierPairs;
 
-    QDir gtlabDir(m_settings->gtlabPath());
+    QDir gtlabDir(settings()->gtlabPath());
     bool success(gtlabDir.cdUp() && gtlabDir.exists());
 
     if (!success)
@@ -213,7 +273,10 @@ ModuleGenerator::generateModuleSettingsFiles()
     }
 
     identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, gtlabDir.absolutePath() });
-    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR, QDir::cleanPath(m_settings->devToolsPath()) });
+    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR,
+                             QDir::cleanPath(settings()->devToolsPath()) });
+    identifierPairs.append({ S_ID_GTLAB_MAJOR_VERSION,
+                             QString::number(settings()->gtlabMajorVersion())});
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
@@ -227,14 +290,14 @@ ModuleGenerator::generateModuleSettingsFiles()
 bool
 ModuleGenerator::generateModuleProjectFile()
 {
-    LOG_INSTANCE("generating project file...");
+    LOG_INDENT("generating project file...");
 
     auto fileString = utils::readFile(S_TEMPLATES_PATH + "module.pro");
 
     IdentifierPairs identifierPairs;
 
-    QDir gtlabDir(m_settings->gtlabPath());
-    auto moduleClass(m_settings->moduleClass());
+    QDir gtlabDir(settings()->gtlabPath());
+    auto moduleClass(settings()->moduleClass());
 
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
@@ -242,7 +305,8 @@ ModuleGenerator::generateModuleProjectFile()
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
-    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName + ".pro");
+    utils::writeStringToFile(fileString, m_moduleDir, moduleClass.fileName +
+                             ".pro");
 
     LOG_INFO << "done!";
 
@@ -252,12 +316,12 @@ ModuleGenerator::generateModuleProjectFile()
 bool
 ModuleGenerator::generateGitFiles()
 {
-    if (!m_settings->createGitFiles())
+    if (!settings()->createGitFiles())
     {
         return true;
     }
 
-    LOG_INSTANCE("generating git files...");
+    LOG_INDENT("generating git files...");
 
     // gitignore
     LOG_INFO << ".gitignore" << ENDL;
@@ -276,9 +340,9 @@ ModuleGenerator::generateGitFiles()
     fileString = utils::readFile(S_TEMPLATES_PATH + "README.md");
     IdentifierPairs identifierPairs;
 
-    auto moduleClass(m_settings->moduleClass());
+    auto moduleClass(settings()->moduleClass());
 
-    identifierPairs.append({ S_ID_PREFIX, m_settings->modulePrefix() });
+    identifierPairs.append({ S_ID_PREFIX, settings()->modulePrefix() });
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_MODULE_DESCRIPTION, moduleClass.description });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleClass.version });
@@ -296,15 +360,15 @@ ModuleGenerator::generateGitFiles()
 bool
 ModuleGenerator::generateModuleDependencies()
 {
-    LOG_INSTANCE("generating dependencies...");
+    LOG_INDENT("generating dependencies...");
 
     // for logging purpose
     {
-        LOG_INSTANCE("creating json document...");
+        LOG_INDENT("creating json document...");
 
         QJsonArray dependenciesJsonArray;
 
-        for (auto dependency : m_settings->selectedDependencies())
+        for (auto dependency : settings()->selectedDependencies())
         {
             LOG_INFO << dependency.name << ENDL;
 
@@ -325,12 +389,12 @@ ModuleGenerator::generateModuleDependencies()
         QString fileString = document.toJson(QJsonDocument::Indented);
 
         utils::writeStringToFile(fileString, m_srcDir,
-                                 m_settings->moduleClass().fileName + ".json");
+                                 settings()->moduleClass().fileName + ".json");
 
         LOG_INFO << "done!";
     }
 
-    for (auto dependency : m_settings->selectedDependencies())
+    for (auto dependency : settings()->selectedDependencies())
     {
         appendLibToProjectFile(dependency.name);
     }
@@ -343,12 +407,14 @@ ModuleGenerator::generateModuleDependencies()
 bool
 ModuleGenerator::generateModule()
 {
-    LOG_INSTANCE("generating module files...");
+    LOG_INDENT("generating module files...");
 
-    auto headerString = utils::readFile(S_TEMPLATES_PATH + "basic_module_class.h");
-    auto sourceString = utils::readFile(S_TEMPLATES_PATH + "basic_module_class.cpp");
+    auto headerString = utils::readFile(S_TEMPLATES_PATH +
+                                        "basic_module_class.h");
+    auto sourceString = utils::readFile(S_TEMPLATES_PATH +
+                                        "basic_module_class.cpp");
 
-    auto moduleClass = m_settings->moduleClass();
+    auto moduleClass = settings()->moduleClass();
 
     // set the filename for the include to the module header file
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME,
@@ -359,28 +425,28 @@ ModuleGenerator::generateModule()
     LOG_INFO << "implementing interfaces..." << ENDL;
 
     // IMPLEMENT INTERFACES
-    for (auto* interface : m_settings->selectedInterfaces())
+    for (auto const& interface : settings()->selectedInterfaces())
     {
-        if (interface == Q_NULLPTR) continue;
+        if (!interface.isValid()) continue;
 
-        LOG_INSTANCE(interface->className);
+        LOG_INDENT(interface.className);
 
         // HEADER ONLY
         identifierPairs.append({ S_ID_INCLUDE_FILE,
-                                 utils::makeInclude(interface->fileName,
+                                 utils::makeInclude(interface.fileName,
                                                     S_ID_INCLUDE_FILE) });
         identifierPairs.append({ S_ID_INTERFACE_MACRO,
                                  S_INTERFACE_MACRO + S_ID_INTERFACE_MACRO });
         identifierPairs.append({ S_ID_DERIVE_BASE_CLASS,
                                  S_DERIVE_BASE_CLASS + S_ID_DERIVE_BASE_CLASS });
-        identifierPairs.append({ S_ID_BASE_CLASS, interface->className });
+        identifierPairs.append({ S_ID_BASE_CLASS, interface.className });
 
         utils::replaceIdentifier(headerString, identifierPairs);
 
         identifierPairs.clear();
 
         // IMPLEMENT FUNCTIONS
-        for (auto& function : interface->functions)
+        for (auto const& function : interface.functions)
         {
             if (!function.isValid())
             {
@@ -413,8 +479,8 @@ ModuleGenerator::generateModule()
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleVersion });
     identifierPairs.append({ S_ID_MODULE_DESCRIPTION, moduleClass.description });
-    identifierPairs.append({ S_ID_AUTHOR, m_settings->authorDetails().name });
-    identifierPairs.append({ S_ID_AUTHOR_EMAIL, m_settings->authorDetails().email });
+    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
+    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
     identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
 
     utils::replaceIdentifier(headerString, identifierPairs);
@@ -441,10 +507,10 @@ ModuleGenerator::generateModule()
 void
 ModuleGenerator::generateFunction(QString& headerString,
                                   QString& sourceString,
-                                  FunctionStruct& f,
+                                  FunctionStruct const& f,
                                   bool isConstructor)
 {
-    LOG_INSTANCE("generating function '" + f.name + "'...");
+    LOG_INDENT("generating function '" + f.name + "'...");
 
     LOG_INFO << "building header function definition..." << ENDL;
 
@@ -473,7 +539,7 @@ ModuleGenerator::generateFunction(QString& headerString,
     if (!isConstructor) {
         functionHeader += f.returnValue + " ";
         functionHeader += functionString;
-        functionHeader += S_Q_DECL_OVERRIDE;
+        functionHeader += S_OVERRIDE;
     }
     else {
         functionHeader += S_Q_INVOKABLE;
@@ -488,8 +554,8 @@ ModuleGenerator::generateFunction(QString& headerString,
 
     // CPP
     // remove default parameters in the cpp function declaration
-    QRegularExpression defaultparamRegExp(QStringLiteral("\\s?=\\s?(\\w|:|\\d|\\(\\))+"));
-    functionString.remove(defaultparamRegExp);
+    QRegularExpression defaultParamReg("\\s?=\\s?(\\w|:|\\d|\\(\\)|\\{\\})+");
+    functionString.remove(defaultParamReg);
 
     if (!isConstructor) {
         functionString.prepend(f.returnValue + "\n" + S_ID_CLASS_NAME + "::");
@@ -512,12 +578,12 @@ ModuleGenerator::generateFunction(QString& headerString,
 void
 ModuleGenerator::generateImplementation(QString& headerString,
                                         QString& sourceString,
-                                        FunctionStruct& function,
+                                        FunctionStruct const& function,
                                         bool isConstructor)
 {
-    LOG_INSTANCE("generating implementation...");
+    LOG_INDENT("generating implementation...");
 
-    ImplementationStruct& implementation = function.implementation;
+    auto& implementation = function.implementation;
 
     // function return value
     if (implementation.values.isEmpty())
@@ -527,7 +593,7 @@ ModuleGenerator::generateImplementation(QString& headerString,
         return;
     }
 
-    LOG_INFO << "creating implemetnation string..." << ENDL;
+    LOG_INFO << "creating implementation string..." << ENDL;
 
     QString implementationString;
 
@@ -544,7 +610,7 @@ ModuleGenerator::generateImplementation(QString& headerString,
     // remove empty statements
     implementationString.remove("\t;");
 
-    LOG_INFO << "setting implemetnation string..." << ENDL;
+    LOG_INFO << "setting implementation string..." << ENDL;
 
     utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION,
                                              implementationString });
@@ -568,18 +634,18 @@ ModuleGenerator::generateImplementation(QString& headerString,
 
 void
 ModuleGenerator::generateImplementationHelper(QString& sourceString,
-                                              ClassStruct& baseClass,
-                                              QList<ClassStruct>& classes)
+                                              ClassStruct const& baseClass,
+                                              QList<ClassStruct> const& classes)
 {
     // linked classes to generate
-    for (ClassStruct& classStruct : classes)
+    for (auto const& classStruct : classes)
     {
         if (!baseClass.isValid()) continue;
 
         if (!classStruct.isValid())
         {
-            LOG_INSTANCE("skipping invalid class struct!",
-                         ModuleGeneratorLogger::Warning);
+            LOG_INDENT("skipping invalid class struct!",
+                       ModuleGeneratorLogger::Warning);
             continue;
         }
 
@@ -594,14 +660,17 @@ ModuleGenerator::generateImplementationHelper(QString& sourceString,
 }
 
 void
-ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
+ModuleGenerator::generateBasicClass(ClassStruct const& base,
+                                    ClassStruct const& derived)
 {
-    LOG_INSTANCE("generating class '" + derived.className + "'...");
+    LOG_INDENT("generating class '" + derived.className + "'...");
 
     LOG_INFO << "creating file strings..." << ENDL;
 
-    auto headerString = utils::readFile(S_TEMPLATES_PATH + QStringLiteral("basic_derived_class.h"));
-    auto sourceString = utils::readFile(S_TEMPLATES_PATH + QStringLiteral("basic_derived_class.cpp"));
+    auto headerString = utils::readFile(S_TEMPLATES_PATH +
+                                        QStringLiteral("basic_derived_class.h"));
+    auto sourceString = utils::readFile(S_TEMPLATES_PATH +
+                                        QStringLiteral("basic_derived_class.cpp"));
 
     // set the filename for the include to the module header file
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME, derived.fileName });
@@ -631,8 +700,8 @@ ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
     identifierPairs.append({ S_ID_HEADER_NAME, derived.className.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, derived.className });
     identifierPairs.append({ S_ID_OBJECT_NAME, derived.objectName });
-    identifierPairs.append({ S_ID_AUTHOR, m_settings->authorDetails().name });
-    identifierPairs.append({ S_ID_AUTHOR_EMAIL, m_settings->authorDetails().email });
+    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
+    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
     identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
 
     utils::replaceIdentifier(headerString, identifierPairs);
@@ -665,9 +734,10 @@ ModuleGenerator::generateBasicClass(ClassStruct& base, ClassStruct& derived)
 }
 
 void
-ModuleGenerator::generateIncludes(QString& sourceString, QStringList& includes)
+ModuleGenerator::generateIncludes(QString& sourceString,
+                                  QStringList const& includes)
 {
-    LOG_INSTANCE("adding additional includes...");
+    LOG_INDENT("adding additional includes...");
 
     IdentifierPairs identifiers;
 
@@ -703,9 +773,9 @@ ModuleGenerator::generateIncludes(QString& sourceString, QStringList& includes)
 
 void
 ModuleGenerator::generateForwardDeclarations(QString& headerString,
-                                             QStringList& forwardDecls)
+                                             QStringList const& forwardDecls)
 {
-    LOG_INSTANCE("adding forward declarations...");
+    LOG_INDENT("adding forward declarations...");
 
     IdentifierPairs identifiers;
 
@@ -739,18 +809,21 @@ ModuleGenerator::generateForwardDeclarations(QString& headerString,
 void
 ModuleGenerator::generateConstructors(QString& headerString,
                                       QString& sourceString,
-                                      ClassStruct& base)
+                                      ClassStruct const& base)
 {
-    LOG_INSTANCE("generating constructors...");
+    LOG_INDENT("generating constructors...");
 
-    if (base.constructors.isEmpty())
+    auto constructors = base.constructors;
+
+    if (constructors.isEmpty())
     {
-        base.constructors.append(G_CONSTRUCTOR_DEFAULT);
+        constructors.append(G_CONSTRUCTOR_DEFAULT);
     }
 
-    for (Constructor& constructor : base.constructors)
+    for (auto& constructor : qAsConst(constructors))
     {
-        FunctionStruct fConstructor( {S_ID_CLASS_NAME, "", constructor.parameter });
+        FunctionStruct fConstructor{S_ID_CLASS_NAME, {},
+                                    constructor.parameter};
 
         fConstructor.implementation.values = constructor.implementation;
 
@@ -761,11 +834,12 @@ ModuleGenerator::generateConstructors(QString& headerString,
 }
 
 void
-ModuleGenerator::appendFileToProjectFile(QString& fileName, const QString& path)
+ModuleGenerator::appendFileToProjectFile(QString const& fileName,
+                                         QString const& path)
 {
-    LOG_INSTANCE("adding class to project file...");
+    LOG_INDENT("adding class to project file...");
 
-    auto moduleClass = m_settings->moduleClass();
+    auto moduleClass = settings()->moduleClass();
 
     auto fileString = utils::readFile(
                 m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
@@ -800,15 +874,15 @@ ModuleGenerator::appendFileToProjectFile(QString& fileName, const QString& path)
 void
 ModuleGenerator::appendLibToProjectFile(const QString& name)
 {
-    LOG_INSTANCE("adding lib '" + name + "' to project file...");
+    LOG_INDENT("adding lib '" + name + "' to project file...");
 
-    auto moduleClass(m_settings->moduleClass());
+    auto moduleClass(settings()->moduleClass());
     auto fileString = utils::readFile(
                 m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
 
     IdentifierPairs identifierPairs;
 
-    QDirIterator iterator(m_settings->gtlabPath() + "/modules",
+    QDirIterator iterator(settings()->gtlabPath() + "/modules",
                           QDir::Files, QDirIterator::NoIteratorFlags);
 
     QStringList nameParts(name.split(" ", QString::SkipEmptyParts));
@@ -829,15 +903,16 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
 
             if (!lib.contains(part, Qt::CaseInsensitive)) continue;
 
-            if (!ModuleGeneratorSettings::isOsWindows() && lib.startsWith("lib"))
+            if (!ModuleGeneratorSettings::isOsWindows() &&
+                lib.startsWith("lib"))
             {
                 lib = lib.remove(0, 3); // remove lib prefix on unix
             }
 
             identifierPairs.append({ S_ID_PRO_LIBS, "\n\tLIBS += -l" + lib +
                                      S_ID_PRO_LIBS});
-            identifierPairs.append({ S_ID_PRO_LIBS_D, "\n\tLIBS += -l" + lib + "-d" +
-                                     S_ID_PRO_LIBS_D});
+            identifierPairs.append({ S_ID_PRO_LIBS_D, "\n\tLIBS += -l" + lib +
+                                     "-d" + S_ID_PRO_LIBS_D});
 
             success = true;
             break;
@@ -872,7 +947,7 @@ ModuleGenerator::clearTabulators(QString &fileString)
 void
 ModuleGenerator::clearProjectFileIdentifiers()
 {
-    auto moduleClass = m_settings->moduleClass();
+    auto moduleClass = settings()->moduleClass();
 
     auto fileString = utils::readFile(
                 m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));

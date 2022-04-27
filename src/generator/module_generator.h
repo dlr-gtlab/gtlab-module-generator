@@ -1,9 +1,12 @@
 #ifndef MODULEGENERATOR_H
 #define MODULEGENERATOR_H
 
+#include "module_generator_settings.h"
+
 #include <QObject>
 #include <QString>
 #include <QDir>
+#include <memory>
 
 struct ClassStruct;
 struct FunctionStruct;
@@ -13,6 +16,8 @@ class ModuleGeneratorSettings;
 class ModuleGenerator : public QObject
 {
     Q_OBJECT
+
+    static const Constructor G_CONSTRUCTOR_DEFAULT;
 
 public:
 
@@ -40,6 +45,7 @@ public:
     const static QString S_ID_MODULE_DESCRIPTION;
     const static QString S_ID_MODULE_VERSION;
     const static QString S_ID_INTERFACE_MACRO;
+    const static QString S_ID_GTLAB_MAJOR_VERSION;
 
     const static QString S_ID_GTLAB_INSTALL_DIR;
     const static QString S_ID_GTLAB_INSTALL_SUB_DIR;
@@ -54,8 +60,8 @@ public:
     const static QString S_ID_AUTHOR;
     const static QString S_ID_AUTHOR_EMAIL;
 
-    ModuleGenerator(ModuleGeneratorSettings* settings):
-        m_settings(settings) { }
+    ModuleGeneratorSettings const* settings() const;
+    ModuleGeneratorSettings* settings();
 
 signals:
 
@@ -67,12 +73,12 @@ public slots:
 
 private:
 
-    ModuleGeneratorSettings* m_settings;
+    ModuleGeneratorSettings m_settings{};
 
-    QStringList m_proFileIncludePaths;
-    QDir m_srcDir;
-    QDir m_moduleDir;
-    QDir m_featuresDir;
+    QStringList m_proFileIncludePaths{};
+    QDir m_srcDir{};
+    QDir m_moduleDir{};
+    QDir m_featuresDir{};
 
     bool generateHelper();
 
@@ -90,35 +96,35 @@ private:
 
     void generateFunction(QString& headerString,
                           QString& sourceString,
-                          FunctionStruct& f,
+                          FunctionStruct const& f,
                           bool isConstructor = false);
 
     void generateImplementation(QString& headerString,
                                 QString& sourceString,
-                                FunctionStruct& function,
+                                FunctionStruct const& function,
                                 bool isConstructor = false);
 
     void generateImplementationHelper(QString& sourceString,
-                                      ClassStruct& baseClass,
-                                      QList<ClassStruct>& classes);
+                                      ClassStruct const& baseClass,
+                                      QList<ClassStruct> const& classes);
 
-    void generateBasicClass(ClassStruct& base,
-                            ClassStruct& derived);
+    void generateBasicClass(ClassStruct const& base,
+                            ClassStruct const& derived);
 
     void generateIncludes(QString& sourceString,
-                          QStringList& includes);
+                          QStringList const& includes);
 
     void generateForwardDeclarations(QString& headerString,
-                                     QStringList& forwardDecls);
+                                     QStringList const& forwardDecls);
 
     void generateConstructors(QString& headerString,
                               QString& sourceString,
-                              ClassStruct& base);
+                              ClassStruct const& base);
 
-    void appendFileToProjectFile(QString& fileName,
-                                 const QString& path);
+    void appendFileToProjectFile(QString const& fileName,
+                                 QString const& path);
 
-    void appendLibToProjectFile(const QString& name);
+    void appendLibToProjectFile(QString const& name);
 
     void clearIdentifiers(QString& fileString);
 

@@ -16,18 +16,21 @@
 
 static QTextEdit* s_summaryEdit; // ref for updateSummary methode
 
-void updateSummary(QString&, ModuleGeneratorLogger::Type, int);
+void updateSummary(QString const&, ModuleGeneratorLogger::Type, int);
 
-const char* C_SUMMARY_PAGE_TITLE = "Summary";
+const char*
+SummaryPage::C_SUMMARY_PAGE_TITLE = "Summary";
 
-const QString S_GENERATE_BUTTON_TEXT =
-        QStringLiteral("Generate");
-const QString S_DONE_BUTTON_TEXT =
-        QStringLiteral("Done");
-const QString S_GIT_CHECK_BOX_TEXT =
-        QStringLiteral("generate additional git files");
-const QString S_GIT_CHECK_BOX_TOOLTIP =
-        QStringLiteral("README.md, CHANGELOG.md and .gitignore");
+const QString
+SummaryPage::S_GENERATE_BUTTON_TEXT = QStringLiteral("Generate");
+const QString
+SummaryPage::S_DONE_BUTTON_TEXT = QStringLiteral("Done");
+const QString
+SummaryPage::S_GIT_CHECK_BOX_TEXT = QStringLiteral("generate additional git "
+                                                   "files");
+const QString
+SummaryPage::S_GIT_CHECK_BOX_TOOLTIP = QStringLiteral("README.md, CHANGELOG.md "
+                                                      "and .gitignore");
 /*
  * constructor
  */
@@ -37,7 +40,7 @@ SummaryPage::SummaryPage(ModuleGeneratorSettings *settings, QWidget *parent) :
     // initializations
     m_summaryTextEdit = new QTextEdit;
     m_generateGitFilesCheckBox = new QCheckBox(S_GIT_CHECK_BOX_TEXT);
-    m_vLayout = new QVBoxLayout(this);
+    auto* baseLayout = new QVBoxLayout(this);
 
     // page gui
     setTitle(tr(C_SUMMARY_PAGE_TITLE));
@@ -49,12 +52,10 @@ SummaryPage::SummaryPage(ModuleGeneratorSettings *settings, QWidget *parent) :
     m_generateGitFilesCheckBox->setChecked(true);
     m_generateGitFilesCheckBox->setToolTip(S_GIT_CHECK_BOX_TOOLTIP);
 
-    m_vLayout->addWidget(m_summaryTextEdit);
-    m_vLayout->addWidget(m_generateGitFilesCheckBox);
+    baseLayout->addWidget(m_summaryTextEdit);
+    baseLayout->addWidget(m_generateGitFilesCheckBox);
 
-    setLayout(m_vLayout);
-
-    m_isComplete = true;
+    setLayout(baseLayout);
 
     s_summaryEdit = m_summaryTextEdit;
 }
@@ -77,7 +78,7 @@ SummaryPage::onGenerationFinished()
 void
 SummaryPage::initializePage()
 {
-    LOG_INSTANCE("summary page...");
+    LOG_INDENT("summary page...");
 
     wizard()->setButtonText(QWizard::FinishButton, S_GENERATE_BUTTON_TEXT);
 
@@ -93,14 +94,15 @@ SummaryPage::isComplete() const
 bool
 SummaryPage::validatePage()
 {
-    if (wizard()->buttonText(QWizard::FinishButton) == S_DONE_BUTTON_TEXT && m_isComplete)
+    if (wizard()->buttonText(QWizard::FinishButton) == S_DONE_BUTTON_TEXT &&
+        m_isComplete)
     {        
         ModuleGeneratorLogger::unregisterLoggingFunction();
 
         return true;
     }
 
-    LOG_INSTANCE("validated!");
+    LOG_INDENT("validated!");
 
     m_isComplete = false;
 
@@ -125,7 +127,6 @@ SummaryPage::validatePage()
 
     return false;
 }
-
 
 /*
  * private
@@ -171,11 +172,11 @@ SummaryPage::selectedInterfaces()
 {
     QStringList content;
 
-    for (auto* interface : settings()->selectedInterfaces())
+    for (auto& interface : settings()->selectedInterfaces())
     {
-        if (interface == Q_NULLPTR) continue;
+//        if (interface == Q_NULLPTR) continue;
 
-        content << interface->className;
+        content << interface.className;
     }
 
     if (content.isEmpty())
@@ -227,13 +228,13 @@ SummaryPage::filesToGenerate()
     content << baseFolder + moduleClass.fileName + ".cpp";
     content << baseFolder + moduleClass.fileName + ".json";
 
-    for (auto* interface : settings()->selectedInterfaces())
+    for (auto& interface : settings()->selectedInterfaces())
     {
-        if (interface == Q_NULLPTR) continue;
+//        if (interface == Q_NULLPTR) continue;
 
-        for (const auto& function : interface->functions)
+        for (auto& function : interface.functions)
         {
-            const auto& baseClass  = function.baseClass;
+            auto& baseClass  = function.baseClass;
 
             for (auto derivedClass : function.implementation.derivedClasses)
             {
@@ -252,7 +253,7 @@ SummaryPage::filesToGenerate()
     {
         content.first().prepend("files to generate:\t");
 
-        content << "";
+        content << QString{};
     }
 
     return content.join("\n\t\t");
@@ -270,8 +271,10 @@ SummaryPage::printSummary()
 }
 
 void
-updateSummary(QString& text, ModuleGeneratorLogger::Type type, int indent)
+updateSummary(QString const&text, ModuleGeneratorLogger::Type type, int indent)
 {
+    if (!s_summaryEdit) return;
+
     QString indendation = text.left(indent > 0 ? indent - 1:0);
     QString actualText  = text.mid(indent > 0 ? indent - 1:0);
 
@@ -292,7 +295,8 @@ updateSummary(QString& text, ModuleGeneratorLogger::Type type, int indent)
 
     if (type != ModuleGeneratorLogger::Info)
     {
-        actualText = QString("[" + ModuleGeneratorLogger::typeName(type) +"] " + actualText);
+        actualText = QString("[" + ModuleGeneratorLogger::typeName(type) +"] " +
+                             actualText);
     }
 
     s_summaryEdit->setTextColor(color);

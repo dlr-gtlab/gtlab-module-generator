@@ -16,7 +16,7 @@ class BoolClassSpecificationWidget : public QCheckBox,
 
 public:
 
-    BoolClassSpecificationWidget(const ImplementationStruct& implementation,
+    BoolClassSpecificationWidget(ImplementationStruct const& implementation,
                                  QWidget* parent = nullptr) :
         QCheckBox(parent),
         AbstractClassSpecification(implementation)
@@ -27,7 +27,7 @@ public:
 
     QStringList implementationValues() override
     {
-        return QStringList(stateToString());
+        return {stateToString()};
     }
 
     QString stateToString()
@@ -52,14 +52,14 @@ class StringClassSpecificationWidget : public QLineEdit,
 
 public:
 
-    StringClassSpecificationWidget(const ImplementationStruct& implementation,
+    StringClassSpecificationWidget(ImplementationStruct const& implementation,
                                    QWidget* parent = nullptr) :
         QLineEdit(parent),
         AbstractClassSpecification(implementation) { }
 
     QStringList implementationValues() override
     {
-        return QStringList("QStringLiteral(\"" + text() + "\")");
+        return {"QStringLiteral(\"" + text() + "\")"};
     }
 };
 
@@ -80,15 +80,15 @@ public:
      * @param suffix
      * @param parent
      */
-    ComboClassSpecificationWidget(const ImplementationStruct& implementation,
-                                  const QStringList& values,
-                                  const QString& prefix = "",
-                                  const QString& suffix = "",
+    ComboClassSpecificationWidget(ImplementationStruct const& implementation,
+                                  QStringList const& values,
+                                  QString const& prefix = {},
+                                  QString const& suffix = {},
                                   QWidget* parent = nullptr) :
         QComboBox(parent),
         AbstractClassSpecification(implementation),
-        m_prefix(prefix),
-        m_suffix(suffix)
+        m_prefix{prefix},
+        m_suffix{suffix}
     {
         addItems(values);
     }
@@ -100,13 +100,13 @@ public:
         retVal.prepend(m_prefix);
         retVal.append(m_suffix);
 
-        return QStringList(retVal);
+        return {retVal};
     }
 
 private:
 
-    const QString m_prefix;
-    const QString m_suffix;
+    const QString m_prefix{};
+    const QString m_suffix{};
 };
 
 #endif // SIMPLECLASSSPECIFICATIONWIDGET_H

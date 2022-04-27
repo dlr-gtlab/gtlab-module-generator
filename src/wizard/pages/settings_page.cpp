@@ -8,6 +8,8 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QMessageBox>
+#include <QComboBox>
+#include <QVersionNumber>
 
 #include "settings_page.h"
 
@@ -15,34 +17,44 @@
 #include "module_generator_logger.h"
 
 
-const int I_DIR_PUSHBTN_WIDTH = 40;
+const int
+SettingsPage::I_DIR_PUSHBTN_WIDTH = 40;
 
-const char* C_SETTINGS_PAGE_TITLE = "Settings";
+const char*
+SettingsPage::C_SETTINGS_PAGE_TITLE = "Settings";
 
-const QString S_INFO_TEXT =
-        QStringLiteral("Enter the output directory for the generated module. "
-                       "Select the GTlab application and enter "
-                       "the path to your local DevTools installation.");
-const QString S_OUTPUT_LABEL =
-        QStringLiteral("Output directory:");
-const QString S_DEVTOOLS_LABEL =
-        QStringLiteral("DevTools directory:");
-const QString S_GTLAB_LABEL =
-        QStringLiteral("GTlab application:");
+const QString
+SettingsPage::S_INFO_TEXT = QStringLiteral("Enter the output directory for the "
+                                           "generated module. Select the GTlab "
+                                           "application and enter the path to "
+                                           "your local DevTools installation.");
+const QString
+SettingsPage::S_OUTPUT_LABEL = QStringLiteral("Output directory:");
+const QString
+SettingsPage::S_DEVTOOLS_LABEL = QStringLiteral("DevTools directory:");
+const QString
+SettingsPage::S_GTLAB_LABEL = QStringLiteral("GTlab application:");
 
-const QString S_OUTPUT_TOOLTIP =
-        QStringLiteral("All module files will be placed in a separate subfolder.\n"
-                       "The path is created at runtime if necessary");
-const QString S_DEVTOOLS_TOOLTIP =
-        QStringLiteral("This directory should contain:\n"
-                       "include/ lib/ ThirdPartyLibraries/");
-const QString S_GTLAB_TOOLTIP =
-        QStringLiteral("This must point to GTlab");
+const QString
+SettingsPage::S_OUTPUT_TOOLTIP = QStringLiteral("All module files will be "
+                                                "placed in a separate sub"
+                                                "folder.\nThe path is created "
+                                                "at runtime if necessary");
+const QString
+SettingsPage::S_DEVTOOLS_TOOLTIP = QStringLiteral("This directory should "
+                                                  "contain:\ninclude/ lib/ "
+                                                  "ThirdPartyLibraries/");
+const QString
+SettingsPage::S_GTLAB_TOOLTIP = QStringLiteral("This must point to GTlab");
+const QString
+SettingsPage::S_VERSION_LABEL(QStringLiteral("Target version"));
+const QString
+SettingsPage::S_VERSION_TOOLTIP(QStringLiteral("Target version of GTlab"));
 
-const QString S_DIR_BTN_TOOLTIP =
-        QStringLiteral("select directory");
-const QString S_DIR_BTN_TEXT =
-        QStringLiteral("...");
+const QString
+SettingsPage::S_DIR_BTN_TOOLTIP = QStringLiteral("select directory");
+const QString
+SettingsPage::S_DIR_BTN_TEXT = QStringLiteral("...");
 
 
 
@@ -53,68 +65,74 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
     // initializations
-    m_infoTextLabel      = new QLabel(S_INFO_TEXT);
+    auto* infoLabel      = new QLabel(S_INFO_TEXT);
 
-    m_outputDirLabel     = new QLabel(S_OUTPUT_LABEL);
+    auto* outputLabel     = new QLabel(S_OUTPUT_LABEL);
+    auto* outputDirPushBtn   = new QPushButton(S_DIR_BTN_TEXT);
+
+    auto* gtlabLabel         = new QLabel(S_GTLAB_LABEL);
+    auto* gtlabDirPushBtn    = new QPushButton(S_DIR_BTN_TEXT);
+
+    auto* devToolsLabel      = new QLabel(S_DEVTOOLS_LABEL);
+    auto* devToolsDirPushBtn = new QPushButton(S_DIR_BTN_TEXT);
+    auto* baseGridLayout     = new QGridLayout;
+    auto* label = new QLabel(S_VERSION_LABEL);
+
     m_outputDirEdit      = new QLineEdit;
-    m_outputDirPushBtn   = new QPushButton(S_DIR_BTN_TEXT);
-
-    m_gtlabLabel         = new QLabel(S_GTLAB_LABEL);
     m_gtlabDirEdit       = new QLineEdit;
-    m_gtlabDirPushBtn    = new QPushButton(S_DIR_BTN_TEXT);
-
-    m_devToolsLabel      = new QLabel(S_DEVTOOLS_LABEL);
     m_devToolsDirEdit    = new QLineEdit;
-    m_devToolsDirPushBtn = new QPushButton(S_DIR_BTN_TEXT);
-    m_baseGridLayout     = new QGridLayout;
+    m_versionBox = new QComboBox;
 
     // page gui
     setTitle(tr(C_SETTINGS_PAGE_TITLE));
 
-    m_infoTextLabel->setWordWrap(true);
-    m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
-    m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);    
+    infoLabel->setWordWrap(true);
+    infoLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
+    infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     m_outputDirEdit->setToolTip(S_OUTPUT_TOOLTIP);
-    m_outputDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
+    outputDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
     m_gtlabDirEdit->setToolTip(S_GTLAB_TOOLTIP);
-    m_gtlabDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
+    gtlabDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
     m_devToolsDirEdit->setToolTip(S_DEVTOOLS_TOOLTIP);
-    m_devToolsDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
+    devToolsDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
-
+    m_versionBox->addItems(settings->supportedVersions());
+    m_versionBox->setMaximumWidth(100);
+    m_versionBox->setToolTip(S_VERSION_TOOLTIP);
 
     // layout
-    m_baseGridLayout->addWidget(m_infoTextLabel, 0, 0, 1, 3);
-    m_baseGridLayout->addWidget(m_outputDirLabel, 1, 0);
-    m_baseGridLayout->addWidget(m_outputDirEdit, 1, 1);
-    m_baseGridLayout->addWidget(m_outputDirPushBtn, 1, 2);
-    m_baseGridLayout->addWidget(m_gtlabLabel, 2, 0);
-    m_baseGridLayout->addWidget(m_gtlabDirEdit, 2, 1);
-    m_baseGridLayout->addWidget(m_gtlabDirPushBtn, 2, 2);
-    m_baseGridLayout->addWidget(m_devToolsLabel, 3, 0);
-    m_baseGridLayout->addWidget(m_devToolsDirEdit, 3, 1);
-    m_baseGridLayout->addWidget(m_devToolsDirPushBtn, 3, 2);
-    m_baseGridLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
+    baseGridLayout->addWidget(infoLabel, 0, 0, 1, 3);
+    baseGridLayout->addWidget(outputLabel, 1, 0);
+    baseGridLayout->addWidget(m_outputDirEdit, 1, 1);
+    baseGridLayout->addWidget(outputDirPushBtn, 1, 2);
+    baseGridLayout->addWidget(gtlabLabel, 2, 0);
+    baseGridLayout->addWidget(m_gtlabDirEdit, 2, 1);
+    baseGridLayout->addWidget(gtlabDirPushBtn, 2, 2);
+    baseGridLayout->addWidget(devToolsLabel, 3, 0);
+    baseGridLayout->addWidget(m_devToolsDirEdit, 3, 1);
+    baseGridLayout->addWidget(devToolsDirPushBtn, 3, 2);
+    baseGridLayout->addWidget(label, 4, 0);
+    baseGridLayout->addWidget(m_versionBox, 4, 1);
+    baseGridLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
-    setLayout(m_baseGridLayout);
-
+    setLayout(baseGridLayout);
 
     // signals
     connect(m_outputDirEdit, SIGNAL(textEdited(QString)),
             this, SLOT(onEditedOutputDir(QString)));
     connect(m_outputDirEdit, SIGNAL(textChanged(QString)),
             this, SIGNAL(completeChanged()));
-    connect(m_outputDirPushBtn, SIGNAL(clicked(bool)),
+    connect(outputDirPushBtn, SIGNAL(clicked(bool)),
             this, SLOT(onPressedOutputDirPushBtn()));
 
     connect(m_gtlabDirEdit, SIGNAL(textEdited(QString)),
             this, SLOT(onEditedGTlabDir(QString)));
     connect(m_gtlabDirEdit, SIGNAL(textChanged(QString)),
             this, SIGNAL(completeChanged()));
-    connect(m_gtlabDirPushBtn, SIGNAL(clicked(bool)),
+    connect(gtlabDirPushBtn, SIGNAL(clicked(bool)),
             this, SLOT(onPressedGTlabDirPushBtn()));
 
 
@@ -122,13 +140,13 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
             this, SLOT(onEditedDevToolsDir(QString)));
     connect(m_devToolsDirEdit, SIGNAL(textChanged(QString)),
             this, SIGNAL(completeChanged()));
-    connect(m_devToolsDirPushBtn, SIGNAL(clicked(bool)),
+    connect(devToolsDirPushBtn, SIGNAL(clicked(bool)),
             this, SLOT(onPressedDevToolsDirPushBtn()));
 
     // tool tips
-    m_outputDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
-    m_gtlabDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
-    m_devToolsDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
+    outputDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
+    gtlabDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
+    devToolsDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
 
     // defaults
     QString gtlabPath(settings->gtlabPath());
@@ -149,7 +167,7 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
 void
 SettingsPage::initializePage()
 {
-    LOG_INSTANCE("settings page...");
+    LOG_INDENT("settings page...");
 }
 
 
@@ -177,7 +195,7 @@ SettingsPage::validatePage()
 {
     // for nicer debug output
     {
-        LOG_INSTANCE("validated!");
+        LOG_INDENT("validated!");
 
         QFileInfo gtlabApp(m_gtlabDirEdit->text());
         QString path(gtlabApp.path());
@@ -190,6 +208,11 @@ SettingsPage::validatePage()
         settings()->setOutputPath(m_outputDirEdit->text());
         settings()->setGTlabPath(path);
         settings()->setDevToolsPath(m_devToolsDirEdit->text());
+        settings()->setGTlabVersion(m_versionBox->currentText());
+
+        LOG_INFO << "target version: " << settings()->gtlabVersion() << ENDL;
+        LOG_INFO << "major version:  "
+                 << QString::number(settings()->gtlabMajorVersion());
     }
 
     settings()->preLoad();
@@ -222,7 +245,7 @@ SettingsPage::setLineEditColor(QLineEdit* edit, bool isExec) const
  * private slots
  */
 void
-updateDirEdit(QLineEdit* edit, QString& path)
+SettingsPage::updateDirEdit(QLineEdit* edit, QString& path)
 {
     int cursor(edit->cursorPosition());
 
@@ -255,7 +278,8 @@ SettingsPage::onPressedOutputDirPushBtn()
     QString dirOutput;
 
     dirOutput = QFileDialog::getExistingDirectory(
-                this, tr("Select target directory"), m_outputDirEdit->text(),
+                this, tr("Select target directory"),
+                m_outputDirEdit->text(),
                 QFileDialog::DontResolveSymlinks);
 
     if(!dirOutput.isEmpty())
@@ -270,7 +294,8 @@ SettingsPage::onPressedGTlabDirPushBtn()
     QString dirGTlab;
 
     dirGTlab = QFileDialog::getOpenFileName(
-                this, tr("Select the GTlab application"), m_gtlabDirEdit->text(),
+                this, tr("Select the GTlab application"),
+                m_gtlabDirEdit->text(),
                 QStringLiteral("GTlab application (") +
                 ModuleGeneratorSettings::S_GTLAB_APP +
                 QStringLiteral(")"));
@@ -287,7 +312,8 @@ SettingsPage::onPressedDevToolsDirPushBtn()
     QString dirDevTools;
 
     dirDevTools = QFileDialog::getExistingDirectory(
-                this, tr("Select DevTools directory"), m_devToolsDirEdit->text(),
+                this, tr("Select DevTools directory"),
+                m_devToolsDirEdit->text(),
                 QFileDialog::DontResolveSymlinks);
 
     if (dirDevTools.isEmpty() == false)

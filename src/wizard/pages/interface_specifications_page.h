@@ -4,12 +4,17 @@
 
 #include "abstract_wizardpage.h"
 
+struct ClassStruct;
 class QLabel;
 class QGridLayout;
 class QTabWidget;
 class InterfaceSpecificationsPage : public AbstractWizardPage
 {
     Q_OBJECT
+
+    static const char* C_TITLE_INTERFACE_SPECIFICATIONS_PAGE;
+
+    static const QString S_INFO_TEXT;
 
 public:
 
@@ -18,29 +23,30 @@ public:
 
 protected:
 
-    void initializePage() Q_DECL_OVERRIDE;
+    void initializePage() override;
 
-    bool isComplete() const Q_DECL_OVERRIDE;
+    bool isComplete() const override;
 
-    bool validatePage() Q_DECL_OVERRIDE;
+    bool validatePage() override;
 
 private:
 
-    QStringList m_activeInterfaces;
-    /// info text label
-    QLabel* m_infoTextLabel;
-    /// grid layout
-    QGridLayout* m_baseLayout;
+    QStringList m_activeInterfaces{};
 
-    QTabWidget* m_interfaceTabBar;
+    QTabWidget* m_interfaceTabBar{};
 
-    void setSelectedInterfaces();
+    void intInterfaces();
 
     void clearInterfaceTabs();
 
     void setInterfaceImplementation();
 
     bool checkInterfaceData();
+
+    bool checkClassImplementation(ClassStruct const& base,
+                                  QStringList& classNames);
+
+    bool checkDuplicateClassNames(QStringList const& classNames);
 };
 
 #endif // INTERFACESPEZIFICATIONPAGE_H

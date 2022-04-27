@@ -24,7 +24,7 @@ QT += core widgets xml
 TEMPLATE = lib
 CONFIG += plugin
 CONFIG += silent
-CONFIG += c++11
+CONFIG += c++14
 
 CONFIG(debug, debug|release) {
     OBJECTS_DIR = $${MOC_BUILD_DEST}/debug-app/obj
@@ -49,25 +49,33 @@ HEADERS += \
 SOURCES += \
     src/$$FILE_NAME$$.cpp $$PRO_SOURCEPATH$$
 
+message(Targeting Major Version: $${MAJOR_VERSION})
+
 CONFIG(debug, debug|release){
     # GTLAB CORE
     LIBS += -lGTlabLogging-d
-    LIBS += -lGTlabDatamodel-d
     LIBS += -lGTlabNumerics-d
-    LIBS += -lGTlabCalculators-d
-    LIBS += -lGTlabCore-d
-    LIBS += -lGTlabMdi-d
-    LIBS += -lGTlabNetwork-d
+
+    greaterThan(MAJOR_VERSION, 1) {
+        LIBS += -lGTlabCore-d -lGTlabGui-d -lGTlabDataProcessor-d
+    } else {
+        LIBS += -lGTlabCalculators-d -lGTlabCore-d
+        LIBS += -lGTlabMdi-d -lGTlabDatamodel-d
+    }
+
     # MODULES$$PRO_LIBS_D$$
 } else {
     # GTLAB CORE
     LIBS += -lGTlabLogging
-    LIBS += -lGTlabDatamodel
     LIBS += -lGTlabNumerics
-    LIBS += -lGTlabCalculators
-    LIBS += -lGTlabCore
-    LIBS += -lGTlabMdi
-    LIBS += -lGTlabNetwork
+
+    greaterThan(MAJOR_VERSION, 1) {
+        LIBS += -lGTlabCore -lGTlabGui -lGTlabDataProcessor
+    } else {
+        LIBS += -lGTlabCalculators -lGTlabCore
+        LIBS += -lGTlabMdi -lGTlabDatamodel
+    }
+
     # MODULES$$PRO_LIBS$$
 }
 

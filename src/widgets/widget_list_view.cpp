@@ -5,20 +5,20 @@
 
 WidgetListView::WidgetListView(QWidget* parent) : QScrollArea(parent)
 {
-    m_scrollWidget = new QWidget();
-    m_scrollLayout = new QVBoxLayout();
-    m_scrollLayoutSpacer = new QSpacerItem(1, 10,
-                                QSizePolicy::Minimum,
-                                QSizePolicy::Expanding);
+    auto* scrollWidget = new QWidget;
+    auto* m_scrollLayoutSpacer = new QSpacerItem(1, 10,
+                                                 QSizePolicy::Minimum,
+                                                 QSizePolicy::Expanding);
 
+    m_scrollLayout = new QVBoxLayout;
     m_scrollLayout->setSpacing(0);
     m_scrollLayout->setContentsMargins(0, 0, 0, 0);
     m_scrollLayout->addItem(m_scrollLayoutSpacer);
 
-    m_scrollWidget->setLayout(m_scrollLayout);
+    scrollWidget->setLayout(m_scrollLayout);
 
     setWidgetResizable(true);
-    setWidget(m_scrollWidget);
+    setWidget(scrollWidget);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
@@ -31,7 +31,7 @@ WidgetListView::widgets() const
     {
         QWidget* widget = m_scrollLayout->itemAt(i)->widget();
 
-        if (widget == Q_NULLPTR)
+        if (!widget)
         {
             continue;
         }

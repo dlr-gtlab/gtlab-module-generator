@@ -14,7 +14,8 @@ const QString S_BTN_TEXT = QStringLiteral("...");
 const QString S_SETTINGS_TOOLTIP = QStringLiteral("Define implementations for functions");
 
 
-InterfaceSelectionWidget::InterfaceSelectionWidget(ClassStruct& interface, QWidget* parent)
+InterfaceSelectionWidget::InterfaceSelectionWidget(ClassStruct const& interface,
+                                                   QWidget* parent)
     : QWidget(parent), m_interfaceStruct(interface)
 {
     m_nameCheckBox = new QCheckBox();

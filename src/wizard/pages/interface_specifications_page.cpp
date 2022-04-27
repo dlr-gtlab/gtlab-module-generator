@@ -8,11 +8,16 @@
 #include <QGridLayout>
 #include <QTabWidget>
 #include <QMessageBox>
+#include <QElapsedTimer>
 
+#include <memory>
 
-const char* C_TITLE_INTERFACE_SPECIFICATIONS_PAGE = "Interface Specifications";
+const char*
+InterfaceSpecificationsPage::C_TITLE_INTERFACE_SPECIFICATIONS_PAGE =
+        "Interface Specifications";
 
-const QString S_INFO_TEXT = QStringLiteral(
+const QString
+InterfaceSpecificationsPage::S_INFO_TEXT = QStringLiteral(
     "Most interfaces require additional data and classes to be registered. "
     "This process can be automated by filling out the required fields below. "
     "If not filled out correctly the module may not be able to compile and must "
@@ -23,51 +28,55 @@ InterfaceSpecificationsPage::InterfaceSpecificationsPage(ModuleGeneratorSettings
                                                         QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
-    m_infoTextLabel = new QLabel(S_INFO_TEXT);
-    m_baseLayout = new QGridLayout;
+    auto* infoLabel = new QLabel(S_INFO_TEXT);
+    auto* baseLayout = new QGridLayout;
 
     m_interfaceTabBar = new QTabWidget();
 
     // page gui
     setTitle(tr(C_TITLE_INTERFACE_SPECIFICATIONS_PAGE));
 
-    m_infoTextLabel->setWordWrap(true);
-    m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
-    m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    infoLabel->setWordWrap(true);
+    infoLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
+    infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    m_baseLayout->addWidget(m_infoTextLabel, 0, 0, 1, 3);
-    m_baseLayout->addWidget(m_interfaceTabBar, 2, 0, 1, 3);
-    m_baseLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
+    baseLayout->addWidget(infoLabel, 0, 0, 1, 3);
+    baseLayout->addWidget(m_interfaceTabBar, 2, 0, 1, 3);
+    baseLayout->setColumnMinimumWidth(0,
+                                      AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
-    setLayout(m_baseLayout);
+    setLayout(baseLayout);
 }
 
 void
 InterfaceSpecificationsPage::initializePage()
 {
-    LOG_INSTANCE("interface specifications page...");
+    QElapsedTimer timer;
+    timer.start();
+
+    LOG_INDENT("interface specifications page...");
 
     // only regenerate the widgets if the selection changed
     bool reload = false;
-    auto interfaces = settings()->selectedInterfaces();
+    auto& interfaces = settings()->selectedInterfaces();
 
-    for (auto* interface : interfaces)
+    for (auto& interface : interfaces)
     {
-        if (interface == Q_NULLPTR) continue;
-
-        if (!m_activeInterfaces.contains(interface->className))
+        if (!m_activeInterfaces.contains(interface.className))
         {
-            reload = true; break;
+            reload = true;
+            break;
         }
     }
 
     if (reload || m_activeInterfaces.length() != interfaces.length())
     {
         LOG_INFO << "reloading all widgets!" << ENDL;
-        setSelectedInterfaces();
+        intInterfaces();
     }
 
-    LOG_INFO << "done!";
+    LOG_INFO << "done! Took " << QString::number(timer.elapsed())
+             << " ms";
 }
 
 bool
@@ -79,7 +88,7 @@ InterfaceSpecificationsPage::isComplete() const
 bool
 InterfaceSpecificationsPage::validatePage()
 {
-    LOG_INSTANCE("validated!");
+    LOG_INDENT("validated!");
 
     setInterfaceImplementation();
 
@@ -91,45 +100,44 @@ InterfaceSpecificationsPage::validatePage()
 }
 
 void
-InterfaceSpecificationsPage::setSelectedInterfaces()
+InterfaceSpecificationsPage::intInterfaces()
 {
     m_activeInterfaces.clear();
     clearInterfaceTabs();
 
-    LOG_INSTANCE("setting up selected interfaces...");
+    LOG_INDENT("setting up selected interfaces...");
 
-    for (auto* interface : settings()->selectedInterfaces())
+    auto interfaces = settings()->selectedInterfaces();
+
+    for (auto& interface : interfaces)
     {
-        if (interface == Q_NULLPTR)
-        {
-            LOG_ERR << "null interface!";
-            continue;
-        }
+        QString className(interface.className);
 
-        QString className(interface->className);
-
-        LOG_INSTANCE(className);
+        LOG_INDENT(className);
 
         m_activeInterfaces << className;
 
-        auto* widget = new FunctionSpecificationWidget(interface->functions, settings());
+        auto widget = std::make_unique<FunctionSpecificationWidget>(
+                    interface.functions, settings());
 
         if (widget->isEmpty())
         {
-            interface->functions = widget->implementedFunctions();
+            interface.functions = widget->implementedFunctions();
 
             LOG_WARN << "no widget to register!";
-            delete widget;
             continue;
         }
 
-        m_interfaceTabBar->addTab(widget, interface->objectName);
+        m_interfaceTabBar->addTab(widget.release(), interface.objectName);
 
         LOG_INFO << "done!";
     }
 
+    // update implementations for empty widgets
+    settings()->setSelectedInterfaces(interfaces);
+
     // label to inform user that no further steps are required
-    if (m_interfaceTabBar->count() == 0)
+    if (!m_interfaceTabBar->count())
     {
         LOG_INFO << "setting up info label..." << ENDL;
 
@@ -146,13 +154,13 @@ InterfaceSpecificationsPage::setSelectedInterfaces()
 void
 InterfaceSpecificationsPage::clearInterfaceTabs()
 {
-    LOG_INSTANCE("clearing interfaces...");
+    LOG_INDENT("clearing interfaces...");
 
     for (int i = 0; i < m_interfaceTabBar->count(); i++)
     {
         auto* widget = m_interfaceTabBar->widget(i);
 
-        if (widget == Q_NULLPTR)
+        if (!widget)
         {
             LOG_ERR << "null widget!";
             continue;
@@ -167,54 +175,58 @@ InterfaceSpecificationsPage::clearInterfaceTabs()
 void
 InterfaceSpecificationsPage::setInterfaceImplementation()
 {
-    LOG_INSTANCE("setting interface implementation...");
+    LOG_INDENT("setting interface implementation...");
 
     auto interfaces = settings()->selectedInterfaces();
 
     for (int i = 0; i < m_interfaceTabBar->count(); ++i)
     {
-        auto* widget = dynamic_cast<FunctionSpecificationWidget*>(m_interfaceTabBar->widget(i));
+        auto* widget = qobject_cast<FunctionSpecificationWidget*>(
+                    m_interfaceTabBar->widget(i));
 
-        if (widget == Q_NULLPTR)
+        if (!widget)
         {
             LOG_ERR << "null widget!" << ENDL;
             continue;
         }
 
-        for (int j = 0; j < interfaces.length(); ++j)
+        for (auto& interface : interfaces)
         {
-            if (interfaces[j]->objectName == m_interfaceTabBar->tabText(i))
+            if (interface.objectName == m_interfaceTabBar->tabText(i))
             {
                 LOG_INFO << m_interfaceTabBar->tabText(i) << ENDL;
-                interfaces[j]->functions = widget->implementedFunctions();
-
+                interface.functions = widget->implementedFunctions();
                 break;
             }
         }
     }
 
+    settings()->setSelectedInterfaces(std::move(interfaces));
+
     LOG_INFO << "done!";
 }
 
 bool
-checkClassImplementation(const ClassStruct& base, QStringList& classNames)
+InterfaceSpecificationsPage::checkClassImplementation(ClassStruct const& base,
+                                                      QStringList& classNames)
 {
     for (const auto& function : base.functions)
     {
         for (const auto& derived : function.implementation.derivedClasses)
         {
-            classNames << derived.className;
-
             if (derived.className.isEmpty() &&
                 function.returnValue == QStringLiteral("QMetaObject"))
             {
-                QMessageBox::critical(0, QStringLiteral("Empty class name"),
-                                      QStringLiteral("The function '") + function.name +
-                                      QStringLiteral("' has an empty class associated!\n"
-                                                     "Please create a valid class name."));
+                QMessageBox::critical(nullptr,
+                    QStringLiteral("Empty class name"),
+                    QStringLiteral("The function '") + function.name +
+                    QStringLiteral("' has an empty class associated!\n"
+                                   "Please create a valid class name."));
 
                 return false;
             }
+
+            classNames << derived.className;
 
             if (!checkClassImplementation(derived, classNames))
             {
@@ -227,7 +239,8 @@ checkClassImplementation(const ClassStruct& base, QStringList& classNames)
 }
 
 bool
-checkDuplicateClassNames(const QStringList& classNames)
+InterfaceSpecificationsPage::checkDuplicateClassNames(QStringList const&
+                                                      classNames)
 {
     bool messageBoxDisplayed = false;
 
@@ -238,10 +251,11 @@ checkDuplicateClassNames(const QStringList& classNames)
             // in case multiple classes are empty only report it once
             if (messageBoxDisplayed) continue;
 
-            auto ans = QMessageBox::warning(0, QStringLiteral("Empty class name"),
-                                            QStringLiteral("A function has an empty class associated!\n"
-                                                           "Empty classes will not be generated."),
-                                            QMessageBox::Ignore, QMessageBox::Cancel);
+            auto ans = QMessageBox::warning(nullptr,
+                QStringLiteral("Empty class name"),
+                QStringLiteral("A function implements an invalid class!\n"
+                               "Invalid classes may not be generated."),
+                QMessageBox::Ignore, QMessageBox::Cancel);
             messageBoxDisplayed = true;
 
             if (ans == QMessageBox::Cancel)
@@ -251,10 +265,11 @@ checkDuplicateClassNames(const QStringList& classNames)
         }
         else if (classNames.count(className) > 1)
         {
-            QMessageBox::critical(0, QStringLiteral("Duplicate class names"),
-                                  QStringLiteral("The class name '") + className +
-                                  QStringLiteral("' is defined multiple times!\n"
-                                                 "Please create a valid class name."));
+            QMessageBox::critical(nullptr,
+                QStringLiteral("Duplicate class names"),
+                QStringLiteral("The class name '") + className +
+                QStringLiteral("' is defined multiple times!\n"
+                               "Please choose a different class name."));
 
             return false;
         }
@@ -266,17 +281,15 @@ checkDuplicateClassNames(const QStringList& classNames)
 bool
 InterfaceSpecificationsPage::checkInterfaceData()
 {
-    LOG_INSTANCE("checking interface data...");
+    LOG_INDENT("checking interface data...");
 
-    QStringList classNames;
+    QStringList classNames{settings()->moduleClass().className};
 
-    classNames << settings()->moduleClass().className;
-
-    for (auto* interface : settings()->selectedInterfaces())
+    for (auto& interface : settings()->selectedInterfaces())
     {
-        if (interface == Q_NULLPTR) continue;
+//        if (interface == Q_NULLPTR) continue;
 
-        if (!checkClassImplementation(*interface, classNames))
+        if (!checkClassImplementation(interface, classNames))
         {
             LOG_WARN << "missing class implementation!";
             return false;

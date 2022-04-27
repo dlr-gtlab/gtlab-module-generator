@@ -72,7 +72,7 @@ ClassSpecificationWidget::ClassSpecificationWidget(const FunctionStruct& functio
 
         if (m_functionSpecificationWidget->isEmpty())
         {
-           LOG_INSTANCE("empty function widget!", ModuleGeneratorLogger::Type::Warning);
+           LOG_INDENT("empty function widget!", ModuleGeneratorLogger::Type::Warning);
             m_implementedClass.functions = m_functionSpecificationWidget->implementedFunctions();
             delete m_functionSpecificationWidget;
             m_functionSpecificationWidget = Q_NULLPTR;

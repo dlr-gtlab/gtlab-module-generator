@@ -15,13 +15,13 @@ public:
         Error = 2
     };
 
-    using LogFunction = void (*)(QString&, Type, int);
+    using LogFunction = void (*)(QString const&, Type, int);
 
     static void unregisterLoggingFunction();
     static void registerLoggingFunction(LogFunction function);
     static QString typeName(Type type);
 
-    ModuleGeneratorLogger(const QString& text = "", const Type& type = Info);
+    ModuleGeneratorLogger(QString const& text = {}, const Type& type = Info);
     ~ModuleGeneratorLogger();
 
     inline void setType(const Type& type) { m_type = type; }
@@ -31,12 +31,12 @@ public:
 
 private:
 
-    bool m_isEndl;
-    Type m_type;
-    QString m_bufferText;
+    bool m_isEndl{true};
+    Type m_type{Info};
+    QString m_bufferedText{};
 };
 
-#define LOG_INSTANCE ModuleGeneratorLogger __logger__ = ModuleGeneratorLogger
+#define LOG_INDENT ModuleGeneratorLogger __logger__ = ModuleGeneratorLogger
 #define LOG_INFO __logger__
 #define LOG_WARN __logger__.setType(ModuleGeneratorLogger::Type::Warning); __logger__
 #define LOG_ERR __logger__.setType(ModuleGeneratorLogger::Type::Error); __logger__

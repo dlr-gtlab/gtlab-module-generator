@@ -2,7 +2,7 @@
 
 
 
-void consoleLog(QString&, ModuleGeneratorLogger::Type, int);
+void consoleLog(QString const&, ModuleGeneratorLogger::Type, int);
 
 static const int s_indentSize =  3;
 static       int s_indent     = 0;
@@ -39,11 +39,9 @@ ModuleGeneratorLogger::typeName(ModuleGeneratorLogger::Type type)
 }
 
 ModuleGeneratorLogger::ModuleGeneratorLogger(const QString& text,
-                                             const Type& type)
+                                             const Type& type) :
+    m_type(type)
 {
-    m_type   = type;
-    m_isEndl = true;
-
     *this << text << ENDL;
 
     s_indent += s_indentSize;
@@ -53,7 +51,7 @@ ModuleGeneratorLogger::~ModuleGeneratorLogger()
 {
     if (!m_isEndl)
     {
-        m_bufferText.replace("├", "└");
+        m_bufferedText.replace("├", "└");
         *this << ENDL;
     }
 
@@ -68,37 +66,36 @@ ModuleGeneratorLogger::operator<<(const QString& text)
     {
         int indent = s_indent - s_indentSize;
         m_isEndl = false;
-        m_bufferText = QStringLiteral(" ").repeated(indent);
+        m_bufferedText = QStringLiteral(" ").repeated(indent);
 
         for (int i = 0; i < indent; ++i)
         {
-            if (i % s_indentSize == 0) m_bufferText.replace(i, 1, "│");
+            if (i % s_indentSize == 0) m_bufferedText.replace(i, 1, "│");
         }
 
-        if (s_indent > 0) m_bufferText += "├ ";
+        if (s_indent > 0) m_bufferedText += "├ ";
     }
 
-    m_bufferText += text;
+    m_bufferedText += text;
 
     // only print if line is finished
     if (text.contains(ENDL))
     {
         m_isEndl = true;
 
-        s_loggingFunction(m_bufferText, m_type, s_indent);
+        s_loggingFunction(m_bufferedText, m_type, s_indent);
 
         // reset type to info
         if (m_type != Type::Info) m_type = Type::Info;
 
-        m_bufferText.clear();
+        m_bufferedText.clear();
     }
-
 
     return *this;
 }
 
 void
-consoleLog(QString& text, ModuleGeneratorLogger::Type type, int indent)
+consoleLog(QString const& text, ModuleGeneratorLogger::Type type, int indent)
 {
     QString indendation = text.left(indent > 0 ? indent - 1:0);
     QString actualText  = text.mid(indent > 0 ? indent - 1:0);

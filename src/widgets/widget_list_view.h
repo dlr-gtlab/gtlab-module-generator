@@ -29,9 +29,7 @@ public:
 
 private:
 
-    QVBoxLayout* m_scrollLayout;
-    QWidget* m_scrollWidget;
-    QSpacerItem* m_scrollLayoutSpacer;
+    QVBoxLayout* m_scrollLayout{};
 
 signals:
 

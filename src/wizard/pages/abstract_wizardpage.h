@@ -39,7 +39,7 @@ protected:
 private:
 
     /// pointer to global settings class
-    ModuleGeneratorSettings* m_settings;
+    ModuleGeneratorSettings* m_settings{};
 };
 
 #endif // GLOBALWIZARDPAGE_H

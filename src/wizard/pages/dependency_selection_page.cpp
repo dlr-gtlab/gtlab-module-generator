@@ -13,31 +13,32 @@
 #include <QGridLayout>
 
 
-const char* C_DEPENDENCY_PAGE_TITLE = "Module Dependencies";
+const char*
+DependencySelectionPage::C_DEPENDENCY_PAGE_TITLE = "Module Dependencies";
 
-const QString S_INFO_TEXT =
+const QString
+DependencySelectionPage::S_INFO_TEXT =
         QStringLiteral("Select or add module dependencies. The list of "
                        "available modules is based on the GTlab environment "
                        "set in the settings page.");
-const QString S_DEPENDENCY_BTN_TEXT =
-        QStringLiteral("Add");
-const QString S_DEPENDENCY_ADD_LABEL =
-        QStringLiteral("Add dependency:");
-const QString S_DEPENDENCY_LABEL =
-        QStringLiteral("Dependencies:");
-
+const QString
+DependencySelectionPage::S_DEPENDENCY_BTN_TEXT = QStringLiteral("Add");
+const QString
+DependencySelectionPage::S_DEPENDENCY_ADD_LABEL = QStringLiteral("Add dependency:");
+const QString
+DependencySelectionPage::S_DEPENDENCY_LABEL = QStringLiteral("Dependencies:");
 
 DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
 {
-    m_infoTextLabel = new QLabel(S_INFO_TEXT);
-    m_addDependencyLabel = new QLabel(S_DEPENDENCY_ADD_LABEL);
-    m_dependenciesLabel = new QLabel(S_DEPENDENCY_LABEL);
+    auto* infoLabel = new QLabel(S_INFO_TEXT);
+    auto* addDependencyLabel = new QLabel(S_DEPENDENCY_ADD_LABEL);
+    auto* dependenciesLabel = new QLabel(S_DEPENDENCY_LABEL);
     m_resolveStatusLabel = new QLabel;
     m_addDependencyEdit = new QLineEdit;
     m_addDependencyPushBtn = new QPushButton;
 
-    m_baseLayout = new QGridLayout(this);
+    auto* baseLayout = new QGridLayout(this);
 
     m_widgetListView = new WidgetListView;
 
@@ -48,25 +49,25 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
     m_resolveStatusLabel->setVisible(false);
     m_resolveStatusLabel->setWordWrap(true);
 
-    m_infoTextLabel->setWordWrap(true);
-    m_infoTextLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
-    m_infoTextLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    infoLabel->setWordWrap(true);
+    infoLabel->setMinimumHeight(AbstractWizardPage::I_INFOTEXTLABEL_HEIGHT);
+    infoLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     m_addDependencyPushBtn->setText(S_DEPENDENCY_BTN_TEXT);
     m_addDependencyPushBtn->setEnabled(false);
 
-    m_dependenciesLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    dependenciesLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    m_baseLayout->addWidget(m_infoTextLabel, 0, 0, 1, 2);
-    m_baseLayout->addWidget(m_addDependencyLabel, 1, 0);
-    m_baseLayout->addWidget(m_addDependencyEdit, 1, 1);
-    m_baseLayout->addWidget(m_addDependencyPushBtn, 1, 2);
-    m_baseLayout->addWidget(m_dependenciesLabel, 2, 0);
-    m_baseLayout->addWidget(m_widgetListView, 2, 1, 1, 2);
-    m_baseLayout->addWidget(m_resolveStatusLabel, 3, 1, 1, 2);
-    m_baseLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
+    baseLayout->addWidget(infoLabel, 0, 0, 1, 2);
+    baseLayout->addWidget(addDependencyLabel, 1, 0);
+    baseLayout->addWidget(m_addDependencyEdit, 1, 1);
+    baseLayout->addWidget(m_addDependencyPushBtn, 1, 2);
+    baseLayout->addWidget(dependenciesLabel, 2, 0);
+    baseLayout->addWidget(m_widgetListView, 2, 1, 1, 2);
+    baseLayout->addWidget(m_resolveStatusLabel, 3, 1, 1, 2);
+    baseLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
-    setLayout(m_baseLayout);
+    setLayout(baseLayout);
 
     // signals
     connect(m_addDependencyEdit, SIGNAL(textChanged(QString)),
@@ -81,7 +82,7 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
 void
 DependencySelectionPage::initializePage()
 {
-    LOG_INSTANCE("dependency page...");
+    LOG_INDENT("dependency page...");
 
     m_addDependencyPushBtn->setDefault(true);
 
@@ -111,7 +112,7 @@ DependencySelectionPage::isComplete() const
 bool
 DependencySelectionPage::validatePage()
 {
-    LOG_INSTANCE("validated!");
+    LOG_INDENT("validated!");
 
     auto list = selectedDependencies();
 
@@ -152,7 +153,7 @@ DependencySelectionPage::selectedDependencies() const
 void
 DependencySelectionPage::addStandardDependencies()
 {
-    LOG_INSTANCE("adding standard dependencies...");
+    LOG_INDENT("adding standard dependencies...");
     auto list  = settings()->availableDependencies();
     int status = settings()->dependencyResolveStatus();
 
@@ -187,7 +188,6 @@ DependencySelectionPage::addStandardDependencies()
             statusText = QStringLiteral("The process of retrieving dependencies "
                                         "failed!");
             LOG_ERR << "invalid dependency resolve status!";
-            return;
         }
 
         m_resolveStatusLabel->setText(statusText);

@@ -18,7 +18,7 @@ class SingleClassSpecificationWidget :
 
 public:
 
-    SingleClassSpecificationWidget(const FunctionStruct& function,
+    SingleClassSpecificationWidget(FunctionStruct const& function,
                                    ModuleGeneratorSettings* settings,
                                    bool deletable  = false,
                                    bool editable   = false,

@@ -12,27 +12,32 @@
 #include "dependency_selection_page.h"
 #include "signature_page.h"
 
+const QString
+ModuleWizard::S_MODULE_GENERATOR_NAME = QStringLiteral("Module Generator");
 
+const QSize
+ModuleWizard::S_SIZE_WIZARD = QSize(570, 475);
 
-
-const QString S_MODULE_GENERATOR_NAME = QStringLiteral("Module Generator");
-
-const QSize SIZE_WIZARD = QSize(570, 475);
-
-ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent)
+ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent),
+    m_generator{std::make_unique<ModuleGenerator>()}
 {
-    // generator
-    m_generator = new ModuleGenerator(&m_settings);
-
     // pages
-    m_introPage = new IntroPage(&m_settings, this);
-    m_settingsPage = new SettingsPage(&m_settings, this);
-    m_moduleSpecificationPage = new ModuleSpecificationsPage(&m_settings, this);
-    m_interfaceSelectionPage = new InterfaceSelectionPage(&m_settings, this);
-    m_interfaceSpecificationsPage = new InterfaceSpecificationsPage(&m_settings, this);
-    m_dependencySelectionPage = new DependencySelectionPage(&m_settings, this);
-    m_signaturePage = new SignaturePage(&m_settings, this);
-    m_summaryPage = new SummaryPage(&m_settings, this);
+    auto* m_introPage = new IntroPage(
+                m_generator->settings(), this);
+    auto* m_settingsPage = new SettingsPage(
+                m_generator->settings(), this);
+    auto* m_moduleSpecificationPage = new ModuleSpecificationsPage(
+                m_generator->settings(), this);
+    auto* m_interfaceSelectionPage = new InterfaceSelectionPage(
+                m_generator->settings(), this);
+    auto* m_interfaceSpecificationsPage = new InterfaceSpecificationsPage(
+                m_generator->settings(), this);
+    auto* m_dependencySelectionPage = new DependencySelectionPage(
+                m_generator->settings(), this);
+    auto* m_signaturePage = new SignaturePage(
+                m_generator->settings(), this);
+    auto* m_summaryPage = new SummaryPage(
+                m_generator->settings(), this);
 
     // add pages
     setPage(PAGE::INTRO_PAGE, m_introPage);
@@ -45,21 +50,17 @@ ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent)
     setPage(PAGE::SUMMARY_PAGE, m_summaryPage);
 
     connect(m_summaryPage, SIGNAL(validated()),
-            m_generator, SLOT(generate()));
-    connect(m_generator, SIGNAL(generationFinished()),
+            m_generator.get(), SLOT(generate()));
+    connect(m_generator.get(), SIGNAL(generationFinished()),
             m_summaryPage, SLOT(onGenerationFinished()));
 
     // wizard gui
-    setWindowTitle(S_MODULE_GENERATOR_NAME + " (v. " + ModuleGeneratorSettings::S_VERSION + ")");
+    setWindowTitle(S_MODULE_GENERATOR_NAME + " (v. " +
+                   ModuleGeneratorSettings::S_VERSION + ")");
     setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    this->resize(SIZE_WIZARD);
-}
-
-ModuleWizard::~ModuleWizard()
-{
-    delete m_generator;
+    this->resize(S_SIZE_WIZARD);
 }
 
 int
@@ -68,14 +69,11 @@ ModuleWizard::nextId() const
     switch (currentId())
     {
     case ModuleWizard::INTERFACE_SELECTION_PAGE:
-        if (m_settings.selectedInterfaces().size() > 0)
+        if (m_generator->settings()->selectedInterfaces().size() > 0)
         {
             return QWizard::nextId();
         }
         return ModuleWizard::DEPENDENCY_SELECTION_PAGE;
-    case ModuleWizard::INTERFACE_SPECIFICATION_PAGE:
-        return QWizard::nextId();
-    default:
-        return QWizard::nextId();
     }
+    return QWizard::nextId();
 }
