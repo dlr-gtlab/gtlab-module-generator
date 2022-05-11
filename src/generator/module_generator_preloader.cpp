@@ -37,7 +37,8 @@ const QRegularExpression REGEXP_VIRTUAL_FUNCTION(
                        "\\((.*)?\\)\\s+" // parameter
                        "(const)?\\s?=\\s+0")); // const and pure virtual
 */
-const QRegularExpression REGEXP_PREFIX(QStringLiteral("(\\w+?)_\\w+\\.h"));
+const QRegularExpression
+ModuleGeneratorPreLoader::REGEXP_PREFIX(QStringLiteral("(\\w+?)_\\w+\\.h"));
 
 
 void
@@ -50,11 +51,16 @@ ModuleGeneratorPreLoader::searchForInterfaces()
     QDirIterator iterator(":/interfaces/", QStringList{"*.json"},
                           QDir::Files, QDirIterator::NoIteratorFlags);
 
-    while (iterator.hasNext())
-    {
-        QString file = iterator.next();
+    QDir tmpDir{":/interfaces/"};
 
-        LOG_INDENT(file);
+    auto entries = tmpDir.entryList(QStringList{"*.json"},
+                                    QDir::Files, QDir::SortFlag::Name);
+
+    for (auto& entry : entries)
+    {
+        QString file = tmpDir.absoluteFilePath(entry);
+
+        LOG_INDENT(entry);
 
         auto document = QJsonDocument::fromJson(utils::readFile(file).toUtf8());
 
@@ -66,11 +72,12 @@ ModuleGeneratorPreLoader::searchForInterfaces()
 
         auto interfaceJObject = document.object();
 
-        auto interfaceLocal = searchForClass(interfaceJObject);
+        /// interface class
+        auto interface = searchForClass(interfaceJObject);
 
-        if (!interfaceLocal.isValid()) continue;
+        if (!interface.isValid()) continue;
 
-        m_interfaces << interfaceLocal;
+        m_interfaces.append(std::move(interface));
 
         LOG_INFO << "done!";
     }
@@ -78,30 +85,31 @@ ModuleGeneratorPreLoader::searchForInterfaces()
     LOG_INFO << "done!";
 }
 
-ClassStruct
+ClassData
 ModuleGeneratorPreLoader::searchForClass(QJsonObject const& classJObject)
 {
-    if (classJObject.isEmpty()) return ClassStruct();
+    if (classJObject.isEmpty()) return {};
 
     QString className  = classJObject["name"].toString();
     QString fileName   = classJObject["fileName"].toString();
     QString outputPath = classJObject["outputPath"].toString();
-    QString objectName = classJObject["shortName"].toString();
+    /// only relevant for interface class
+    QString objectName = classJObject["displayName"].toString();
+    QString tooltip    = classJObject["tooltip"].toString();
 
     auto functionsJArray   = classJObject["functions"].toArray();
     auto constructorJArray = classJObject["constructors"].toArray();
 
     LOG_INDENT("className  " + className);
 
-    auto functions = searchForFunctions(functionsJArray);
-
-    ClassStruct classStruct;
-    classStruct.className  = className;
-    classStruct.fileName   = fileName;
-    classStruct.objectName = objectName;
-    classStruct.outputPath = outputPath;
-    classStruct.functions  = functions;
-
+    ClassData classStruct;
+    // moving because varaibles are no longer needed
+    classStruct.className  = std::move(className);
+    classStruct.fileName   = std::move(fileName);
+    classStruct.objectName = std::move(objectName);
+    classStruct.tooltip    = std::move(tooltip);
+    classStruct.outputPath = std::move(outputPath);
+    classStruct.functions    = searchForFunctions(functionsJArray);
     classStruct.constructors = searchForConstructors(constructorJArray);
 
     LOG_INFO << "done!";
@@ -110,17 +118,17 @@ ModuleGeneratorPreLoader::searchForClass(QJsonObject const& classJObject)
 }
 
 Constructors
-ModuleGeneratorPreLoader::searchForConstructors(QJsonArray const& constructorJObject)
+ModuleGeneratorPreLoader::searchForConstructors(QJsonArray const& constructorJArray)
 {
-    Constructors constructors;
-
-    if (constructorJObject.isEmpty()) return constructors;
+    if (constructorJArray.isEmpty()) return {};
 
     LOG_INDENT("adding custom constructors...");
 
-    for (auto jsonValueRef : constructorJObject)
+    Constructors constructors;
+
+    for (auto constructorJObj : constructorJArray)
     {
-        auto constructorJObject = jsonValueRef.toObject();
+        auto constructorJObject = constructorJObj.toObject();
 
         if (constructorJObject.isEmpty())
         {
@@ -128,20 +136,17 @@ ModuleGeneratorPreLoader::searchForConstructors(QJsonArray const& constructorJOb
             continue;
         }
 
-        QString parameter = constructorJObject["parameter"].toString();
-        auto sourceArray  = constructorJObject["source"].toArray();
+        auto parameters = parseStringJArray(constructorJObject["parameters"].toArray());
+        auto initList = parseStringJArray(constructorJObject["initList"].toArray());
+        auto implementation = parseStringJArray(constructorJObject["source"].toArray());
 
-        // constructor implementation
-        QStringList source;
+        LOG_INFO << "parameters:       " << parameters.join(", ") << ENDL;
+        LOG_INFO << "initializer list: " << initList.join(", ") << ENDL;
+        LOG_INFO << "implementation:   " << implementation.join(", ") << ENDL;
 
-        for (auto jsonValueRef : sourceArray)
-        {
-            source << jsonValueRef.toString();
-        }
-
-        LOG_INFO << "..." << source.join("; ") << ENDL;
-
-        constructors << Constructor({ parameter, source });
+        constructors << ConstructorData{std::move(parameters),
+                                        std::move(implementation),
+                                        std::move(initList)};
     }
 
     LOG_INFO << "done!";
@@ -149,22 +154,21 @@ ModuleGeneratorPreLoader::searchForConstructors(QJsonArray const& constructorJOb
     return constructors;
 }
 
-FunctionStructs
+FunctionDataList
 ModuleGeneratorPreLoader::searchForFunctions(QJsonArray const& functionsJArray)
 {
     LOG_INDENT("searching for functions...");
 
-    FunctionStructs functions;
-
     if (functionsJArray.isEmpty())
     {
-        LOG_WARN << "empty function array!";
-        return functions;
+        return {};
     }
 
-    for (auto jsonValueRef : functionsJArray)
+    FunctionDataList functions;
+
+    for (auto functionJValue : functionsJArray)
     {
-        auto functionJObject = jsonValueRef.toObject();
+        auto functionJObject = functionJValue.toObject();
 
         if (functionJObject.isEmpty())
         {
@@ -174,74 +178,81 @@ ModuleGeneratorPreLoader::searchForFunctions(QJsonArray const& functionsJArray)
 
         QString name        = functionJObject["name"].toString();
         QString returnValue = functionJObject["returnValue"].toString();
-        QString qualifier   = functionJObject["qualifier"].toString();
-        QString parameter   = functionJObject["parameter"].toString();
         QString tooltip     = functionJObject["tooltip"].toString();
 
+        QJsonArray parameter    = functionJObject["parameters"].toArray();
         QJsonArray includes     = functionJObject["includes"].toArray();
-        QJsonArray forwardDecls = functionJObject["forwardDecl"].toArray();
+        QJsonArray forwardDecls     = functionJObject["forwardDecl"].toArray();
         QJsonArray descriptionArray = functionJObject["description"].toArray();
 
         auto baseClassJObject   = functionJObject["baseClass"].toObject();
         auto linkedClassJObject = functionJObject["linkedClass"].toObject();
 
-        // description
-        QString description;
+        LOG_INFO << "function: " << returnValue << " " << name << ENDL;
 
-        for (auto jsonValueRef : descriptionArray)
-        {
-            QString line = jsonValueRef.toString();
+        /* Implementation */
+        ImplementationData implementation;
 
-            if (line.isEmpty()) continue;
+        implementation.includes = parseStringJArray(includes);
+        implementation.forwardDeclarations = parseStringJArray(forwardDecls);
 
-            description += "\n\t" + line;
-        }
+//        LOG_INFO << "inlcudes: '"
+//                 << implementation.includes.join(", ")
+//                 << "'" << ENDL;
+//        LOG_INFO << "forward Decl: '"
+//                 << implementation.forwardDeclarations.join(", ")
+//                 << "'" << ENDL;
 
-        LOG_INFO << returnValue << " " << name << ENDL;
-
-        FunctionStruct function;
-
-        function.name = name;
-        function.returnValue = returnValue;
-        function.qualifier   = qualifier;
-        function.parameter   = parameter;
-        function.description = description;
-        function.tooltip     = tooltip;
+        /* Function */
+        FunctionData function;
+        function.name = std::move(name);
+        function.returnType = std::move(returnValue);
+        function.isConst     = functionJObject["const"].toBool();
+        function.isProtected = functionJObject["protected"].toBool();
+        function.parameters  = parseStringJArray(parameter);
+        function.description = parseDescription(descriptionArray);
+        function.tooltip     = std::move(tooltip);
         function.baseClass   = searchForClass(baseClassJObject);
         function.linkedClass = searchForClass(linkedClassJObject);
+        function.implementation = std::move(implementation);
 
-        // includes
-        for (auto jsonValueRef : includes)
+        if (function.isProtected)
         {
-            QString include = jsonValueRef.toString();
-
-            if (!include.isEmpty())
-            {
-                LOG_INFO << "added inlcude '" << include << "'" << ENDL;
-
-                function.implementation.includes << include;
-            }
+            LOG_INFO << "PROTECTED";
         }
 
-        // forward declarations
-        for (auto jsonValueRef : forwardDecls)
-        {
-            QString forwardDecl = jsonValueRef.toString();
-
-            if (!forwardDecl.isEmpty())
-            {
-                LOG_INFO << "added forward declaration '" << forwardDecl << "'" << ENDL;
-
-                function.implementation.forwardDeclarations << forwardDecl;
-            }
-        }
-
-        functions << function;
+        functions.append(std::move(function));
     }
 
     LOG_INFO << "done!";
 
     return functions;
+}
+
+QStringList
+ModuleGeneratorPreLoader::parseStringJArray(QJsonArray const& jArray)
+{
+    QStringList retVal;
+    for (auto valueJObj : jArray)
+    {
+        retVal << valueJObj.toString();
+    }
+    return retVal;
+}
+
+QString
+ModuleGeneratorPreLoader::parseDescription(QJsonArray const& descriptionJArray)
+{
+    if (descriptionJArray.isEmpty()) return {};
+
+    QString description{"\n"
+                        "\t/**"};
+
+    description += parseStringJArray(descriptionJArray).join("\n\t * ");
+
+    // end of description
+    return description + "\n"
+                         "\t */";
 }
 
 void
@@ -259,15 +270,19 @@ ModuleGeneratorPreLoader::searchForPrefixes(QString const& devToolsPath)
         return;
     }
 
-    QDirIterator dirIterator(devToolsDir.absolutePath(), QStringList(),
-                             QDir::Dirs, QDirIterator::NoIteratorFlags);
+    QDirIterator dirIterator{
+        devToolsDir.absolutePath(), {},
+        QDir::Dirs | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags
+    };
 
     while (dirIterator.hasNext())
     {
         QDir subDir = dirIterator.next();
 
-        QDirIterator iterator(subDir.absolutePath(), QStringList() << "*.h",
-                              QDir::Files, QDirIterator::NoIteratorFlags);
+        QDirIterator iterator{
+            subDir.absolutePath(), {"*.h"},
+            QDir::Files, QDirIterator::NoIteratorFlags
+        };
 
         while (iterator.hasNext())
         {
@@ -279,7 +294,7 @@ ModuleGeneratorPreLoader::searchForPrefixes(QString const& devToolsPath)
 
             if (prefix.isEmpty()) continue;
 
-            if (m_prefixes.indexOf(prefix) < 0)
+            if (!m_prefixes.contains(prefix))
             {
                 LOG_INFO << "'" << prefix << "'" << ENDL;
 
@@ -306,8 +321,6 @@ ModuleGeneratorPreLoader::searchForDependencies(QString const& gtlabPath,
 
     *status = -1;
 
-    m_searchPath = gtlabPath;
-
     m_dependencies.clear();
 
     QDir gtlabDir(gtlabPath);
@@ -316,7 +329,7 @@ ModuleGeneratorPreLoader::searchForDependencies(QString const& gtlabPath,
 
     if (!gtlabDir.exists(processName))
     {
-        LOG_ERR << "invlaid path to GTlabConsole ("
+        LOG_ERR << "invalid path to GTlabConsole ("
                 << gtlabDir.absolutePath()
                 << processName << ")!";
         return;

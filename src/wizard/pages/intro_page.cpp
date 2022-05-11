@@ -41,8 +41,6 @@ IntroPage::IntroPage(ModuleGeneratorSettings* settings, QWidget* parent) :
 
     m_createRBtn = new QRadioButton(S_CREATE_BUTTON_TEXT);
     m_editRBtn = new QRadioButton(S_EDIT_BUTTON_TEXT);
-    m_createRBtn->setChecked(true);
-    m_editRBtn->setDisabled(true);
 
     // layout
     baseLayout->addWidget(infoLabel);
@@ -59,6 +57,9 @@ void
 IntroPage::initializePage()
 {
     LOG_INDENT("intro page...");
+
+    m_createRBtn->setChecked(true);
+    m_editRBtn->setDisabled(true);
 }
 
 bool

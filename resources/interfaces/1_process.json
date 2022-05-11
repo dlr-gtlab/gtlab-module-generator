@@ -1,7 +1,8 @@
 {
   "name": "GtProcessInterface",
   "fileName": "gt_processinterface",
-  "shortName": "Process",
+  "displayName": "Process",
+  "tooltip": "Registers custom processes and calculators.\nAllows for the integration of external tools.",
   "functions": 
   [
     {
@@ -10,21 +11,18 @@
       "tooltip": "List of calculators",
       "description":
       [
-        "/**",
-        " * @brief Returns static meta objects of calculator classes.",
-        " * @return list including meta objects.",
-        " */"
+        "@brief Returns static meta objects of calculator classes.",
+        "@return list including meta objects."
       ],
       "includes":
       [
-        "gt_application",
         "gt_extendedcalculatordata"
       ],
       "baseClass":
       {
         "name": "GtCalculator",
         "fileName": "gt_calculator",
-        "outputPath": "calculators",
+        "outputPath": "process/calculators",
         "functions": 
         [
           {
@@ -33,10 +31,8 @@
             "tooltip": "Should the process succeed by default?",
             "description":
             [
-              "/**",
-              " * @brief Main run method of the calculator.",
-              " * @return Whether run process was successful or not.",
-              " */"
+              "@brief Main run method of the calculator.",
+              "@return Whether run process was successful or not."
             ]
           }
         ]
@@ -48,21 +44,18 @@
       "tooltip": "List of tasks",
       "description":
       [
-        "/**",
-        " * @brief Returns static meta objects of task classes.",
-        " * @return list including meta objects.",
-        " */"
+        "@brief Returns static meta objects of task classes.",
+        "@return list including meta objects."
       ],
       "includes":
       [
-        "gt_application",
         "gt_extendedtaskdata"
       ],
       "baseClass":
       {
         "name": "GtTask",
-        "fileName": "gt_task",  
-        "outputPath": "tasks"
+        "fileName": "gt_task",
+        "outputPath": "process/tasks"
       }
     }
   ]

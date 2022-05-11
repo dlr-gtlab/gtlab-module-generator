@@ -1,12 +1,12 @@
-#ifndef INTERFACESPECIFICATIONSWIDGET_H
-#define INTERFACESPECIFICATIONSWIDGET_H
+#ifndef FUNCTIONSPECIFICATIONWIDGET_H
+#define FUNCTIONSPECIFICATIONWIDGET_H
 
 #include <QScrollArea>
 
 #include "module_generator_structs.h"
 
 class QGridLayout;
-class AbstractClassSpecification;
+class AbstractTypeSpecifier;
 class ModuleGeneratorSettings;
 class FunctionSpecificationWidget : public QScrollArea
 {
@@ -14,27 +14,27 @@ class FunctionSpecificationWidget : public QScrollArea
 
 public:
 
-    FunctionSpecificationWidget(FunctionStructs const& functions,
+    FunctionSpecificationWidget(FunctionDataList functions,
                                 ModuleGeneratorSettings* settings,
                                 QWidget* parent = nullptr);
 
     int count() const;
     bool isEmpty() const;
 
-    FunctionStructs implementedFunctions();
+    FunctionDataList implementedFunctions();
 
 private:
 
-    FunctionStructs m_functions{};
+    FunctionDataList m_functions{};
     ModuleGeneratorSettings* m_settings{};
     QGridLayout* m_baseLayout{};
-    QMap<QString, AbstractClassSpecification*> m_specificationWidgets{};
+    QMap<QString, AbstractTypeSpecifier*> m_specificationWidgets{};
 
     void setContent();
 
-    void setStandardImplementation(FunctionStruct& function);
+    void generateStdImplementation(FunctionData& function);
 
-    AbstractClassSpecification* setSpecificationWidget(const FunctionStruct& function);
+    AbstractTypeSpecifier* getSpecificationWidget(const FunctionData& function);
 };
 
-#endif // INTERFACESPECIFICATIONSWIDGET_H
+#endif // FUNCTIONSPECIFICATIONWIDGET_H

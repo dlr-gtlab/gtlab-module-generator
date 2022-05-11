@@ -45,7 +45,10 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
     // page gui
     setTitle(tr(C_DEPENDENCY_PAGE_TITLE));
 
-    m_resolveStatusLabel->setStyleSheet("QLabel { color : red }");
+    QPalette palette;
+    palette.setColor(QPalette::WindowText, Qt::red);
+
+    m_resolveStatusLabel->setPalette(palette);
     m_resolveStatusLabel->setVisible(false);
     m_resolveStatusLabel->setWordWrap(true);
 
@@ -58,13 +61,14 @@ DependencySelectionPage::DependencySelectionPage(ModuleGeneratorSettings* settin
 
     dependenciesLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    baseLayout->addWidget(infoLabel, 0, 0, 1, 2);
-    baseLayout->addWidget(addDependencyLabel, 1, 0);
-    baseLayout->addWidget(m_addDependencyEdit, 1, 1);
-    baseLayout->addWidget(m_addDependencyPushBtn, 1, 2);
-    baseLayout->addWidget(dependenciesLabel, 2, 0);
-    baseLayout->addWidget(m_widgetListView, 2, 1, 1, 2);
-    baseLayout->addWidget(m_resolveStatusLabel, 3, 1, 1, 2);
+    int row = 0;
+    baseLayout->addWidget(infoLabel, row++, 0, 1, 2);
+    baseLayout->addWidget(addDependencyLabel, row, 0);
+    baseLayout->addWidget(m_addDependencyEdit, row, 1);
+    baseLayout->addWidget(m_addDependencyPushBtn, row++, 2);
+    baseLayout->addWidget(dependenciesLabel, row, 0);
+    baseLayout->addWidget(m_widgetListView, row++, 1, 1, 2);
+    baseLayout->addWidget(m_resolveStatusLabel, row++, 1, 1, 2);
     baseLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
     setLayout(baseLayout);
@@ -118,7 +122,7 @@ DependencySelectionPage::validatePage()
 
     LOG_INFO << "selected " + QString::number(list.count()) + " dependencies..." << ENDL;
 
-    for (auto dependency : list)
+    for (auto const& dependency : list)
     {
         LOG_INFO << dependency.name << ENDL;
     }
@@ -130,10 +134,10 @@ DependencySelectionPage::validatePage()
     return true;
 }
 
-DependencyStructs
+DependencyDataList
 DependencySelectionPage::selectedDependencies() const
 {
-    DependencyStructs list;
+    DependencyDataList list;
 
     for (auto* widget : m_widgetListView->widgets())
     {
@@ -176,13 +180,13 @@ DependencySelectionPage::addStandardDependencies()
         case 1:
             statusText = QStringLiteral("The process of retrieving dependencies "
                                         "failed! Could not parse xml output! "
-                                        "(The GTlab version may be incompatible "
-                                        "with this feature)");
+                                        "The GTlab version may be incompatible "
+                                        "with this feature.");
             break;
         case 2:
             statusText = QStringLiteral("The process of retrieving dependencies is "
-                                        "still in progress! (Reload this page "
-                                        "to update the list)");
+                                        "still in progress! Reload this page "
+                                        "to update the list.");
             break;
         default:
             statusText = QStringLiteral("The process of retrieving dependencies "
@@ -197,7 +201,7 @@ DependencySelectionPage::addStandardDependencies()
 
     m_resolveStatusLabel->setVisible(false);
 
-    for (DependencyStruct dependency : list)
+    for (auto const&  dependency : list)
     {
         addDependency(dependency, false);
     }

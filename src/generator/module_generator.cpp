@@ -48,6 +48,8 @@ ModuleGenerator::S_ID_HEADER_NAME(QStringLiteral("$$HEADER_NAME$$"));
 const QString
 ModuleGenerator::S_ID_CONSTRUCTOR(QStringLiteral("$$CONSTRUCTOR$$"));
 const QString
+ModuleGenerator::S_ID_CONSTRUCTOR_INIT_LIST(QStringLiteral("$$CONSTRUCTOR_INIT_LIST$$"));
+const QString
 ModuleGenerator::S_ID_FUNCTION(QStringLiteral("$$FUNCTION$$"));
 const QString
 ModuleGenerator::S_ID_IMPLEMENTATION(QStringLiteral("$$IMPLEMENTATION$$"));
@@ -86,6 +88,38 @@ ModuleGenerator::S_ID_AUTHOR(QStringLiteral("$$AUTHOR$$"));
 const QString
 ModuleGenerator::S_ID_AUTHOR_EMAIL(QStringLiteral("$$AUTHOR_EMAIL$$"));
 
+const QString
+ModuleGenerator::S_ID_INDENT = QStringLiteral("$$INDENT$$");
+
+const QString
+ModuleGenerator::S_CONSTREF_MACRO(QStringLiteral("GT_2_0_CONSTREF"));
+
+const QString
+ModuleGenerator::S_2_0_VERSION_CHECK(QStringLiteral("#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))"));
+
+const QStringList
+ModuleGenerator::S_2_0_ICON_INCLUDES{
+    "gt_globals",
+    // prior GTlab 2.0
+    S_2_0_VERSION_CHECK + "\n"
+    "#include \"gt_application.h\"\n"
+    "#else\n"
+    "#include \"gt_icons.h\"\n"
+    "#endif\n",
+    "QIcon"
+};
+
+const QStringList
+ModuleGenerator::S_2_0_CONSTREF{
+    "gt_globals",
+    // prior GTlab 2.0
+    S_2_0_VERSION_CHECK + "\n"
+    "#define " + S_CONSTREF_MACRO+ "\n"
+    "#else\n"
+    "#define " + S_CONSTREF_MACRO+ " const&\n"
+    "#endif\n"
+};
+
 // paths
 const QString
 S_TEMPLATES_PATH = QStringLiteral(":/templates/");
@@ -93,6 +127,9 @@ const QString
 S_SRC_DIR      = QStringLiteral("src");
 const QString
 S_FEATURES_DIR = QStringLiteral("features");
+
+const QString
+S_PROTECTED_TAG = QStringLiteral("protected:");
 
 // qt makros
 const QString
@@ -111,10 +148,12 @@ S_DERIVE_BASE_CLASS(
 const QString
 S_PRO_ENDL(QStringLiteral("\\\n\t"));
 
-const Constructor
+const ConstructorData
 ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
-    {}, { QStringLiteral("setObjectName(\"") + S_ID_OBJECT_NAME +
-          QStringLiteral("\")") }
+    {},
+    { QStringLiteral("setObjectName(\"") + S_ID_OBJECT_NAME +
+      QStringLiteral("\")") },
+    {}
 };
 
 ModuleGeneratorSettings const*
@@ -254,18 +293,17 @@ ModuleGenerator::generateModuleSettingsFiles()
     // features/local_setting.pri
     fileString = utils::readFile(S_TEMPLATES_PATH + "local_settings.pri");
 
-    QString featuresString(fileString);
-    clearIdentifiers(featuresString);
+    QString featuresString = fileString;
+    clearFileString(featuresString);
 
     utils::writeStringToFile(featuresString, m_featuresDir, "local_settings.pri");
 
     // local_setting.pri
     IdentifierPairs identifierPairs;
 
-    QDir gtlabDir(settings()->gtlabPath());
-    bool success(gtlabDir.cdUp() && gtlabDir.exists());
+    QDir gtlabDir{settings()->gtlabPath()};
 
-    if (!success)
+    if (!(gtlabDir.cdUp() && gtlabDir.exists()))
     {
         LOG_ERR  << "could not set a valid path to GTlab install dir!" << ENDL;
         LOG_WARN << "continuing!" << ENDL;
@@ -343,7 +381,7 @@ ModuleGenerator::generateGitFiles()
     fileString = utils::readFile(S_TEMPLATES_PATH + "README.md");
     IdentifierPairs identifierPairs;
 
-    auto moduleClass(settings()->moduleClass());
+    auto moduleClass = settings()->moduleClass();
 
     identifierPairs.append({ S_ID_PREFIX, settings()->modulePrefix() });
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
@@ -371,7 +409,7 @@ ModuleGenerator::generateModuleDependencies()
 
         QJsonArray dependenciesJsonArray;
 
-        for (auto dependency : settings()->selectedDependencies())
+        for (auto const& dependency : settings()->selectedDependencies())
         {
             LOG_INFO << dependency.name << ENDL;
 
@@ -492,12 +530,9 @@ ModuleGenerator::generateModule()
 
     LOG_INFO << "cleanup..." << ENDL;
 
-    // REMOVE LEFT IDENTIFIERS
-    clearIdentifiers(headerString);
-    clearIdentifiers(sourceString);
-    // REPLACE TABULATORS
-    clearTabulators(headerString);
-    clearTabulators(sourceString);
+    // CLEANUP
+    clearFileString(headerString);
+    clearFileString(sourceString);
 
     utils::writeStringToFile(headerString, m_srcDir, moduleClass.fileName + ".h");
     utils::writeStringToFile(sourceString, m_srcDir, moduleClass.fileName + ".cpp");
@@ -510,37 +545,53 @@ ModuleGenerator::generateModule()
 void
 ModuleGenerator::generateFunction(QString& headerString,
                                   QString& sourceString,
-                                  FunctionStruct const& f,
+                                  FunctionData const& function,
                                   bool isConstructor)
 {
-    LOG_INDENT("generating function '" + f.name + "'...");
+    auto fname = isConstructor ? "constructor":
+                                 "function '" + function.name +"'";
 
-    LOG_INFO << "building header function definition..." << ENDL;
+    LOG_INDENT("generating " + fname + "...");
 
     // Build basic function string
-    QString indentifier(isConstructor ? S_ID_CONSTRUCTOR : S_ID_FUNCTION);
-    QString functionString;
-    functionString += f.name;
-    functionString += "(" + f.parameter + ")";
+    auto functionString = function.name;
 
-    if (!f.qualifier.isEmpty())
+    // add ident for each parameter
+    int indent = 2 + function.name.length();
+    indent += isConstructor ? S_Q_INVOKABLE.length()-1 :
+                              function.returnType.length();
+
+    functionString += "(";
+    functionString += function.parameters.join(",\n\t" +
+                                               QString{" "}.repeated(indent));
+    functionString += ")";
+
+    if (function.isConst)
     {
-        functionString += " " + f.qualifier;
+        functionString += " const";
     }
 
-    // HEADER
+    /* HEADER */
+    LOG_INFO << "building header function definition..." << ENDL;
+
     QString functionHeader("\n");
 
-    // description
-    if (!f.description.isEmpty())
+    if (function.isProtected)
     {
-        functionHeader += f.description;
+        functionHeader += "\n" + S_PROTECTED_TAG + "\n";
+    }
+
+    // description
+    if (!function.description.isEmpty())
+    {
+        functionHeader += function.description;
     }
 
     functionHeader += "\n\t";
 
+    // function declaration
     if (!isConstructor) {
-        functionHeader += f.returnValue + " ";
+        functionHeader += function.returnType + " ";
         functionHeader += functionString;
         functionHeader += S_OVERRIDE;
     }
@@ -549,31 +600,46 @@ ModuleGenerator::generateFunction(QString& headerString,
         functionHeader += functionString +";";
     }
 
+    auto indentifier = isConstructor ? S_ID_CONSTRUCTOR : S_ID_FUNCTION;
     functionHeader += indentifier;
 
     utils::replaceIdentifier(headerString, { indentifier, functionHeader});
 
+
+    /* CPP */
     LOG_INFO << "building cpp function definition..." << ENDL;
 
-    // CPP
     // remove default parameters in the cpp function declaration
     QRegularExpression defaultParamReg("\\s?=\\s?(\\w|:|\\d|\\(\\)|\\{\\})+");
     functionString.remove(defaultParamReg);
 
+    // replace indent with identifier
+    functionString.replace("\t" + QString{" "}.repeated(indent), S_ID_INDENT);
+
+    // function base
     if (!isConstructor) {
-        functionString.prepend(f.returnValue + "\n" + S_ID_CLASS_NAME + "::");
+        functionString.prepend(function.returnType + "\n" +
+                               S_ID_CLASS_NAME + "::");
     }
     else {
         functionString.prepend(S_ID_CLASS_NAME + "::");
+        functionString += S_ID_CONSTRUCTOR_INIT_LIST;
     }
 
+    // implementation
     functionString += "\n{\n\t" + S_ID_IMPLEMENTATION + "\n}";
     functionString += indentifier;
     functionString.prepend("\n\n");
 
+    // compatability macros
+    if (functionHeader.contains(S_CONSTREF_MACRO))
+    {
+        generateIncludes(headerString, S_2_0_CONSTREF);
+    }
+
     utils::replaceIdentifier(sourceString, { indentifier, functionString});
 
-    generateImplementation(headerString, sourceString, f, isConstructor);
+    generateImplementation(headerString, sourceString, function, isConstructor);
 
     LOG_INFO << "done!";
 }
@@ -581,7 +647,7 @@ ModuleGenerator::generateFunction(QString& headerString,
 void
 ModuleGenerator::generateImplementation(QString& headerString,
                                         QString& sourceString,
-                                        FunctionStruct const& function,
+                                        FunctionData const& function,
                                         bool isConstructor)
 {
     LOG_INDENT("generating implementation...");
@@ -589,37 +655,49 @@ ModuleGenerator::generateImplementation(QString& headerString,
     auto& implementation = function.implementation;
 
     // function return value
-    if (implementation.values.isEmpty())
+    if (implementation.lines.isEmpty())
     {
-        LOG_WARN << "skipping invalid implementation!" << ENDL;
-
+        LOG_WARN << "skipping invalid implementation!";
+        // clear identifier
+        utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION, {} });
         return;
     }
 
-    LOG_INFO << "creating implementation string..." << ENDL;
+//    LOG_INFO << "creating implementation string..." << ENDL;
 
     QString implementationString;
 
-    QStringList list = implementation.values;
+    QStringList lines = implementation.lines;
+
+    for (auto& line : lines)
+    {
+        if (line.startsWith("#") || line.startsWith("//")) continue;
+        line.append(";");
+    }
 
     if (!isConstructor)
     {
-        list.last().prepend("return ");
+        auto& last = lines.last();
+        if (last.endsWith(";"))
+        {
+            last.prepend("return ");
+        }
     }
 
-    list.last().append(';');
-
-    implementationString = list.join(";\n\t");
+    implementationString = lines.join("\n\t");
     // remove empty statements
     implementationString.remove("\t;");
+    // dont indent preprocessor
+    sourceString.replace("\t#", "#");
 
-    LOG_INFO << "setting implementation string..." << ENDL;
+//    LOG_INFO << "setting implementation string..." << ENDL;
 
     utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION,
                                              implementationString });
 
     if (isConstructor) {
-        LOG_INFO << "done!"; return;
+//        LOG_INFO << "done!";
+        return;
     }
 
     generateIncludes(sourceString, implementation.includes);
@@ -632,13 +710,13 @@ ModuleGenerator::generateImplementation(QString& headerString,
     generateImplementationHelper(sourceString, function.linkedClass,
                                  implementation.linkedClasses);
 
-    LOG_INFO << "done!";
+//    LOG_INFO << "done!";
 }
 
 void
 ModuleGenerator::generateImplementationHelper(QString& sourceString,
-                                              ClassStruct const& baseClass,
-                                              QList<ClassStruct> const& classes)
+                                              ClassData const& baseClass,
+                                              QList<ClassData> const& classes)
 {
     // linked classes to generate
     for (auto const& classStruct : classes)
@@ -647,14 +725,14 @@ ModuleGenerator::generateImplementationHelper(QString& sourceString,
 
         if (!classStruct.isValid())
         {
-            LOG_INDENT("skipping invalid class struct!",
-                       ModuleGeneratorLogger::Warning);
+            LOG_INDENT_WARN("skipping invalid class struct!");
             continue;
         }
 
-        IdentifierPair pair;
-        pair.identifier = S_ID_INCLUDE_FILE;
-        pair.value = utils::makeInclude(classStruct.fileName, S_ID_INCLUDE_FILE);
+        IdentifierPair pair{
+            S_ID_INCLUDE_FILE,
+            utils::makeInclude(classStruct.fileName, S_ID_INCLUDE_FILE)
+        };
 
         utils::replaceIdentifier(sourceString, pair);
 
@@ -663,8 +741,8 @@ ModuleGenerator::generateImplementationHelper(QString& sourceString,
 }
 
 void
-ModuleGenerator::generateBasicClass(ClassStruct const& base,
-                                    ClassStruct const& derived)
+ModuleGenerator::generateBasicClass(ClassData const& base,
+                                    ClassData const& derived)
 {
     LOG_INDENT("generating class '" + derived.className + "'...");
 
@@ -691,6 +769,12 @@ ModuleGenerator::generateBasicClass(ClassStruct const& base,
         }
 
         generateFunction(headerString, sourceString, function);
+
+        // indent for parameters
+        qDebug() << "sourceString.contains(S_ID_INDENT)" << sourceString.contains(S_ID_INDENT);
+        int indent = derived.className.length() + 3 + function.name.length();
+        utils::replaceIdentifier(sourceString, {
+                S_ID_INDENT, QString{" "}.repeated(indent)});
     }
 
     LOG_INFO << "setting identifiers..." << ENDL;
@@ -708,23 +792,19 @@ ModuleGenerator::generateBasicClass(ClassStruct const& base,
     identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
 
     utils::replaceIdentifier(headerString, identifierPairs);
-
     utils::replaceIdentifier(sourceString, identifierPairs);
 
     LOG_INFO << "cleanup..." << ENDL;
 
-    // REMOVE LEFT IDENTIFIERS
-    clearIdentifiers(headerString);
-    clearIdentifiers(sourceString);
-    // REPLACE TABULATORS
-    clearTabulators(headerString);
-    clearTabulators(sourceString);
+    // CLEANUP
+    clearFileString(headerString);
+    clearFileString(sourceString);
 
     LOG_INFO << "writing files..." << ENDL;
 
     QDir targetDir = m_srcDir.cleanPath(m_srcDir.absolutePath() +
-                                           QDir::separator() +
-                                           base.outputPath);
+                                        QDir::separator() +
+                                        base.outputPath);
 
     targetDir.mkpath(targetDir.absolutePath());
 
@@ -740,33 +820,56 @@ void
 ModuleGenerator::generateIncludes(QString& sourceString,
                                   QStringList const& includes)
 {
+    if (includes.isEmpty()) return;
+
     LOG_INDENT("adding additional includes...");
 
     IdentifierPairs identifiers;
 
-    for (QString include : includes)
+    for (auto& include : includes)
     {
+        if (include.startsWith("#"))
+        {
+            LOG_INFO << "adding macro" << ENDL;
+
+            IdentifierPair identifierPair{S_ID_ADD_INCLUDE_FILE,
+                                          S_ID_ADD_INCLUDE_FILE + include};
+
+            if (!sourceString.contains(include) &&
+                !identifiers.contains(identifierPair))
+            {
+                identifiers.append(std::move(identifierPair));
+            }
+            else
+            {
+                LOG_WARN << "duplicate!" << ENDL;
+            }
+            continue;
+        }
+
         LOG_INFO << include << ENDL;
 
         bool isQtInclude = include.startsWith("Q");
 
-        QString includeString = utils::makeInclude(include, "", isQtInclude);
+        QString includeString = utils::makeInclude(include, {}, isQtInclude);
         QString identifier    = isQtInclude ? S_ID_QT_INCLUDE_FILE:
                                               S_ID_ADD_INCLUDE_FILE;
-        IdentifierPair identifierPair;
-
-        identifierPair.identifier = identifier;
-        identifierPair.value = includeString + identifier;
+        IdentifierPair identifierPair{identifier, includeString + identifier};
 
         if (!sourceString.contains(includeString) &&
             !identifiers.contains(identifierPair))
         {
-            identifiers.append(identifierPair);
+            identifiers.append(std::move(identifierPair));
         }
         else
         {
             LOG_WARN << "duplicate!" << ENDL;
         }
+    }
+
+    for (auto const& ids : identifiers)
+    {
+        qDebug() << "IDS:" << ids.identifier << ids.value;
     }
 
     utils::replaceIdentifier(sourceString, identifiers);
@@ -778,6 +881,8 @@ void
 ModuleGenerator::generateForwardDeclarations(QString& headerString,
                                              QStringList const& forwardDecls)
 {
+    if (forwardDecls.isEmpty()) return;
+
     LOG_INDENT("adding forward declarations...");
 
     IdentifierPairs identifiers;
@@ -812,7 +917,7 @@ ModuleGenerator::generateForwardDeclarations(QString& headerString,
 void
 ModuleGenerator::generateConstructors(QString& headerString,
                                       QString& sourceString,
-                                      ClassStruct const& base)
+                                      ClassData const& base)
 {
     LOG_INDENT("generating constructors...");
 
@@ -823,14 +928,30 @@ ModuleGenerator::generateConstructors(QString& headerString,
         constructors.append(G_CONSTRUCTOR_DEFAULT);
     }
 
-    for (auto& constructor : qAsConst(constructors))
+    for (auto& ctor : qAsConst(constructors))
     {
-        FunctionStruct fConstructor{S_ID_CLASS_NAME, {},
-                                    constructor.parameter};
+        FunctionData fCtor;
+        fCtor.name = S_ID_CLASS_NAME;
+        fCtor.parameters = ctor.parameters;
 
-        fConstructor.implementation.values = constructor.implementation;
+        fCtor.implementation.lines = ctor.implementation;
 
-        generateFunction(headerString, sourceString, fConstructor, true);
+        generateFunction(headerString, sourceString, fCtor, true);
+
+        // indent for cpp parameters
+        int indent = fCtor.name.length() * 2 + 3;
+        utils::replaceIdentifier(sourceString, {
+                S_ID_INDENT, QString{" "}.repeated(indent)});
+
+        if (ctor.initilizerList.isEmpty())
+        {
+            continue;
+        }
+
+        // initializer list
+        QString initList = " :\n\t" + ctor.initilizerList.join(",\n\t");
+        utils::replaceIdentifier(sourceString, { S_ID_CONSTRUCTOR_INIT_LIST,
+                                                 initList });
     }
 
     LOG_INFO << "done!";
@@ -870,7 +991,7 @@ ModuleGenerator::appendFileToProjectFile(QString const& fileName,
 
     utils::writeStringToFile(fileString, m_srcDir, "src.pro");
 
-    LOG_INFO << "done!";
+//    LOG_INFO << "done!";
 }
 
 void
@@ -900,7 +1021,7 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
         // 2. check if post is in libname
         for (int i = nameParts.length(); i > 0; --i)
         {
-            QString part(nameParts.mid(0, i).join(""));
+            QString part = nameParts.mid(0, i).join("");
 
             if (!lib.contains(part, Qt::CaseInsensitive)) continue;
 
@@ -932,28 +1053,64 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
 }
 
 void
-ModuleGenerator::clearIdentifiers(QString& fileString)
+ModuleGenerator::clearFileString(QString& fileString)
 {
-    QRegularExpression regExp(QStringLiteral("\\$\\$.+\\$\\$"));
+    clearCompabilityMacros(fileString);
 
-    fileString.remove(regExp);
+    // remove identifiers
+    fileString.remove(QRegularExpression{"\\$\\$.+\\$\\$"});
+
+    // preprocessor should start at line beginning
+    fileString.replace("\t#", "#");
+
+    // convert tab to blanks
+    fileString.replace("\t", "    ");
+
+    // condense new lines
+    fileString.replace(QRegularExpression{"[\\n\\r]{3}"}, "\n\n");
 }
 
 void
-ModuleGenerator::clearTabulators(QString &fileString)
+ModuleGenerator::clearCompabilityMacros(QString &fileString)
 {
-    fileString.replace("\t", "    ");
+    if (settings()->useCompabilityMacros())
+    {
+        return;
+    }
+
+    // gt_lobals.h for version dependent code
+    fileString.remove("#include \"gt_globals.h\"\n");
+
+    // const ref macro
+    fileString.remove(S_2_0_CONSTREF.last());
+    fileString.remove(S_CONSTREF_MACRO + ' ');
+
+    if (settings()->gtlabMajorVersion() < 2)
+    {
+        // use if case
+        QRegularExpression regExp{
+            QStringLiteral("#else\\n(.+\\n)+?#endif\\n")};
+
+        fileString.remove(regExp);
+        fileString.remove(S_2_0_VERSION_CHECK + '\n');
+        return;
+    }
+
+    // use else case
+    QRegularExpression regExp{
+        QStringLiteral("#if\\s.+\\n(.+\\n)+?#else\\n")};
+
+    fileString.remove(regExp);
+    fileString.remove("#endif\n");
 }
 
 void
 ModuleGenerator::clearProjectFileIdentifiers()
 {
-
     // src.pro
     auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
 
-    clearIdentifiers(fileString);
-    clearTabulators(fileString);
+    clearFileString(fileString);
 
     utils::writeStringToFile(fileString, m_srcDir, "src.pro");
 
@@ -963,8 +1120,7 @@ ModuleGenerator::clearProjectFileIdentifiers()
     fileString = utils::readFile(m_moduleDir.absoluteFilePath(
                                      moduleClass.fileName + ".pro"));
 
-    clearIdentifiers(fileString);
-    clearTabulators(fileString);
+    clearFileString(fileString);
 
     utils::writeStringToFile(fileString, m_moduleDir,
                              moduleClass.fileName + ".pro");

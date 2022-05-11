@@ -4,12 +4,12 @@
 #include <QList>
 
 class QString;
-struct ModuleClass;
+struct ModuleData;
 struct AuthorDetails;
-struct ImplementationStruct;
-struct Constructor;
-struct ClassStruct;
-struct FunctionStruct;
+struct ImplementationData;
+struct ConstructorData;
+struct ClassData;
+struct FunctionData;
 
 /// Data struct fr dependencies
 struct DependencyStruct
@@ -40,7 +40,7 @@ inline bool operator==(IdentifierPair const& first,
 }
 
 /// Data struct that holds the module specifications
-struct ModuleClass
+struct ModuleData
 {
     QString ident{};
     QString className{};
@@ -49,29 +49,50 @@ struct ModuleClass
     QString version{};
 };
 
-struct ImplementationStruct
+/// Implementation data for function struct
+struct ImplementationData
 {
-    QStringList values{};
+    /// lines in the cpp function. Last line is the return statement
+    QStringList lines{};
+    /// required includes in the cpp file
     QStringList includes{};
+//    /// required includes in the h file
+//    QStringList headerIncludes{};
+    /// required declarations in header file
     QStringList forwardDeclarations{};
-    QList<ClassStruct> derivedClasses{};
-    QList<ClassStruct> linkedClasses{};
+    /// list of derived classes (subclasses of base class in function struct)
+    QList<ClassData> derivedClasses{};
+    /// list of linked classes (subclasses of linked class in function struct)
+    QList<ClassData> linkedClasses{};
 };
 
-struct Constructor
+struct ConstructorData
 {
-    QString parameter{};
+    /// parameters
+    QStringList parameters{};
+    /// implementation lines
     QStringList implementation{};
+    /// initializer list
+    QStringList initilizerList{};
 };
 
-struct ClassStruct
+/// represents an interface or a user defined class (exporter, calc, task etc.)
+struct ClassData
 {
+    /// class name
     QString className{};
+    /// file name
     QString fileName{};
+    /// object name for class or display name for interface
     QString objectName{};
+    /// outputpath relative to root dir of module (e.g. 'data/property')
     QString outputPath{};
-    QList<Constructor> constructors{};
-    QList<FunctionStruct> functions{};
+    /// tooltip in interface selection
+    QString tooltip{};
+    /// custom constructors, keep empty for default
+    QList<ConstructorData> constructors{};
+    /// functions to implement
+    QList<FunctionData> functions{};
 
     bool isValid() const
     {
@@ -79,30 +100,41 @@ struct ClassStruct
     }
 };
 
-struct FunctionStruct
+struct FunctionData
 {
+    /// function anme
     QString name{};
-    QString returnValue{};
-    QString parameter{};
-    QString qualifier{};
+    /// return type
+    QString returnType{};
+    /// parameters
+    QStringList parameters{};
+    /// const function
+    bool isConst{};
+    /// is protected
+    bool isProtected{};
+    /// doxygen description
     QString description{};
+    /// tooltip in input mask
     QString tooltip{};
-    ClassStruct baseClass{};
-    ClassStruct linkedClass{};
-    ImplementationStruct implementation{};
+    /// denotes the base class of the meta object (if func return a single
+    /// or multiple meta objects)
+    ClassData baseClass{};
+    /// denotes the linked class (linked class is the first template
+    /// parameter in QMap<const char*, QMetaObject>)
+    ClassData linkedClass{};
+    /// implementation data
+    ImplementationData implementation{};
 
     bool isValid() const
     {
-        return !returnValue.isEmpty() && !name.isEmpty();
+        return !returnType.isEmpty() && !name.isEmpty();
     }
 };
 
-using DependencyStructs = QList<DependencyStruct>;
-using IdentifierPairs   = QList<IdentifierPair>;
-using FunctionStructs   = QList<FunctionStruct>;
-using ClassStructs      = QList<ClassStruct>;
-using Constructors      = QList<Constructor>;
-
-
+using DependencyDataList = QList<DependencyStruct>;
+using IdentifierPairs    = QList<IdentifierPair>;
+using FunctionDataList   = QList<FunctionData>;
+using ClassDataList      = QList<ClassData>;
+using Constructors       = QList<ConstructorData>;
 
 #endif // MODULEGENERATOR_STRUCTS_H

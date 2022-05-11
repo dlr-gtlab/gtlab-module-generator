@@ -13,31 +13,53 @@ class ModuleGeneratorPreLoader
 
     static const int I_PROCESS_TIMEOUT_MS;
 
+    static const QRegularExpression REGEXP_PREFIX;
+
 public:
 
+    /**
+     * @brief Parses interface json files and generates a list of class structs
+     */
     void searchForInterfaces();
 
+    /**
+     * @brief searches in devtools for reserved prefixes (gt, gtp, etc.)
+     * @param devToolsPath path to dev tools
+     */
     void searchForPrefixes(QString const& devToolsPath);
 
+    /**
+     * @brief asks GtlabConsole for modules to generate dependencies.
+     * Should be run concurrently
+     * @param gtlabPath path to gtlab
+     * @param status return code of process
+     */
     void searchForDependencies(QString const& gtlabPath, int* status = nullptr);
 
-    QString const& searchPath() const { return m_searchPath; }
-    ClassStructs const& interfaces() const { return m_interfaces; }
-    DependencyStructs const& dependencies() const { return m_dependencies; }
+    ClassDataList const& interfaces() const { return m_interfaces; }
+    DependencyDataList const& dependencies() const { return m_dependencies; }
     QStringList const& prefixes() const { return m_prefixes; }
 
 private:
 
-    QString m_searchPath{};
     QStringList m_prefixes{};
-    ClassStructs m_interfaces{};
-    DependencyStructs m_dependencies{};
+    ClassDataList m_interfaces{};
+    DependencyDataList m_dependencies{};
 
-    ClassStruct searchForClass(QJsonObject const& classJObject);
+    /**
+     * @brief Parses json object to a class struct
+     * @param classJObject json object for class
+     * @return class struct
+     */
+    ClassData searchForClass(QJsonObject const& classJObject);
 
-    Constructors searchForConstructors(QJsonArray const& constructorJObject);
+    Constructors searchForConstructors(QJsonArray const& constructorJArray);
 
-    FunctionStructs searchForFunctions(QJsonArray const& functionsJArray);
+    FunctionDataList searchForFunctions(QJsonArray const& functionsJArray);
+
+    QStringList parseStringJArray(QJsonArray const& jArray);
+
+    QString parseDescription(QJsonArray const& descriptionJArray);
 
     void clearInterfaceStructs();
 };

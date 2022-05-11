@@ -1,14 +1,12 @@
-#ifndef CLASSSPECIFICATIONSWIDGET_H
-#define CLASSSPECIFICATIONSWIDGET_H
+#ifndef CLASSSPECIFICATIONWIDGET_H
+#define CLASSSPECIFICATIONWIDGET_H
 
 #include <QWidget>
 
 #include "module_generator_structs.h"
 
 class QGridLayout;
-class QPushButton;
 class QLineEdit;
-class QLabel;
 class QCheckBox;
 class FunctionSpecificationWidget;
 class ModuleGeneratorSettings;
@@ -17,37 +15,46 @@ class ClassSpecificationWidget : public QWidget
 {
     Q_OBJECT
 
+    static const QString S_CLASS_NAME_LABEL;
+    static const QString S_FILE_NAME_LABEL;
+    static const QString S_OBJECT_NAME_LABEL;
+    static const QString S_AUTO_COMPLETE_LABEL;
+
+    static const QString S_AUTO_GENERATED_TOOLTIP;
+    static const QString S_AUTO_GENERATED_ALT_TOOLTIP;
+
 public:
 
-    ClassSpecificationWidget(FunctionStruct const& function,
+    ClassSpecificationWidget(ClassData const& baseClass,
                              ModuleGeneratorSettings* settings,
-                             bool isLinked = false,
                              QWidget* parent = nullptr);
 
-    ClassStruct implementedClass();
+    ClassData implementedClass();
 
 private:
 
-    ModuleGeneratorSettings* m_settings;
+    ClassData m_implementedClass{};
 
-    ClassStruct m_implementedClass;
+    ModuleGeneratorSettings* m_settings{};
 
-    QLineEdit* m_classNameEdit;
-    QLabel* m_classNameLabel;
-    QLineEdit* m_objectNameEdit;
-    QLabel* m_objectNamelabel;
-    QLineEdit* m_fileNameEdit;
-    QLabel* m_fileNameLabel;    
-    QCheckBox* m_autoEditCheckBox;
+    QLineEdit* m_classNameEdit{};
+    QLineEdit* m_objectNameEdit{};
+    QLineEdit* m_fileNameEdit{};
+    QCheckBox* m_autoEditCheckBox{};
+
+    bool m_autoEditFileName{false};
 
     /// module name validator
-    QRegularExpressionValidator* m_nameValidator;
+    QRegularExpressionValidator* m_nameValidator{};
+    QRegularExpressionValidator* m_classNameValidator{};
+    QRegularExpressionValidator* m_fileNameValidator{};
 
-    FunctionSpecificationWidget* m_functionSpecificationWidget;
-
-    QGridLayout* m_baseLayout;
+    FunctionSpecificationWidget* m_functionWidget{};
 
     void autoComplete();
+
+    void initFunctionWidget(QGridLayout& layout, int& row,
+                            FunctionDataList const& functions);
 
 protected:
 
@@ -55,7 +62,9 @@ protected:
 
 private slots:
 
-    void onEditedObjectName(QString string);
+    void onEditedObjectName(QString name);
+    void onEditedClassName(QString name);
+    void onEditedFileName();
 
     void onAutoCompleteChanged(int state);
 
@@ -64,4 +73,4 @@ signals:
     void hidden();
 };
 
-#endif // CLASSSPECIFICATIONSWIDGET_H
+#endif // CLASSSPECIFICATIONWIDGET_H

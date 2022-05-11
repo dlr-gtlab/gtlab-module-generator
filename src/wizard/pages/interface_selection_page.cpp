@@ -40,9 +40,10 @@ InterfaceSelectionPage::InterfaceSelectionPage(ModuleGeneratorSettings* settings
 
     interfaceLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
-    gridLayout->addWidget(infoTextLabel, 0, 0, 1, 2);
-    gridLayout->addWidget(interfaceLabel, 1, 0);
-    gridLayout->addWidget(m_widgetListView, 1, 1);
+    int row = 0;
+    gridLayout->addWidget(infoTextLabel, row++, 0, 1, 2);
+    gridLayout->addWidget(interfaceLabel, row, 0);
+    gridLayout->addWidget(m_widgetListView, row++, 1);
     gridLayout->setColumnMinimumWidth(0,
                                       AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
@@ -75,7 +76,7 @@ InterfaceSelectionPage::validatePage()
 
     LOG_INFO << "selected " << QString::number(list.count()) << " interfaces..." << ENDL;
 
-    for (auto item : list)
+    for (auto const& item : list)
     {
         LOG_INFO << item.className << ENDL;
     }
@@ -90,9 +91,9 @@ InterfaceSelectionPage::validatePage()
 void
 InterfaceSelectionPage::initInterfaces()
 {
-    auto interfaceStructs = settings()->availableInterfaces();
+    auto interfaces = settings()->availableInterfaces();
 
-    for (auto const& interfaceStruct : interfaceStructs)
+    for (auto const& interfaceStruct : interfaces)
     {
         auto widget = new InterfaceSelectionWidget(interfaceStruct);
 
@@ -100,10 +101,10 @@ InterfaceSelectionPage::initInterfaces()
     }
 }
 
-ClassStructs
+ClassDataList
 InterfaceSelectionPage::selectedInterfaces() const
 {
-    ClassStructs list;
+    ClassDataList interfaces;
 
     for (auto* widget : m_widgetListView->widgets())
     {
@@ -113,10 +114,10 @@ InterfaceSelectionPage::selectedInterfaces() const
 
         if (interfaceWidget->isChecked())
         {
-            list << interfaceWidget->interfaceStruct();
+            interfaces << interfaceWidget->interface();
         }
     }
 
-    return list;
+    return interfaces;
 }
 

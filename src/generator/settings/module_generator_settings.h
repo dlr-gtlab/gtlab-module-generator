@@ -18,6 +18,8 @@ public:
     const static QString S_VERSION;
     const static QRegularExpression REG_PREFIX;
     const static QRegularExpression REG_OBJECT_NAME;
+    const static QRegularExpression REG_CLASS_NAME;
+    const static QRegularExpression REG_FILE_NAME;
     const static QRegularExpression REG_VERSION;
     const static QRegularExpression REG_AUTHOR;
     const static QRegularExpression REG_AUTHOR_EMAIL;
@@ -52,6 +54,9 @@ public:
     QString const& gtlabVersion() const { return m_version; }
     void setGTlabVersion(QString const& version) { m_version = version; }
 
+    bool useCompabilityMacros() const  { return m_useCompabilityMacros; }
+    void setUseCompabilityMacros(bool yes) { m_useCompabilityMacros = yes; }
+
     QStringList supportedVersions() const;
 
     // settings
@@ -67,16 +72,16 @@ public:
     QString const& modulePrefix() const;
     void setModulePrefix(QString const& prefix);
 
-    ModuleClass const& moduleClass() const;
-    void setModuleClass(ModuleClass const& module);
+    ModuleData const& moduleClass() const;
+    void setModuleClass(ModuleData const& module);
 
     // interfaces
-    ClassStructs const& selectedInterfaces() const;
-    void setSelectedInterfaces(ClassStructs const& interfaces);
+    ClassDataList const& selectedInterfaces() const;
+    void setSelectedInterfaces(ClassDataList const& interfaces);
 
     // dependencies
-    DependencyStructs const& selectedDependencies() const;
-    void setSelectedDependencies(DependencyStructs const& dependencies);
+    DependencyDataList const& selectedDependencies() const;
+    void setSelectedDependencies(DependencyDataList const& dependencies);
 
     // signature
     AuthorDetails const& authorDetails() const;
@@ -90,8 +95,8 @@ public:
     void preLoad();
 
     QStringList const& reservedPrefixes() const;
-    ClassStructs const& availableInterfaces() const;
-    DependencyStructs const& availableDependencies() const;
+    ClassDataList const& availableInterfaces() const;
+    DependencyDataList const& availableDependencies() const;
 
     int dependencyResolveStatus() const;
 
@@ -102,6 +107,7 @@ public:
 private:
 
     ModuleGeneratorPreLoader m_preLoader{};
+    QString m_lastPreLoadPath{};
 
     /* settings */
     WizardMode m_wizardMode{Create};
@@ -109,16 +115,17 @@ private:
     QString m_version{};
 
     bool m_createGitFiles{true};
+    bool m_useCompabilityMacros{true};
 
     QString m_outputPath{};
     QString m_gtlabPath{};
     QString m_devToolsPath{};
 
     QString m_modulePrefix{};
-    ModuleClass m_moduleClass{};
+    ModuleData m_moduleClass{};
 
-    ClassStructs m_selectedInterfaces{};
-    DependencyStructs m_selectedDependencies{};
+    ClassDataList m_selectedInterfaces{};
+    DependencyDataList m_selectedDependencies{};
 
     QString m_signature{};
     AuthorDetails m_authorDetails{};

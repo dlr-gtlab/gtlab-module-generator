@@ -1,0 +1,153 @@
+{
+  "name": "GtPropertyInterface",
+  "fileName": "gt_propertyinterface",
+  "displayName": "Property",
+  "tooltip": "Allows the registration fo custom properties and property items",
+  "functions": 
+  [
+    {
+      "name": "propertyItems",
+      "returnValue": "QMap<const char*, QMetaObject>",
+      "tooltip": "Map of properties and property items",
+      "description":
+      [
+        "@brief Returns static meta objects of property item classes.",
+        "@return list of meta objects of property item classes."
+      ],
+      "includes":
+      [
+        "QMap"
+      ],
+      "linkedClass":
+      {
+        "name": "GtProperty<QString>",
+        "fileName": "gt_property",
+        "outputPath": "data/property",
+        "constructors":
+        [
+          {
+            "parameters":
+            [
+              "const QString& ident",
+              "const QString& name"
+            ],
+            "initList":
+            [
+              "$$CLASS_NAME$${ident, name, {}}"
+            ]
+          },
+          {
+            "parameters":
+            [
+              "const QString& ident",
+              "const QString& name",
+              "const QString& brief",
+              "const QString& value = {}"
+            ],
+            "source":
+            [
+              "setObjectName(name)",
+              "",
+              "m_id = ident",
+              "m_brief = brief",
+              "m_unitCategory = GtUnit::Category::None",
+              "m_value = value",
+              "m_initValue = value"
+            ]
+          }
+        ],
+        "functions":
+        [
+          {
+            "name": "valueToVariant",
+            "returnValue": "QVariant",
+            "parameters":
+            [
+              "const QString& unit",
+              "bool* success = {}"
+            ],
+            "const": true,
+            "description":
+            [
+              "@brief valueToVariant",
+              "@param unit",
+              "@param success",
+              "@return variant"
+            ],
+            "includes":
+            [
+              "QVariant"
+            ]
+          },
+          {
+            "name": "setValueFromVariant",
+            "returnValue": "bool",
+            "parameters":
+            [
+              "const QVariant& val",
+              "const QString& unit",
+              "bool* success = {}"
+            ],
+            "description":
+            [
+              "@brief setValueFromVariant",
+              "@param val",
+              "@param unit",
+              "@param success",
+              "@return success"
+            ]
+          }
+        ]
+      },
+      "baseClass":
+      {
+        "name": "GtAbstractPropertyItem",
+        "fileName": "gt_abstractpropertyitem",
+        "outputPath": "gui/property_items",
+        "functions":
+        [
+          {
+            "name": "data",
+            "returnValue": "QVariant",
+            "parameters":
+            [
+              "int column, int role"
+            ],
+            "const": true,
+            "description":
+            [
+              "data",
+              "column",
+              "role",
+              "variant"
+            ],
+            "includes":
+            [
+              "QVariant"
+            ]
+          },
+          {
+            "name": "setData",
+            "returnValue": "bool",
+            "parameters":
+            [
+              "int column",
+              "const QVariant& value",
+              "GtObject* obj",
+              "int role = Qt::EditRole"
+            ],
+            "description":
+            [
+              "setData",
+              "column",
+              "value",
+              "obj",
+              "role",
+              ""
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

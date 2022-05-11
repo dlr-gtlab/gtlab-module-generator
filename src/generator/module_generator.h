@@ -8,16 +8,17 @@
 #include <QDir>
 #include <memory>
 
-struct ClassStruct;
-struct FunctionStruct;
-struct ImplementationStruct;
+struct ClassData;
+struct FunctionData;
+struct ImplementationData;
 
 class ModuleGeneratorSettings;
 class ModuleGenerator : public QObject
 {
     Q_OBJECT
 
-    static const Constructor G_CONSTRUCTOR_DEFAULT;
+    // default ctor
+    static const ConstructorData G_CONSTRUCTOR_DEFAULT;
 
 public:
 
@@ -38,6 +39,7 @@ public:
     const static QString S_ID_FILE_NAME;
     const static QString S_ID_HEADER_NAME;
     const static QString S_ID_CONSTRUCTOR;
+    const static QString S_ID_CONSTRUCTOR_INIT_LIST;
     const static QString S_ID_FUNCTION;
     const static QString S_ID_IMPLEMENTATION;
 
@@ -59,6 +61,14 @@ public:
 
     const static QString S_ID_AUTHOR;
     const static QString S_ID_AUTHOR_EMAIL;
+
+    const static QString S_ID_INDENT;
+
+    // compatability
+    const static QString S_CONSTREF_MACRO;
+    const static QString S_2_0_VERSION_CHECK;
+    const static QStringList S_2_0_ICON_INCLUDES;
+    const static QStringList S_2_0_CONSTREF;
 
     ModuleGeneratorSettings const* settings() const;
     ModuleGeneratorSettings* settings();
@@ -96,20 +106,20 @@ private:
 
     void generateFunction(QString& headerString,
                           QString& sourceString,
-                          FunctionStruct const& f,
+                          FunctionData const& function,
                           bool isConstructor = false);
 
     void generateImplementation(QString& headerString,
                                 QString& sourceString,
-                                FunctionStruct const& function,
+                                FunctionData const& function,
                                 bool isConstructor = false);
 
     void generateImplementationHelper(QString& sourceString,
-                                      ClassStruct const& baseClass,
-                                      QList<ClassStruct> const& classes);
+                                      ClassData const& baseClass,
+                                      QList<ClassData> const& classes);
 
-    void generateBasicClass(ClassStruct const& base,
-                            ClassStruct const& derived);
+    void generateBasicClass(ClassData const& base,
+                            ClassData const& derived);
 
     void generateIncludes(QString& sourceString,
                           QStringList const& includes);
@@ -119,16 +129,16 @@ private:
 
     void generateConstructors(QString& headerString,
                               QString& sourceString,
-                              ClassStruct const& base);
+                              ClassData const& base);
 
     void appendFileToProjectFile(QString const& fileName,
                                  QString const& path);
 
     void appendLibToProjectFile(QString const& name);
 
-    void clearIdentifiers(QString& fileString);
+    void clearFileString(QString& fileString);
 
-    void clearTabulators(QString& fileString);
+    void clearCompabilityMacros(QString& fileString);
 
     void clearProjectFileIdentifiers();
 };

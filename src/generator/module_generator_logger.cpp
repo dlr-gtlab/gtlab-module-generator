@@ -1,6 +1,6 @@
 #include "module_generator_logger.h"
 
-
+#include <QDebug>
 
 void consoleLog(QString const&, ModuleGeneratorLogger::Type, int);
 

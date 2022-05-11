@@ -16,10 +16,10 @@ class InterfaceSelectionWidget : public QWidget
 
 public:
 
-    explicit InterfaceSelectionWidget(ClassStruct const& interface,
+    explicit InterfaceSelectionWidget(ClassData interface,
                                       QWidget* parent = nullptr);
 
-    ClassStruct const& interfaceStruct() const { return m_interfaceStruct; }
+    ClassData const& interface() const { return m_interface; }
 
     bool isChecked() const;
     void setChecked(const bool value) const;
@@ -30,11 +30,9 @@ signals:
 
 private:
 
-    QLabel* m_warningLabel;
-    QCheckBox* m_nameCheckBox;
-    QHBoxLayout* m_baseLayout;
+    QCheckBox* m_nameCheckBox{};
 
-    ClassStruct m_interfaceStruct;
+    ClassData m_interface{};
 };
 
 #endif // INTERFACESELECTIONWIDGET_H

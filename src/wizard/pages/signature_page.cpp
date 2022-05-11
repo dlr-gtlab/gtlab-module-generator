@@ -57,13 +57,14 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
     m_signatureTextEdit->setReadOnly(true);
     m_signatureTextEdit->setFont(ModuleGeneratorSettings::F_MONO_FONT);
 
-    baseLayout->addWidget(infoLabel, 0, 0, 1, 3);
-    baseLayout->addWidget(authorLabel, 1, 0);
-    baseLayout->addWidget(m_authorEdit, 1, 1);
-    baseLayout->addWidget(emailLabel, 2, 0);
-    baseLayout->addWidget(m_emailEdit, 2, 1);
-    baseLayout->addWidget(signatureLabel, 3, 0);
-    baseLayout->addWidget(m_signatureTextEdit, 3, 1, 1, 2);
+    int row = 0;
+    baseLayout->addWidget(infoLabel, row++, 0, 1, 3);
+    baseLayout->addWidget(authorLabel, row, 0);
+    baseLayout->addWidget(m_authorEdit, row++, 1);
+    baseLayout->addWidget(emailLabel, row, 0);
+    baseLayout->addWidget(m_emailEdit, row++, 1);
+    baseLayout->addWidget(signatureLabel, row, 0);
+    baseLayout->addWidget(m_signatureTextEdit, row++, 1, 1, 2);
     baseLayout->setColumnMinimumWidth(0,
                                       AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 

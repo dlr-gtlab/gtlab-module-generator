@@ -2,9 +2,10 @@
 
 #include "widget_list_view.h"
 
-#include "simple_class_specification_widget.h"
-#include "single_class_specification_widget.h"
-#include "multiple_class_specification_widget.h"
+#include "type_specification_widget.h"
+#include "class_specification_item.h"
+#include "class_specification_list.h"
+#include "module_generator.h"
 #include "module_generator_logger.h"
 #include "module_generator_settings.h"
 
@@ -16,11 +17,11 @@
 #include <QSpacerItem>
 
 
-FunctionSpecificationWidget::FunctionSpecificationWidget(const FunctionStructs& functions,
+FunctionSpecificationWidget::FunctionSpecificationWidget(FunctionDataList functions,
                                                          ModuleGeneratorSettings* settings,
                                                          QWidget* parent)
     : QScrollArea(parent),
-      m_functions(functions),
+      m_functions(std::move(functions)),
       m_settings(settings)
 {
     auto* scrollWidget = new QWidget;
@@ -34,13 +35,13 @@ FunctionSpecificationWidget::FunctionSpecificationWidget(const FunctionStructs& 
 
     setWidgetResizable(true);
     setWidget(scrollWidget);
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 }
 
 int
 FunctionSpecificationWidget::count() const
 {
-    return m_specificationWidgets.keys().length();
+    return m_specificationWidgets.count();
 }
 
 bool
@@ -51,10 +52,10 @@ FunctionSpecificationWidget::isEmpty() const
 
 
 
-FunctionStructs
+FunctionDataList
 FunctionSpecificationWidget::implementedFunctions()
 {
-    QMapIterator<QString, AbstractClassSpecification*> iterator{
+    QMapIterator<QString, AbstractTypeSpecifier*> iterator{
         m_specificationWidgets
     };
 
@@ -62,7 +63,11 @@ FunctionSpecificationWidget::implementedFunctions()
     {
         auto item = iterator.next();
 
-        if (!item.value()) continue;
+        if (!item.value())
+        {
+            LOG_INDENT_ERR("Null Interface");
+            continue;
+        }
 
         for (auto& f : m_functions)
         {
@@ -84,31 +89,46 @@ FunctionSpecificationWidget::setContent()
     for (auto& function : m_functions)
     {
         LOG_INDENT("setting specifcation widget for '" +
-                     function.returnValue + ' ' +
+                     function.returnType + ' ' +
                      function.name + "'...");
 
-        auto* widget = setSpecificationWidget(function);
+        auto* widget = getSpecificationWidget(function);
         auto* inputWidget = dynamic_cast<QWidget*>(widget);
 
         if (!inputWidget)
         {
-            setStandardImplementation(function);
+            generateStdImplementation(function);
             LOG_INFO << "done!";
             continue;
         }
 
         inputWidget->setToolTip(function.tooltip);
 
-        auto* returnTypeLabel = new QLabel(function.returnValue);
-        auto* functionLabel   = new QLabel(function.name);
+        // shorten return type:
+        //  QMap<A, B>
+        // to
+        //  QMap<A,
+        //       B>
+        auto returnType = function.returnType;
+        auto tIdx = returnType.indexOf('<');
+        auto cIdx = returnType.indexOf(',');
+        if (cIdx > tIdx && tIdx > 0)
+        {
+            returnType.replace(',', ",\n" + QString{' '}.repeated(tIdx));
+        }
+
+        auto* returnTypeLabel = new QLabel{returnType};
+        auto* functionLabel   = new QLabel{function.name};
+
+        QPalette palette;
+        palette.setColor(QPalette::WindowText, Qt::darkBlue);
 
         returnTypeLabel->setMinimumHeight(20);
         returnTypeLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
-        returnTypeLabel->setStyleSheet("QLabel { color : DarkBlue }");
+        returnTypeLabel->setPalette(palette);
 
         functionLabel->setFont(ModuleGeneratorSettings::F_MONO_FONT);
         functionLabel->setMinimumHeight(20);
-        functionLabel->setStyleSheet("QLabel { color : black }");
 
         returnTypeLabel->setSizePolicy(QSizePolicy::Minimum,
                                        QSizePolicy::Minimum);
@@ -129,73 +149,96 @@ FunctionSpecificationWidget::setContent()
         LOG_INFO << "done!";
     }
 
-    auto* spacer = new QSpacerItem(1, 1, QSizePolicy::Minimum,
-                                   QSizePolicy::MinimumExpanding);
+    auto* spacer = new QSpacerItem{1, 1, QSizePolicy::Minimum,
+                                   QSizePolicy::MinimumExpanding};
 
-    m_baseLayout->addItem(spacer, this->count() + 1, 0, 1, 1);
+    m_baseLayout->addItem(spacer, this->count() + 1, 0);
 
     LOG_INFO << "done!";
 }
 
 void
-FunctionSpecificationWidget::setStandardImplementation(FunctionStruct& function)
+FunctionSpecificationWidget::generateStdImplementation(FunctionData& function)
 {
-    QString returnValue = function.returnValue;
+    auto& returnValue = function.returnType;
 
-    QStringList values;
+    QStringList lines;
 
     LOG_INDENT("setting standard implementation: " + returnValue);
 
     // simple return types
     if (returnValue == QStringLiteral("void"))
     {
-        values << QStringLiteral("/* TODO: add implementation */");
+        lines << QStringLiteral("// TODO: add implementation");
+    }
+    // icons changed in 2.0
+    else if (returnValue == QStringLiteral("QIcon"))
+    {
+        QString iconName = "list"; // defaults to list icon
+
+        // hacky soloution to find icon name
+        if (function.tooltip.contains("collection")) iconName = "collection";
+        if (function.tooltip.contains("import")) iconName = "import";
+        if (function.tooltip.contains("export")) iconName = "export";
+
+        lines << ModuleGenerator::S_2_0_VERSION_CHECK;
+        lines << "return gtApp->icon(QStringLiteral(\"" +
+                 iconName + "Icon.png\"))";
+        lines << "#else";
+        lines << "return GtGUI::Icon::" + iconName + "16()";
+        lines << "#endif";
+
+        // includes for icons
+        function.implementation.includes += ModuleGenerator::S_2_0_ICON_INCLUDES;
     }
     else if (returnValue == QStringLiteral("QStringList") ||
              returnValue.startsWith(QStringLiteral("QMap<")) ||
              returnValue.startsWith(QStringLiteral("QList<")))
     {
-        values << QString{returnValue + " retVal"};
-        values << QString{};
-        values << QStringLiteral("retVal");
+        lines << QString{returnValue + " retVal"};
+        lines << QString{};
+        lines << QStringLiteral("retVal");
     }
     else
     {
-        values << QStringLiteral("{}");
+        lines << QStringLiteral("{}");
 //        LOG_ERR << "no standard implementation set!";
     }
 
-    function.implementation.values = values;
+    function.implementation.lines = lines;
 
     LOG_INFO << "done!";
 }
 
-AbstractClassSpecification*
-FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& function)
+AbstractTypeSpecifier*
+FunctionSpecificationWidget::getSpecificationWidget(FunctionData const& function)
 {
-    QString returnValue = function.returnValue;
+    auto& returnValue = function.returnType;
 
     // simple return types
     if (returnValue == QStringLiteral("bool"))
     {
-        return new BoolClassSpecificationWidget(function.implementation);
+        return new BoolSpecificationWidget(function.implementation);
     }
+
     if (returnValue == QStringLiteral("QString"))
     {
-        return new StringClassSpecificationWidget(function.implementation);
+        return new StringSpecificationWidget(function.implementation);
     }
-    if (returnValue == QStringLiteral("QIcon"))
-    {
-        QStringList values;
-        values << QStringLiteral("-");
-        values << QStringLiteral("exportIcon");
-        values << QStringLiteral("importIcon");
-        values << QStringLiteral("collectionIcon");
 
-        return new ComboClassSpecificationWidget(function.implementation,
-                                                 values,
-                                                 "gtApp->icon(\"", ".png\")");
-    }
+//    if (returnValue == QStringLiteral("QIcon"))
+//    {
+//        QStringList values;
+//        values << QStringLiteral("-");
+//        values << QStringLiteral("exportIcon");
+//        values << QStringLiteral("importIcon");
+//        values << QStringLiteral("collectionIcon");
+
+//        return new ComboboxSpecificationWidget(function.implementation,
+//                                               values,
+//                                               "gtApp->icon(\"", ".png\")");
+//    }
+
     if (returnValue == QStringLiteral("Qt::DockWidgetArea"))
     {
         QStringList values;
@@ -204,22 +247,21 @@ FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& functi
         values << QStringLiteral("Qt::TopDockWidgetArea");
         values << QStringLiteral("Qt::BottomDockWidgetArea");
 
-        return new ComboClassSpecificationWidget(function.implementation,
-                                                 values);
+        return new ComboboxSpecificationWidget(function.implementation, values);
     }
 
     // complex return types
-    ClassStruct baseClass = function.baseClass;
+    ClassData baseClass = function.baseClass;
 
     if (baseClass.className.isEmpty())
     {
-        LOG_INDENT("null base class!", ModuleGeneratorLogger::Type::Warning);
+        LOG_INDENT_WARN("null base class!");
         return {};
     }
 
     if (returnValue == QStringLiteral("QMetaObject"))
     {
-        return new SingleClassSpecificationWidget(function, m_settings, false);
+        return new ClassSpecificationItem(function, m_settings, false);
     }
 
     if (returnValue == QStringLiteral("QList<QMetaObject>") ||
@@ -228,11 +270,10 @@ FunctionSpecificationWidget::setSpecificationWidget(const FunctionStruct& functi
         returnValue == QStringLiteral("QList<GtTaskData>") ||
         returnValue == QStringLiteral("QMap<const char*, QMetaObject>"))
     {
-        return new MultipleClassSpecificationWidget(function, m_settings);
+        return new ClassSpecificationList(function, m_settings);
     }
 
-    LOG_INDENT("no specification widget found!",
-               ModuleGeneratorLogger::Type::Warning);
+    LOG_INDENT_WARN("no specification widget found!");
 
     return {};
 }

@@ -12,16 +12,16 @@
         <file>templates/local_settings.pri</file>
         <file>templates/module.pro</file>
         <file>templates/settings.pri</file>
-        <file>interfaces/datamodel.json</file>
-        <file>interfaces/exporter.json</file>
-        <file>interfaces/importer.json</file>
-        <file>interfaces/calculator_exec.json</file>
-        <file>interfaces/collection.json</file>
-        <file>interfaces/init_module.json</file>
-        <file>interfaces/mdi.json</file>
-        <file>interfaces/network.json</file>
-        <file>interfaces/process.json</file>
-        <file>interfaces/property.json</file>
+        <file>interfaces/0_datamodel.json</file>
+        <file>interfaces/1_process.json</file>
+        <file>interfaces/2_mdi.json</file>
+        <file>interfaces/3_exporter.json</file>
+        <file>interfaces/4_importer.json</file>
+        <file>interfaces/5_init.json</file>
+        <file>interfaces/6_property.json</file>
+        <file>interfaces/7_network.json</file>
+        <file>interfaces/8_collection.json</file>
+        <file>interfaces/9_calculator_exec.json</file>
         <file>templates/.gitignore</file>
         <file>templates/CHANGELOG.md</file>
         <file>templates/README.md</file>
