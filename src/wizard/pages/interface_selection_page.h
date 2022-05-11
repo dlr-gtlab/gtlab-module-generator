@@ -24,7 +24,7 @@ public:
     InterfaceSelectionPage(ModuleGeneratorSettings* settings,
                            QWidget* parent = nullptr);
 
-    ClassStructs selectedInterfaces() const;
+    ClassDataList selectedInterfaces() const;
 
 protected:
 

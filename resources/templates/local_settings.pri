@@ -10,7 +10,7 @@ DEV_TOOLS = $$DEVTOOLS_INSTALL_DIR$$
 #  path to GTlab
 GTLAB_DIR = $$GTLAB_INSTALL_DIR$$
 
-# target version
+# target major version
 MAJOR_VERSION = $$GTLAB_MAJOR_VERSION$$
 
 BUILD_MODULE  = true

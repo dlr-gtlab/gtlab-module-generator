@@ -14,10 +14,16 @@ class DependencySelectionWidget : public QWidget
 {
     Q_OBJECT
 
+    static const QString S_DELETE_BTN_ICON_PATH;
+
+    static const QString S_DELETE_BTN_TOOLTIP;
+    static const QString S_CHECKBOX_TOOLTIP;
+    static const QString S_VERSION_TOOLTIP;
+
 public:
 
-    DependencySelectionWidget(const DependencyStruct& dependency,
-                              const bool isEditable,
+    DependencySelectionWidget(DependencyStruct const& dependency,
+                              bool isEditable,
                               QWidget* parent = nullptr);
 
     DependencyStruct dependency() const;
@@ -28,16 +34,11 @@ public:
 
 private:
 
-    ///delete push button
-    QPushButton*  m_deletePushBtn;
-
-    QLineEdit* m_versionEdit;
+    QLineEdit* m_versionEdit{};
     /// check box to selet the dependency
-    QCheckBox* m_isActivCheckBox;
-    /// horizontal layout
-    QHBoxLayout* m_baseLayout;
+    QCheckBox* m_isActivCheckBox{};
 
-    QRegularExpressionValidator* m_versionValidator;
+    QRegularExpressionValidator* m_versionValidator{};
 
 private slots:
 

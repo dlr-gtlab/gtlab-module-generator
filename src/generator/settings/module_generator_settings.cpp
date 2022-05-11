@@ -15,12 +15,16 @@
 #include <QFont>
 
 const QString
-ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.0.5"));
+ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.1.0"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("\\s?[A-Za-z]"
                                                         "([\\w\\d]*\\s?)+"));
+const QRegularExpression
+ModuleGeneratorSettings::REG_CLASS_NAME(QStringLiteral("[A-Za-z]([\\w\\d]*?)+"));
+const QRegularExpression
+ModuleGeneratorSettings::REG_FILE_NAME = REG_CLASS_NAME;
 const QRegularExpression
 ModuleGeneratorSettings::REG_VERSION(QStringLiteral("\\d+(.\\d+)?"
                                                     "(.\\d+)?(-\\w+)?"));
@@ -28,8 +32,9 @@ const QRegularExpression
 ModuleGeneratorSettings::REG_AUTHOR(QStringLiteral("[A-Za-z].*"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_AUTHOR_EMAIL(QStringLiteral(".*"));
+
 const QFont
-ModuleGeneratorSettings::F_MONO_FONT = QFont(QStringLiteral("Consolas"), 9);
+ModuleGeneratorSettings::F_MONO_FONT{QStringLiteral("Consolas"), 9};
 
 const QString S_YEAR = QDate::currentDate().toString("yyyy");
 const QString S_DATE = QDate::currentDate().toString("dd.MM.yyyy");
@@ -46,7 +51,7 @@ const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
 
 const QString
 ModuleGeneratorSettings::S_EXEC_SUFFIX(isOsWindows() ? QStringLiteral(".exe"):
-                                                       QStringLiteral(""));
+                                                       QString{});
 const QString
 ModuleGeneratorSettings::S_GTLAB_APP(QStringLiteral("GTlab") +
                                      S_EXEC_SUFFIX);
@@ -78,14 +83,12 @@ QString
 ModuleGeneratorSettings::classNamingScheme(const QString& name,
                                            const QString& prefix) const
 {
-    QString retString;
-
-    QStringList stringList;
-
     if (name.isEmpty())
     {
-        return QString();
+        return {};
     }
+
+    QStringList stringList;
 
     if (!prefix.isEmpty())
     {
@@ -94,7 +97,8 @@ ModuleGeneratorSettings::classNamingScheme(const QString& name,
 
     stringList << name.split(" ", QString::SkipEmptyParts);
 
-    for (auto string : stringList)
+    QString retString;
+    for (auto& string : stringList)
     {
         string.replace(0, 1, string.at(0).toUpper());
 
@@ -114,13 +118,11 @@ QString
 ModuleGeneratorSettings::fileNamingScheme(const QString& name,
                                           const QString& prefix) const
 {
-    QString retString;
-
-    retString = classNamingScheme(name, prefix);
+    QString retString = classNamingScheme(name, prefix);
 
     if (retString.isEmpty())
     {
-        return QString();
+        return {};
     }
 
     if (!prefix.isEmpty())
@@ -151,7 +153,7 @@ ModuleGeneratorSettings::supportedVersions() const
     QStringList retVal;
 
     retVal << QVersionNumber{1,7,0}.toString();
-    retVal << QVersionNumber{2,0,0}.toString() + "-dp4";
+    retVal << QVersionNumber{2,0,0}.toString() + " (DP4)";
 
     return retVal;
 }
@@ -168,35 +170,35 @@ ModuleGeneratorSettings::setModulePrefix(QString const& prefix)
     m_modulePrefix = prefix;
 }
 
-ModuleClass const&
+ModuleData const&
 ModuleGeneratorSettings::moduleClass() const {
     return m_moduleClass;
 }
 
-void ModuleGeneratorSettings::setModuleClass(const ModuleClass &module) {
+void ModuleGeneratorSettings::setModuleClass(const ModuleData &module) {
     m_moduleClass = module;
 }
 
-ClassStructs const&
+ClassDataList const&
 ModuleGeneratorSettings::selectedInterfaces() const
 {
     return m_selectedInterfaces;
 }
 
 void
-ModuleGeneratorSettings::setSelectedInterfaces(ClassStructs const& interfaces)
+ModuleGeneratorSettings::setSelectedInterfaces(ClassDataList const& interfaces)
 {
     m_selectedInterfaces = interfaces;
 }
 
-DependencyStructs const&
+DependencyDataList const&
 ModuleGeneratorSettings::selectedDependencies() const
 {
     return m_selectedDependencies;
 }
 
 void
-ModuleGeneratorSettings::setSelectedDependencies(DependencyStructs const&
+ModuleGeneratorSettings::setSelectedDependencies(DependencyDataList const&
                                                  dependencies)
 {
     m_selectedDependencies = dependencies;
@@ -228,17 +230,15 @@ ModuleGeneratorSettings::createGitFiles() const
 void
 ModuleGeneratorSettings::preLoad()
 {
-    if (m_preLoader.searchPath() != gtlabPath() ||
-            m_preLoader.prefixes().isEmpty())
+    if (m_lastPreLoadPath != gtlabPath() || m_preLoader.prefixes().isEmpty())
     {
         m_preLoader.searchForPrefixes(devToolsPath());
     }
 
-    if (m_preLoader.searchPath() != gtlabPath() ||
-        m_preLoader.dependencies().isEmpty())
+    if (m_lastPreLoadPath != gtlabPath() || m_preLoader.dependencies().isEmpty())
     {
         // load dependencies in a separate thread
-        auto function = [](ModuleGeneratorPreLoader* loader, QString path) -> int
+        auto function = [](auto* loader, auto const& path)
         {
             int status = -1;
             loader->searchForDependencies(path, &status);
@@ -248,6 +248,7 @@ ModuleGeneratorSettings::preLoad()
         m_futureDependencies = QtConcurrent::run(function,
                                                  &m_preLoader,
                                                  gtlabPath());
+        m_lastPreLoadPath = gtlabPath();
     }
 }
 
@@ -256,12 +257,12 @@ ModuleGeneratorSettings::reservedPrefixes() const {
     return m_preLoader.prefixes();
 }
 
-ClassStructs const&
+ClassDataList const&
 ModuleGeneratorSettings::availableInterfaces() const {
     return m_preLoader.interfaces();
 }
 
-DependencyStructs const&
+DependencyDataList const&
 ModuleGeneratorSettings::availableDependencies() const
 {
     return m_preLoader.dependencies();
@@ -297,19 +298,20 @@ ModuleGeneratorSettings::serializeUserData() const
     pathsObject["gtlab"]    = m_gtlabPath;
 
     QJsonObject moduleObject;
-    moduleObject["target_version"]  = m_version;
+    moduleObject["target_version"] = m_version;
+    moduleObject["use_compability_macros"] = m_useCompabilityMacros;
 
-//    QJsonObject moduleObject;
 //    moduleObject["prefix"]  = m_modulePrefix;
 //    moduleObject["ident"]  = m_moduleClass.ident;
 //    moduleObject["version"]     = m_moduleClass.version;
 //    moduleObject["description"] = m_moduleClass.description;
+//    moduleObject["class_name"] = m_moduleClass.className;
+//    moduleObject["file_name"] = m_moduleClass.fileName;
 
     QJsonObject rootObject;
     rootObject["user"]   = userObject;
     rootObject["paths"]  = pathsObject;
     rootObject["module"] = moduleObject;
-//    rootObject["lastModule"] = moduleObject;
 
     QJsonDocument document(rootObject);
 
@@ -350,7 +352,21 @@ ModuleGeneratorSettings::deserializeUserData()
     m_gtlabPath    = pathsObject["gtlab"].toString();
 
     QJsonObject moduleObject = document["module"].toObject();
-    m_version = moduleObject["target_version"].toString();
+    if (moduleObject.contains("target_version"))
+    {
+        m_version = moduleObject["target_version"].toString();
+    }
+    if (moduleObject.contains("use_compability_macros"))
+    {
+        m_useCompabilityMacros = moduleObject["use_compability_macros"].toBool();
+    }
+
+//    m_modulePrefix = moduleObject["prefix"].toString();
+//    m_moduleClass.ident = moduleObject["ident"].toString();
+//    m_moduleClass.version = moduleObject["version"].toString();
+//    m_moduleClass.description = moduleObject["description"].toString();
+//    m_moduleClass.className = moduleObject["class_name"].toString();
+//    m_moduleClass.fileName = moduleObject["file_name"].toString();
 
     LOG_INFO << "done!";
 }

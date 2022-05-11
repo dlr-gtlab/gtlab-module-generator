@@ -1,0 +1,154 @@
+{
+  "name": "GtMdiInterface",
+  "fileName": "gt_mdiinterface",
+  "displayName": "Mdi",
+  "tooltip": "Used for registering custom dock widgets, editors, viewers, object ui items etc.",
+  "functions": 
+  [
+    {
+      "name": "mdiItems",
+      "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of Mdi items",
+      "description":
+      [
+        "@brief Returns static meta objects of mdi item classes.",
+        "@return list including meta objects"
+      ],
+      "baseClass":
+      {
+        "name": "GtMdiItem",
+        "fileName": "gt_mdiitem",
+        "outputPath": "gui/items",
+        "functions-WIP":
+        [
+          {
+            "name": "allowsMultipleInstances",
+            "returnValue": "bool",
+            "const": true,
+            "tooltip": "Whether a new Mdi Item should be spawned each time its opened",
+            "description":
+            [
+              "@brief Specifies whether mdi item allows multiple instances.",
+              "@return Multiple instances indicator"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "dockWidgets",
+      "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of Dock Widgets",
+      "description":
+      [
+        "@brief Returns static meta objects of dockwidget classes.",
+        "@return list including meta objects"
+      ],
+      "baseClass":
+      {
+        "name": "GtDockWidget",
+        "fileName": "gt_dockwidget",
+        "outputPath": "gui/dock_widgets",
+        "functions":
+        [
+          {
+            "name": "getDockWidgetArea",
+            "returnValue": "Qt::DockWidgetArea",
+            "tooltip": "Recommended position in the main window",
+            "description":
+            [
+              "@brief Returns the recommended dock widget area in main windows.",
+              "@return dock widget area"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "uiItems",
+      "returnValue": "QMap<const char*, QMetaObject>",
+      "tooltip": "Map of data classes and ui items",
+      "description":
+      [
+        "@brief uiItems",
+        "@return data class names mapped to ui item objects"
+      ],
+      "baseClass":
+      {
+        "name": "GtObjectUI",
+        "fileName": "gt_objectui",
+        "outputPath": "gui/ui",
+        "functions":
+        [
+          {
+            "name": "icon",
+            "returnValue": "QIcon",
+            "tooltip": "Icon of the Object",
+            "const": true,
+            "parameters":
+            [
+              "GGtObject* obj"
+            ],
+            "description":
+            [
+              "@brief Specifies object icon.",
+              "@param Oobj Object",
+              "@return Object specific icon"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "postItems",
+      "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of post items",
+      "description":
+      [
+        "@brief postItems",
+        "@return"
+      ],
+      "baseClass":
+      {
+        "name": "GtObject",
+        "fileName": "gt_object",
+        "outputPath": "gui/post"
+      }
+    },
+    {
+      "name": "postPlots",
+      "returnValue": "QList<QMetaObject>",
+      "tooltip": "List of post plots",
+      "description":
+      [
+        "@brief postPlots",
+        "@return"
+      ],
+      "baseClass":
+      {
+        "name": "GtPostTemplateItem",
+        "fileName": "gt_posttemplateitem",
+        "outputPath": "gui/post",
+        "functions":
+        [
+          {
+            "name": "createUI",
+            "returnValue": "GtAbstractPostWidget*",
+            "parameters":
+            [
+              "GtPostTemplateItem* dm",
+              "QWidget* parent"
+            ],
+            "description":
+            [
+              "@brief createUI",
+              "@param dm",
+              "@param parent",
+              "@return"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

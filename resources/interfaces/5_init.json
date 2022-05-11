@@ -1,7 +1,8 @@
 {
   "name": "GtInitModuleInterface",
   "fileName": "gt_initmoduleinterface",
-  "shortName": "Init",
+  "displayName": "Init",
+  "tooltip": "For implementing a dedicated startup routine",
   "functions": 
   [
     {
@@ -9,9 +10,7 @@
       "returnValue": "void",
       "description":
       [
-        "/**",
-        " * @brief Initializes module. Called on application startup.",
-        " */"
+        "@brief Initializes module. Called on application startup."
       ]
     }
   ]

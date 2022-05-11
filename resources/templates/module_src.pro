@@ -39,8 +39,7 @@ CONFIG(debug, debug|release) {
 
 DESTDIR = $${BUILD_DEST}
 
-INCLUDEPATH += . \
-    $$PRO_INCLUDEPATH$$
+INCLUDEPATH += . $$PRO_INCLUDEPATH$$
 
 HEADERS += \
     $$FILE_NAME$$.h $$PRO_HEADERPATH$$
@@ -59,7 +58,7 @@ CONFIG(debug, debug|release){
         LIBS += -lGTlabCore-d -lGTlabGui-d -lGTlabDataProcessor-d
     } else {
         LIBS += -lGTlabCalculators-d -lGTlabCore-d
-        LIBS += -lGTlabMdi-d -lGTlabDatamodel-d
+        LIBS += -lGTlabMdi-d -lGTlabDatamodel-d -lGTlabNetwork-d
     }
     # MODULES$$PRO_LIBS_D$$
 } else {
@@ -71,7 +70,7 @@ CONFIG(debug, debug|release){
         LIBS += -lGTlabCore -lGTlabGui -lGTlabDataProcessor
     } else {
         LIBS += -lGTlabCalculators -lGTlabCore
-        LIBS += -lGTlabMdi -lGTlabDatamodel
+        LIBS += -lGTlabMdi -lGTlabDatamodel -lGTlabNetwork
     }
     # MODULES$$PRO_LIBS$$
 }

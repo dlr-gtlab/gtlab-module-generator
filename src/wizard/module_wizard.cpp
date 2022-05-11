@@ -69,7 +69,7 @@ ModuleWizard::nextId() const
     switch (currentId())
     {
     case ModuleWizard::INTERFACE_SELECTION_PAGE:
-        if (m_generator->settings()->selectedInterfaces().size() > 0)
+        if (!m_generator->settings()->selectedInterfaces().isEmpty())
         {
             return QWizard::nextId();
         }

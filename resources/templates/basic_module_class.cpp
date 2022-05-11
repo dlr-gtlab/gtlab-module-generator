@@ -26,22 +26,5 @@ QString
 $$CLASS_NAME$$::description() const
 {
     return "$$MODULE_DESCRIPTION$$";
-}$$FUNCTION$$
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
+$$FUNCTION$$

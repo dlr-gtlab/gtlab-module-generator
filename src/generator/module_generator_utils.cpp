@@ -7,7 +7,7 @@
 void
 utils::replaceIdentifier(QString& inputString, const IdentifierPairs& pairs)
 {
-    for (auto pair : pairs)
+    for (auto const& pair : pairs)
     {
         inputString.replace(pair.identifier, pair.value);
     }
@@ -24,9 +24,9 @@ utils::readFile(const QString& filePath)
 {
     QFile file(filePath);
 
-    if(file.exists() == false)
+    if(!file.exists())
     {
-        return QString();
+        return {};
     }
 
     file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -46,9 +46,7 @@ utils::writeStringToFile(const QString& fileContent,
                          const QDir& targetDir,
                          const QString& fileName)
 {
-    QString filePath = targetDir.absoluteFilePath(fileName);
-
-    QFile file(filePath);
+    QFile file{targetDir.absoluteFilePath(fileName)};
 
     file.open(QIODevice::ReadWrite | QIODevice::Text);
 
@@ -66,8 +64,8 @@ utils::makeInclude(const QString& inlcude,
 {
     if (isLib)
     {
-        return QString("#include <"+ inlcude + ">\n" + identifier);
+        return {"#include <"+ inlcude + ">\n" + identifier};
     }
 
-    return QString("#include \""+ inlcude + ".h\"\n" + identifier);
+    return {"#include \""+ inlcude + ".h\"\n" + identifier};
 }

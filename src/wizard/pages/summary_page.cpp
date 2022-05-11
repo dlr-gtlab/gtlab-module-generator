@@ -102,14 +102,19 @@ SummaryPage::validatePage()
         return true;
     }
 
-    LOG_INDENT("validated!");
+    // for nicer std out
+    {
+        LOG_INDENT("validated!");
 
-    m_isComplete = false;
+        m_isComplete = false;
 
-    settings()->setCreateGitFiles(m_generateGitFilesCheckBox->isChecked());
-    m_generateGitFilesCheckBox->setEnabled(false);
+        settings()->setCreateGitFiles(m_generateGitFilesCheckBox->isChecked());
+        m_generateGitFilesCheckBox->setEnabled(false);
 
-    settings()->serializeUserData();
+        settings()->serializeUserData();
+
+        LOG_INFO << "done!";
+    }
 
     printSummary();
 
@@ -154,9 +159,9 @@ SummaryPage::createSummary()
 
     content << "";
     content << "Output directory:\t" + outputPath;
-    content << "";
     content << "GTlab directory:\t" + settings()->gtlabPath();
     content << "DevTools directory:\t" + settings()->devToolsPath();
+    content << "GTlab target version:\t" + settings()->gtlabVersion();
 
     content << "";
     content << selectedInterfaces();
@@ -195,18 +200,18 @@ SummaryPage::selectedDependencies()
 {
     QStringList content;
 
-    for (auto dependency : settings()->selectedDependencies())
+    for (auto const& dependency : settings()->selectedDependencies())
     {
         content << QString(dependency.name + " (" + dependency.version + ")");
     }
 
     if (content.isEmpty())
     {
-        content << "";
+        content << QString{};
     }
 
     content.first().prepend("selected dependencies:\t");
-    content << "";
+    content << QString{};
 
     return content.join("\n\t\t");
 }
@@ -224,6 +229,7 @@ SummaryPage::filesToGenerate()
     content << "settings.pri";
     content << "local_settings.pri";
     content << "features" + QString(QDir::separator()) + "local_settings.pri";
+    content << baseFolder + "src.pro";
     content << baseFolder + moduleClass.fileName + ".h";
     content << baseFolder + moduleClass.fileName + ".cpp";
     content << baseFolder + moduleClass.fileName + ".json";
@@ -236,15 +242,15 @@ SummaryPage::filesToGenerate()
         {
             auto& baseClass  = function.baseClass;
 
-            for (auto derivedClass : function.implementation.derivedClasses)
+            for (auto const& derivedClass : function.implementation.derivedClasses)
             {
                 if (derivedClass.className.isEmpty()) continue;
 
                 QString filePath (baseFolder + baseClass.outputPath +
                                   QDir::separator() + derivedClass.fileName);
 
-                content << QString(filePath + ".h");
-                content << QString(filePath + ".cpp");
+                content << QDir::toNativeSeparators(filePath + ".h");
+                content << QDir::toNativeSeparators(filePath + ".cpp");
             }
         }
     }
@@ -262,11 +268,10 @@ SummaryPage::filesToGenerate()
 void
 SummaryPage::printSummary()
 {
-    QString debugString(m_summaryTextEdit->toPlainText());
-    QString line(QStringLiteral("-").repeated(30));
+    QString line = QStringLiteral("-").repeated(30);
 
     qDebug() << line;
-    qDebug() << debugString.toStdString().c_str();
+    qDebug().noquote() << m_summaryTextEdit->toPlainText();
     qDebug() << line;
 }
 

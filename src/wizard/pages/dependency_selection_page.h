@@ -28,7 +28,7 @@ public:
     DependencySelectionPage(ModuleGeneratorSettings* settings,
                             QWidget* parent = nullptr);
 
-    DependencyStructs selectedDependencies() const;
+    DependencyDataList selectedDependencies() const;
 
 protected:
 

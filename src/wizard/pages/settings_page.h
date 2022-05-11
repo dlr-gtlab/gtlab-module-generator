@@ -4,15 +4,9 @@
 
 #include "abstract_wizardpage.h"
 
-class QLabel;
 class QLineEdit;
-class QPushButton;
-class QGridLayout;
-class QFileSystemModel;
-class QString;
-class QCompleter;
 class QComboBox;
-
+class QCheckBox;
 /**
  * @brief to select output path, gtlab path and dev tools path
  */
@@ -33,6 +27,8 @@ class SettingsPage : public AbstractWizardPage
     static const QString S_GTLAB_TOOLTIP;
     static const QString S_VERSION_LABEL;
     static const QString S_VERSION_TOOLTIP;
+    static const QString S_USE_MACRO_LABEL;
+    static const QString S_USE_MACRO_TOOLTIP;
     static const QString S_DIR_BTN_TOOLTIP;
     static const QString S_DIR_BTN_TEXT;
 
@@ -64,6 +60,8 @@ private:
     QLineEdit* m_devToolsDirEdit{};
 
     QComboBox* m_versionBox{};
+
+    QCheckBox* m_useMacroBox{};
 
     static void updateDirEdit(QLineEdit* edit, QString& path);
 

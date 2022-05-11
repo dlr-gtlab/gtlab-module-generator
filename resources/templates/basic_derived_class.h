@@ -4,6 +4,9 @@ $$SIGNATURE$$
 #define $$HEADER_NAME$$_H
 
 #include "$$BASE_FILE_NAME$$.h"
+$$INCLUDE_FILE$$
+$$ADD_INCLUDE_FILE$$
+$$QT_INCLUDE_FILE$$
 
 $$CLASS_FORWARD_DECL$$
 /**

@@ -1,8 +1,5 @@
 #include "module_wizard.h"
 
-#include "module_generator_logger.h"
-
-
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -11,7 +8,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-    QApplication a(argc, argv);
+    QApplication a{argc, argv};
 
     ModuleWizard wizard;
 

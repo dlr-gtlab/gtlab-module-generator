@@ -4,7 +4,7 @@
 
 #include "abstract_wizardpage.h"
 
-struct ClassStruct;
+struct ClassData;
 class QLabel;
 class QGridLayout;
 class QTabWidget;
@@ -35,15 +35,15 @@ private:
 
     QTabWidget* m_interfaceTabBar{};
 
-    void intInterfaces();
+    void initInterfaces();
 
-    void clearInterfaceTabs();
+//    void clearInterfaceTabs();
 
     void setInterfaceImplementation();
 
     bool checkInterfaceData();
 
-    bool checkClassImplementation(ClassStruct const& base,
+    bool checkClassImplementation(ClassData const& base,
                                   QStringList& classNames);
 
     bool checkDuplicateClassNames(QStringList const& classNames);

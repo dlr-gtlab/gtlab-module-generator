@@ -1,9 +1,8 @@
 #ifndef MODULEGENERATORLOGGER_H
 #define MODULEGENERATORLOGGER_H
 
-#include <QDebug>
+#include <QString>
 
-class QString;
 class ModuleGeneratorLogger
 {
 public:
@@ -37,6 +36,8 @@ private:
 };
 
 #define LOG_INDENT ModuleGeneratorLogger __logger__ = ModuleGeneratorLogger
+#define LOG_INDENT_WARN(MSG) ModuleGeneratorLogger __logger__ = ModuleGeneratorLogger(MSG, ModuleGeneratorLogger::Type::Warning)
+#define LOG_INDENT_ERR(MSG) ModuleGeneratorLogger __logger__ = ModuleGeneratorLogger(MSG, ModuleGeneratorLogger::Type::Error)
 #define LOG_INFO __logger__
 #define LOG_WARN __logger__.setType(ModuleGeneratorLogger::Type::Warning); __logger__
 #define LOG_ERR __logger__.setType(ModuleGeneratorLogger::Type::Error); __logger__

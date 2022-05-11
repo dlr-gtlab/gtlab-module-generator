@@ -31,7 +31,6 @@ class ModuleSpecificationsPage : public AbstractWizardPage
     static const QString S_MODULE_DESCRIPTION_LABEL;
     static const QString S_AUTO_COMPLETE_LABEL;
     static const QString S_AUTO_GENERATED_TOOLTIP;
-    static const QString S_AUTO_GENERATED_ALT_TOOLTIP;
 
 public:
 
@@ -70,11 +69,14 @@ private:
 
     QCheckBox* m_autoEditCheckBox{};
 
+    bool m_autoEditFileName{false};
+
     /// prefix validator
     QRegularExpressionValidator* m_prefixValidator{};
     /// module name validator
-    QRegularExpressionValidator* m_nameValidator{};
-
+    QRegularExpressionValidator* m_indentValidator{};
+    QRegularExpressionValidator* m_classNameValidator{};
+    QRegularExpressionValidator* m_fileNameValidator{};
     QRegularExpressionValidator* m_versionValidator{};
 
     void autoComplete();
@@ -84,6 +86,10 @@ private slots:
     void onEditedPrefix();
 
     void onEditedModuleName(QString name);
+
+    void onEditedClassName(QString name);
+
+    void onEditedFileName();
 
     void onEditedVersion(QString content);
 

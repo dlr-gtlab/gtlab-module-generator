@@ -13,7 +13,7 @@ namespace utils
 
     QString readFile(const QString& filePath);
 
-    void writeStringToFile(const QString& textStr,
+    void writeStringToFile(const QString& fileContent,
                            const QDir& targetDir,
                            const QString& fileName);
 

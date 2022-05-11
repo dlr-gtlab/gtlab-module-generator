@@ -1,7 +1,8 @@
 {
   "name": "GtDatamodelInterface",
   "fileName": "gt_datamodelinterface",
-  "shortName": "Datamodel",
+  "displayName": "Datamodel",
+  "tooltip": "Allows the registration of custom data classes\nfor extending the project structure.",
   "functions": 
   [
     {
@@ -10,10 +11,8 @@
       "tooltip": "Package class",
       "description":
       [
-        "/**",
-        " * @brief Returns static meta objects of datamodel package.",
-        " * @return package meta object",
-        " */"
+        "@brief Returns static meta objects of datamodel package.",
+        "@return package meta object"
       ],
       "baseClass":
       {
@@ -28,10 +27,8 @@
       "tooltip": "List of data classes",
       "description":
       [
-        "/**",
-        " * @brief Returns static meta objects of datamodel classes.",
-        " * @return list including meta objects",
-        " */"
+        "@brief Returns static meta objects of datamodel classes.",
+        "@return list including meta objects"
       ],
       "baseClass":
       {
@@ -46,13 +43,11 @@
       "tooltip": "is the module standalone and has its own data model structure?",
       "description":
       [
-        "/**",
-        " * @brief Returns true if module is a standalone module with own",
-        " * data model structure. Otherwise module only extends the overall",
-        " * application with additional functionalities like classes, calculators",
-        " * or graphical user interfaces.",
-        " * @return Standalone indicator.",
-        " */"
+        "@brief Returns true if module is a standalone module with own data",
+        "model structure. Otherwise module only extends the overall application",
+        "with additional functionalities like classes, calculators or ",
+        "graphical user interfaces.",
+        "@return Standalone indicator."
       ]
     }
   ]
