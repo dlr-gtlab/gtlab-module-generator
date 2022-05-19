@@ -1,0 +1,45 @@
+{
+  "name": "GtAbstractImporter",
+  "fileName": "gt_abstractimporter",
+  "outputPath": "importer",
+  "functions": 
+  [
+    {
+      "name": "targets",
+      "returnValue": "QStringList",
+      "const": true,
+      "description":
+      [
+        "@brief Returns list of allowed target class names for this importer.",
+        "@return List of allowed targets."
+      ]
+    },
+    {
+      "name": "icon",
+      "returnValue": "QIcon",
+      "const": true,
+      "tooltip": "Icon of importer",
+      "description":
+      [
+        "@brief Returns icon of importer.",
+        "@return Icon of importer."
+      ]
+    },
+    {
+      "name": "import",
+      "returnValue": "bool",
+      "parameters":
+      [
+        "GtObject* data, QFile& file"
+      ],
+      "tooltip": "Should the import succeed by default?",
+      "description":
+      [
+        "@brief Main import function.",
+        "@param data Pointer to datamodel member.",
+        "@param file Reference to file selected by user.",
+        "@return success"
+      ]
+    }
+  ]
+}

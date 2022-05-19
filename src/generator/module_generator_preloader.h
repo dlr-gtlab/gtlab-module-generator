@@ -52,6 +52,7 @@ private:
      * @return class struct
      */
     ClassData searchForClass(QJsonObject const& classJObject);
+    ClassData searchForClass(QString const& fileName);
 
     Constructors searchForConstructors(QJsonArray const& constructorJArray);
 

@@ -14,12 +14,7 @@
         "@brief Returns static meta objects of datamodel package.",
         "@return package meta object"
       ],
-      "baseClass":
-      {
-        "name": "GtPackage",
-        "fileName": "gt_package",
-        "outputPath": "data"
-      }
+      "baseClass": "gt_package"
     },
     {
       "name": "data",
@@ -30,12 +25,7 @@
         "@brief Returns static meta objects of datamodel classes.",
         "@return list including meta objects"
       ],
-      "baseClass":
-      {
-        "name": "GtObject",
-        "fileName": "gt_object",
-        "outputPath": "data"
-      }
+      "baseClass": "gt_object"
     },
     {
       "name": "standAlone",

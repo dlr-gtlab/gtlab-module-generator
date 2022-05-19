@@ -1,0 +1,48 @@
+{
+  "name": "GtAbstractPropertyItem",
+  "fileName": "gt_abstractpropertyitem",
+  "outputPath": "gui/property_items",
+  "functions":
+  [
+    {
+      "name": "data",
+      "returnValue": "QVariant",
+      "parameters":
+      [
+        "int column, int role"
+      ],
+      "const": true,
+      "description":
+      [
+        "@brief data",
+        "@param column",
+        "@param role",
+        "@return variant"
+      ],
+      "includes":
+      [
+        "QVariant"
+      ]
+    },
+    {
+      "name": "setData",
+      "returnValue": "bool",
+      "parameters":
+      [
+        "int column",
+        "const QVariant& value",
+        "GtObject* obj",
+        "int role = Qt::EditRole"
+      ],
+      "description":
+      [
+        "@brief setData",
+        "@param column",
+        "@param value",
+        "@param obj",
+        "@param role",
+        "@return success"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "GtAbstractAccessDataConnection",
+  "fileName": "gt_abstractaccessdataconnection",
+  "outputPath": "network",
+  "functions":
+  [
+    {
+      "name": "testConnection",
+      "returnValue": "bool",
+      "protected": true,
+      "parameters":
+      [
+        "const GtAccessData& accessData"
+      ],
+      "tooltip": "Should the connection test succeed by default?",
+      "description":
+      [
+        "@brief test connection method.",
+        "@param accessData Given access data.",
+        "@return Returns true if connection test was successful.",
+        "Otherwise false is returned."
+      ]
+    }
+  ]
+}

@@ -48,9 +48,6 @@ ModuleGeneratorPreLoader::searchForInterfaces()
 
     clearInterfaceStructs();
 
-    QDirIterator iterator(":/interfaces/", QStringList{"*.json"},
-                          QDir::Files, QDirIterator::NoIteratorFlags);
-
     QDir tmpDir{":/interfaces/"};
 
     auto entries = tmpDir.entryList(QStringList{"*.json"},
@@ -58,22 +55,10 @@ ModuleGeneratorPreLoader::searchForInterfaces()
 
     for (auto& entry : entries)
     {
-        QString file = tmpDir.absoluteFilePath(entry);
-
         LOG_INDENT(entry);
 
-        auto document = QJsonDocument::fromJson(utils::readFile(file).toUtf8());
-
-        if (document.isNull())
-        {
-            LOG_ERR << "null json document!";
-            continue;
-        }
-
-        auto interfaceJObject = document.object();
-
         /// interface class
-        auto interface = searchForClass(interfaceJObject);
+        auto interface = searchForClass(entry);
 
         if (!interface.isValid()) continue;
 
@@ -115,6 +100,29 @@ ModuleGeneratorPreLoader::searchForClass(QJsonObject const& classJObject)
     LOG_INFO << "done!";
 
     return classStruct;
+}
+
+ClassData
+ModuleGeneratorPreLoader::searchForClass(QString const& fileName)
+{
+    QDir tmpDir{":/interfaces"};
+
+    if (!tmpDir.exists(fileName))
+    {
+        return {};
+    }
+
+    auto document = QJsonDocument::fromJson(utils::readFile(
+                        tmpDir.absoluteFilePath(fileName)).toUtf8());
+
+    if (document.isNull())
+    {
+        return {};
+    }
+
+    auto interfaceJObject = document.object();
+
+    return searchForClass(interfaceJObject);
 }
 
 Constructors
@@ -185,8 +193,8 @@ ModuleGeneratorPreLoader::searchForFunctions(QJsonArray const& functionsJArray)
         QJsonArray forwardDecls     = functionJObject["forwardDecl"].toArray();
         QJsonArray descriptionArray = functionJObject["description"].toArray();
 
-        auto baseClassJObject   = functionJObject["baseClass"].toObject();
-        auto linkedClassJObject = functionJObject["linkedClass"].toObject();
+        auto baseClassName = functionJObject["baseClass"].toString();
+        auto linkedClassName = functionJObject["linkedClass"].toString();
 
         LOG_INFO << "function: " << returnValue << " " << name << ENDL;
 
@@ -212,13 +220,18 @@ ModuleGeneratorPreLoader::searchForFunctions(QJsonArray const& functionsJArray)
         function.parameters  = parseStringJArray(parameter);
         function.description = parseDescription(descriptionArray);
         function.tooltip     = std::move(tooltip);
-        function.baseClass   = searchForClass(baseClassJObject);
-        function.linkedClass = searchForClass(linkedClassJObject);
         function.implementation = std::move(implementation);
 
-        if (function.isProtected)
+        if (!baseClassName.isEmpty())
         {
-            LOG_INFO << "PROTECTED";
+            baseClassName = "class_definitions/" + baseClassName + ".json";
+            function.baseClass   = searchForClass(baseClassName);
+        }
+
+        if (!linkedClassName.isEmpty())
+        {
+            linkedClassName = "class_definitions/" + linkedClassName + ".json";
+            function.linkedClass   = searchForClass(linkedClassName);
         }
 
         functions.append(std::move(function));

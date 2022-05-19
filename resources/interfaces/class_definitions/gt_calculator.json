@@ -1,0 +1,18 @@
+{
+  "name": "GtCalculator",
+  "fileName": "gt_calculator",
+  "outputPath": "process/calculators",
+  "functions": 
+  [
+    {
+      "name": "run",
+      "returnValue": "bool",
+      "tooltip": "Should the process succeed by default?",
+      "description":
+      [
+        "@brief Main run method of the calculator.",
+        "@return Whether run process was successful or not."
+      ]
+    }
+  ]
+}

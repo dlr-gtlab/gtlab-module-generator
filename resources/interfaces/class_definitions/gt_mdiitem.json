@@ -1,0 +1,19 @@
+{
+  "name": "GtMdiItem",
+  "fileName": "gt_mdiitem",
+  "outputPath": "gui/items",
+  "functions-WIP":
+  [
+    {
+      "name": "allowsMultipleInstances",
+      "returnValue": "bool",
+      "const": true,
+      "tooltip": "Whether a new Mdi Item should be spawned each time its opened",
+      "description":
+      [
+        "@brief Specifies whether mdi item allows multiple instances.",
+        "@return Multiple instances indicator"
+      ]
+    }
+  ]
+}

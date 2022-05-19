@@ -1,0 +1,22 @@
+{
+  "name": "GtAbstractCalculatorExecutor",
+  "fileName": "gt_abstractcalculatorexecutor",
+  "outputPath": "process/exec",
+  "functions":
+  [
+    {
+      "name": "exec",
+      "returnValue": "bool",
+      "parameters":
+      [
+        "GtCalculator* calculator"
+      ],
+      "description":
+      [
+        "@brief exec",
+        "@param calculator",
+        "@return success"
+      ]
+    }
+  ]
+}

@@ -26,5 +26,21 @@
         <file>templates/CHANGELOG.md</file>
         <file>templates/README.md</file>
         <file>templates/module_src.pro</file>
+        <file>interfaces/class_definitions/gt_abstractaccessdataconnection.json</file>
+        <file>interfaces/class_definitions/gt_abstractcalculatorexecutor.json</file>
+        <file>interfaces/class_definitions/gt_abstractcollectionsettings.json</file>
+        <file>interfaces/class_definitions/gt_abstractexporter.json</file>
+        <file>interfaces/class_definitions/gt_abstractimporter.json</file>
+        <file>interfaces/class_definitions/gt_abstractproperty.json</file>
+        <file>interfaces/class_definitions/gt_abstractpropertyitem.json</file>
+        <file>interfaces/class_definitions/gt_calculator.json</file>
+        <file>interfaces/class_definitions/gt_dockwidget.json</file>
+        <file>interfaces/class_definitions/gt_mdiitem.json</file>
+        <file>interfaces/class_definitions/gt_object.json</file>
+        <file>interfaces/class_definitions/gt_objectui.json</file>
+        <file>interfaces/class_definitions/gt_package.json</file>
+        <file>interfaces/class_definitions/gt_posttemplateitem.json</file>
+        <file>interfaces/class_definitions/gt_property.json</file>
+        <file>interfaces/class_definitions/gt_task.json</file>
     </qresource>
 </RCC>

@@ -13,8 +13,6 @@
 #include <QCheckBox>
 #include <QPushButton>
 
-const static int I_FUNCTION_WIDGET_HEIGHT = 100;
-
 //const static int I_MINIMAL_WIDTH = 320;
 
 const QString

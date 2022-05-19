@@ -1,0 +1,90 @@
+{
+  "name": "GtAbstractCollectionSettings",
+  "fileName": "gt_abstractcollectionsettings",
+  "outputPath": "collections",
+  "includes":
+  [
+    "gt_object"
+  ],
+  "functions": 
+  [
+    {
+      "name": "localCollectionWidget",
+      "returnValue": "QWidget*",
+      "parameters":
+      [
+        "QWidget* parent"
+      ],
+      "description":
+      [
+        "@brief localCollectionWidget",
+        "@param parent",
+        "@return widget"
+      ]
+    },
+    {
+      "name": "setLocalCollectionData",
+      "returnValue": "void",
+      "parameters":
+      [
+        "QWidget* widget",
+        "QList<GtCollectionItem> items"
+      ],
+      "description":
+      [
+        "@brief setLocalCollectionData",
+        "@param widget editor",
+        "@return items"
+      ],
+      "includes":
+      [
+        "gt_collectionitem"
+      ],
+      "forwardDecl":
+      [
+        "GtCollectionItem"
+      ]
+    },
+    {
+      "name": "browserWidget",
+      "returnValue": "GtAbstractBrowserWidget*",
+      "parameters":
+      [
+        "QWidget* parent"
+      ],
+      "description":
+      [
+        "@brief browseCollectionWidget",
+        "@param parent",
+        "@return browser widget"
+      ]
+    },
+    {
+      "name": "setBrowserWidgetData",
+      "returnValue": "void",
+      "parameters":
+      [
+        "GtAbstractBrowserWidget* widget",
+        "QList<GtCollectionNetworkItem> GT_2_0_CONSTREF installedItems",
+        "QList<GtCollectionNetworkItem> GT_2_0_CONSTREF availableItems",
+        "QList<GtCollectionNetworkItem> GT_2_0_CONSTREF updataAvailableItems"
+      ],
+      "description":
+      [
+        "@brief setBrowserWidgetData",
+        "@param widget",
+        "@param installedItems",
+        "@param availableItems",
+        "@param updataAvailableItems"
+      ],
+      "includes":
+      [
+        "gt_collectionnetworkitem"
+      ],
+      "forwardDecl":
+      [
+        "GtCollectionNetworkItem"
+      ]
+    }
+  ]
+}

@@ -101,7 +101,6 @@ ClassSpecificationItem::setupSpecificationsWidget(ClassSpecificationWidget& widg
     widget.setWindowFlag(Qt::Dialog);
     widget.setWindowModality(Qt::ApplicationModal);
     widget.setMinimumWidth(300);
-    widget.setMinimumHeight(150);
 }
 
 void

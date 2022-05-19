@@ -1,0 +1,24 @@
+{
+  "name": "GtPostTemplateItem",
+  "fileName": "gt_posttemplateitem",
+  "outputPath": "gui/post",
+  "functions":
+  [
+    {
+      "name": "createUI",
+      "returnValue": "GtAbstractPostWidget*",
+      "parameters":
+      [
+        "GtPostTemplateItem* dm",
+        "QWidget* parent"
+      ],
+      "description":
+      [
+        "@brief createUI",
+        "@param dm",
+        "@param parent",
+        "@return"
+      ]
+    }
+  ]
+}

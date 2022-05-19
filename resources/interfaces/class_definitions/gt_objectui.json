@@ -1,0 +1,24 @@
+{
+  "name": "GtObjectUI",
+  "fileName": "gt_objectui",
+  "outputPath": "gui/ui",
+  "functions":
+  [
+    {
+      "name": "icon",
+      "returnValue": "QIcon",
+      "tooltip": "Icon of the Object",
+      "const": true,
+      "parameters":
+      [
+        "GtObject* obj"
+      ],
+      "description":
+      [
+        "@brief Specifies object icon.",
+        "@param Oobj Object",
+        "@return Object specific icon"
+      ]
+    }
+  ]
+}

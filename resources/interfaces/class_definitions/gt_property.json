@@ -1,0 +1,80 @@
+{
+  "name": "GtProperty<QString>",
+  "fileName": "gt_property",
+  "outputPath": "data/property",
+  "constructors":
+  [
+    {
+      "parameters":
+      [
+        "const QString& ident",
+        "const QString& name"
+      ],
+      "initList":
+      [
+        "$$CLASS_NAME$${ident, name, {}}"
+      ]
+    },
+    {
+      "parameters":
+      [
+        "const QString& ident",
+        "const QString& name",
+        "const QString& brief",
+        "const QString& value = {}"
+      ],
+      "source":
+      [
+        "setObjectName(name)",
+        "",
+        "m_id = ident",
+        "m_brief = brief",
+        "m_unitCategory = GtUnit::Category::None",
+        "m_value = value",
+        "m_initValue = value"
+      ]
+    }
+  ],
+  "functions":
+  [
+    {
+      "name": "valueToVariant",
+      "returnValue": "QVariant",
+      "parameters":
+      [
+        "const QString& unit",
+        "bool* success = {}"
+      ],
+      "const": true,
+      "description":
+      [
+        "@brief valueToVariant",
+        "@param unit",
+        "@param success",
+        "@return variant"
+      ],
+      "includes":
+      [
+        "QVariant"
+      ]
+    },
+    {
+      "name": "setValueFromVariant",
+      "returnValue": "bool",
+      "parameters":
+      [
+        "const QVariant& val",
+        "const QString& unit",
+        "bool* success = {}"
+      ],
+      "description":
+      [
+        "@brief setValueFromVariant",
+        "@param val",
+        "@param unit",
+        "@param success",
+        "@return success"
+      ]
+    }
+  ]
+}

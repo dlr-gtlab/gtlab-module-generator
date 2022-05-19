@@ -1,0 +1,18 @@
+{
+  "name": "GtDockWidget",
+  "fileName": "gt_dockwidget",
+  "outputPath": "gui/dock_widgets",
+  "functions":
+  [
+    {
+      "name": "getDockWidgetArea",
+      "returnValue": "Qt::DockWidgetArea",
+      "tooltip": "Recommended position in the main window",
+      "description":
+      [
+        "@brief Returns the recommended dock widget area in main windows.",
+        "@return dock widget area"
+      ]
+    }
+  ]
+}

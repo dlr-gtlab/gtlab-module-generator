@@ -34,29 +34,7 @@
         "@brief Returns meta object of executor.",
         "@return Meta object of executor."
       ],
-      "baseClass":
-      {
-        "name": "GtAbstractCalculatorExecutor",
-        "fileName": "gt_abstractcalculatorexecutor",
-        "outputPath": "process/exec",
-        "functions":
-        [
-          {
-            "name": "exec",
-            "returnValue": "bool",
-            "parameters":
-            [
-              "GtCalculator* calculator"
-            ],
-            "description":
-            [
-              "@brief exec",
-              "@param calculator",
-              "@return success"
-            ]
-          }
-        ]
-      }
+      "baseClass": "gt_abstractcalculatorexecutor"
     },
     {
       "name": "executorSettings",
@@ -67,54 +45,7 @@
         "@brief Returns list of executor settings.",
         "@return Executor settings."
       ],
-      "baseClass":
-      {
-        "name": "GtAbstractProperty",
-        "fileName": "gt_abstractproperty",
-        "outputPath": "process/exec",
-        "functions":
-        [
-          {
-            "name": "valueToVariant",
-            "returnValue": "QVariant",
-            "parameters":
-            [
-              "const QString& unit",
-              "bool* success = {}"
-            ],
-            "const": true,
-            "description":
-            [
-              "@brief valueToVariant",
-              "@param unit",
-              "@param success",
-              "@return variant"
-            ],
-            "includes":
-            [
-              "QVariant"
-            ]
-          },
-          {
-            "name": "setValueFromVariant",
-            "returnValue": "bool",
-            "parameters":
-            [
-              "const QVariant& val",
-              "const QString& unit",
-              "bool* success = {}"
-            ],
-            "description":
-            [
-              "@brief setValueFromVariant",
-              "@param val",
-              "@param unit",
-              "@param success",
-              "@return success"
-            ]
-          }
-        ]
-      }
+      "baseClass": "gt_abstractproperty"
     }
   ]
 }

@@ -1,0 +1,47 @@
+{
+  "name": "GtAbstractProperty",
+  "fileName": "gt_abstractproperty",
+  "outputPath": "process/exec",
+  "functions":
+  [
+    {
+      "name": "valueToVariant",
+      "returnValue": "QVariant",
+      "parameters":
+      [
+        "const QString& unit",
+        "bool* success = {}"
+      ],
+      "const": true,
+      "description":
+      [
+        "@brief valueToVariant",
+        "@param unit",
+        "@param success",
+        "@return variant"
+      ],
+      "includes":
+      [
+        "QVariant"
+      ]
+    },
+    {
+      "name": "setValueFromVariant",
+      "returnValue": "bool",
+      "parameters":
+      [
+        "const QVariant& val",
+        "const QString& unit",
+        "bool* success = {}"
+      ],
+      "description":
+      [
+        "@brief setValueFromVariant",
+        "@param val",
+        "@param unit",
+        "@param success",
+        "@return success"
+      ]
+    }
+  ]
+}

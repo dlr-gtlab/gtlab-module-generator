@@ -1,0 +1,56 @@
+{
+  "name": "GtAbstractExporter",
+  "fileName": "gt_abstractexporter",
+  "outputPath": "exporter",
+  "functions":
+  [
+    {
+      "name": "targets",
+      "returnValue": "QStringList",
+      "const": true,
+      "description":
+      [
+        "@brief Returns list of allowed target class names for this exporter.",
+        "@return List of allowed targets."
+      ]
+    },
+    {
+      "name": "icon",
+      "returnValue": "QIcon",
+      "const": true,
+      "tooltip": "Icon of the exporter",
+      "description":
+      [
+        "@brief Returns icon of exporter.",
+        "@return Icon of exporter."
+      ]
+    },
+    {
+      "name": "extension",
+      "returnValue": "QString",
+      "const": true,
+      "tooltip": "File extensions (e.g.: *.txt, *.csv, ...)",
+      "description":
+      [
+        "@brief Returns file extensions of exporter.",
+        "@return File extensions of exporter."
+      ]
+    },
+    {
+      "name": "doExport",
+      "returnValue": "bool",
+      "parameters":
+      [
+        "GtObject* data, QFile& file"
+      ],
+      "tooltip": "Should the export succeed by default?",
+      "description":
+      [
+        "@brief Main export function.",
+        "@param data Pointer to datamodel member.",
+        "@param file Reference to file selected by user.",
+        "@return success"
+      ]
+    }
+  ]
+}

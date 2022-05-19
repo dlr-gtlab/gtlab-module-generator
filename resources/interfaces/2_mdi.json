@@ -14,26 +14,7 @@
         "@brief Returns static meta objects of mdi item classes.",
         "@return list including meta objects"
       ],
-      "baseClass":
-      {
-        "name": "GtMdiItem",
-        "fileName": "gt_mdiitem",
-        "outputPath": "gui/items",
-        "functions-WIP":
-        [
-          {
-            "name": "allowsMultipleInstances",
-            "returnValue": "bool",
-            "const": true,
-            "tooltip": "Whether a new Mdi Item should be spawned each time its opened",
-            "description":
-            [
-              "@brief Specifies whether mdi item allows multiple instances.",
-              "@return Multiple instances indicator"
-            ]
-          }
-        ]
-      }
+      "baseClass": "gt_mdiitem"
     },
     {
       "name": "dockWidgets",
@@ -44,25 +25,7 @@
         "@brief Returns static meta objects of dockwidget classes.",
         "@return list including meta objects"
       ],
-      "baseClass":
-      {
-        "name": "GtDockWidget",
-        "fileName": "gt_dockwidget",
-        "outputPath": "gui/dock_widgets",
-        "functions":
-        [
-          {
-            "name": "getDockWidgetArea",
-            "returnValue": "Qt::DockWidgetArea",
-            "tooltip": "Recommended position in the main window",
-            "description":
-            [
-              "@brief Returns the recommended dock widget area in main windows.",
-              "@return dock widget area"
-            ]
-          }
-        ]
-      }
+      "baseClass": "gt_dockwidget"
     },
     {
       "name": "uiItems",
@@ -73,31 +36,7 @@
         "@brief uiItems",
         "@return data class names mapped to ui item objects"
       ],
-      "baseClass":
-      {
-        "name": "GtObjectUI",
-        "fileName": "gt_objectui",
-        "outputPath": "gui/ui",
-        "functions":
-        [
-          {
-            "name": "icon",
-            "returnValue": "QIcon",
-            "tooltip": "Icon of the Object",
-            "const": true,
-            "parameters":
-            [
-              "GGtObject* obj"
-            ],
-            "description":
-            [
-              "@brief Specifies object icon.",
-              "@param Oobj Object",
-              "@return Object specific icon"
-            ]
-          }
-        ]
-      }
+      "baseClass": "gt_objectui"
     },
     {
       "name": "postItems",
@@ -108,12 +47,7 @@
         "@brief postItems",
         "@return"
       ],
-      "baseClass":
-      {
-        "name": "GtObject",
-        "fileName": "gt_object",
-        "outputPath": "gui/post"
-      }
+      "baseClass": "gt_object"
     },
     {
       "name": "postPlots",
@@ -124,31 +58,7 @@
         "@brief postPlots",
         "@return"
       ],
-      "baseClass":
-      {
-        "name": "GtPostTemplateItem",
-        "fileName": "gt_posttemplateitem",
-        "outputPath": "gui/post",
-        "functions":
-        [
-          {
-            "name": "createUI",
-            "returnValue": "GtAbstractPostWidget*",
-            "parameters":
-            [
-              "GtPostTemplateItem* dm",
-              "QWidget* parent"
-            ],
-            "description":
-            [
-              "@brief createUI",
-              "@param dm",
-              "@param parent",
-              "@return"
-            ]
-          }
-        ]
-      }
+      "baseClass": "gt_posttemplateitem"
     }
   ]
 }
