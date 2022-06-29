@@ -1,10 +1,13 @@
 ########################################################
 ############### Pipeline  ############
 ########################################################
-
-#variables:
+#  CATEGORY: 00_tools
 #  PROFILENAME: GtModuleGenerator.pro
 #  TARGETNAME: GtModuleGenerator
+#  SUBDIRNAME: ModuleGenerator
+
+variables:
+  GIT_SUBMODULE_STRATEGY: none
 
 stages:
   - build
@@ -13,8 +16,11 @@ stages:
 # Windows build
 windowsBuild:
   stage: build
+  before_script:
+    - git submodule sync
+    - git submodule update --init
   script:
-    - .\ci\build-512.bat 1>buildLog512.txt
+    - .\pipeline-scripts\build\build-512-tools.bat 1>buildLog512.txt
   tags:
     - Win10
   artifacts:
@@ -47,8 +53,11 @@ linuxBuild:
  
 copyForDeploymentWin:
   stage: copy
+  before_script:
+    - git submodule sync
+    - git submodule update --init
   script:
-    - .\ci\copyExecutable.bat
+    - .\pipeline-scripts\deploy\copyTool.bat
   needs:
     - windowsBuild
   dependencies:
@@ -59,13 +68,17 @@ copyForDeploymentWin:
     - tags
   variables:
     PLATFORMNAME:  windows
-    RELEASESTATUS: stable
-#    CATEGORY: 06_module_generator
+    RELEASESTATUS: tools
+#    SUBDIRNAME: ModuleGenerator
+#    CATEGORY: 00_tools
 
 copyForDeploymentLinux:
   stage: copy
+  before_script:
+    - git submodule sync
+    - git submodule update --init
   script:
-    - .\ci\copyExecutable.bat
+    - .\pipeline-scripts\deploy\copyTool.bat
   needs:
     - linuxBuild
   dependencies:
@@ -76,5 +89,6 @@ copyForDeploymentLinux:
     - tags
   variables:
     PLATFORMNAME:  linux
-    RELEASESTATUS: stable
-#    CATEGORY: 06_module_generator
+    RELEASESTATUS: tools
+#    SUBDIRNAME: ModuleGenerator
+#    CATEGORY: 00_tools
