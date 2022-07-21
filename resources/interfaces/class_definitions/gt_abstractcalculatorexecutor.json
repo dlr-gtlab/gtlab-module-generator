@@ -6,7 +6,7 @@
   [
     {
       "name": "exec",
-      "returnValue": "bool",
+      "returnType": "bool",
       "parameters":
       [
         "GtCalculator* calculator"

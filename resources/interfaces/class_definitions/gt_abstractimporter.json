@@ -6,8 +6,10 @@
   [
     {
       "name": "targets",
-      "returnValue": "QStringList",
+      "returnType": "QStringList",
+      "inputType": "QList<GT_CLASSNAME>",
       "const": true,
+      "tooltip": "Target class names to import data from",
       "description":
       [
         "@brief Returns list of allowed target class names for this importer.",
@@ -16,7 +18,7 @@
     },
     {
       "name": "icon",
-      "returnValue": "QIcon",
+      "returnType": "QIcon",
       "const": true,
       "tooltip": "Icon of importer",
       "description":
@@ -27,7 +29,7 @@
     },
     {
       "name": "import",
-      "returnValue": "bool",
+      "returnType": "bool",
       "parameters":
       [
         "GtObject* data, QFile& file"

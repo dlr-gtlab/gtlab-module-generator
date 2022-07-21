@@ -1,0 +1,26 @@
+{
+  "returnType": "GtTaskData",
+  "widgetType": "Class",
+  "includes":
+  [
+    "$$2_0_INCLUDE_ICON$$",
+    "gt_extendedtaskdata"
+  ],
+  "implementation": 
+  [
+    "auto $$VARIABLE_NAME$$ = GT_EXTENDED_TASK_DATA($$CLASS_NAME$$)\n\t",
+    "$$VARIABLE_NAME$$->id = QStringLiteral(\"$$OBJECT_NAME$$\")",
+    "$$VARIABLE_NAME$$->category = QStringLiteral(\"$$MODULE_NAME$$\")",
+    "$$VARIABLE_NAME$$->author = QStringLiteral(\"$$AUTHOR$$\")",
+    "$$VARIABLE_NAME$$->contact = QStringLiteral(\"$$AUTHOR_EMAIL$$\")",
+    "#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))",
+    "$$VARIABLE_NAME$$->icon = gtApp->icon(QStringLiteral(\"processIcon.png\"))",
+    "$$VARIABLE_NAME$$->version = 1",
+    "#else",
+    "$$VARIABLE_NAME$$->icon = GtGUI::Icon::process16()",
+    "$$VARIABLE_NAME$$->version = GtVersionNumber{0, 0, 1}",
+    "#endif",
+    "$$VARIABLE_NAME$$->status = GtAbstractProcessData::PROTOTYPE",
+    "$$VARIABLE_NAME$$"
+  ]
+}

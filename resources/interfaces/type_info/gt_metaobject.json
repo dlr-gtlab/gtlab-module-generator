@@ -1,0 +1,8 @@
+{
+  "returnType": "QMetaObject",
+  "widgetType": "Class",
+  "implementation": 
+  [
+    "GT_METADATA($$CLASS_NAME$$)"
+  ]
+}

@@ -49,26 +49,40 @@ WidgetListView::at(int index) const
     return widgets().at(index);
 }
 
-void WidgetListView::insertWidget(int index, QWidget* widget)
+int
+WidgetListView::count() const
+{
+    return widgets().count();
+}
+
+void
+WidgetListView::insertWidget(int index, QWidget* widget)
 {
     if (index == -1)
     {
-        index = m_scrollLayout->count()-1;
+        index = m_scrollLayout->count() - 1;
     }
 
     m_scrollLayout->insertWidget(index, widget);
 }
 
 void
+WidgetListView::appendWidget(QWidget* widget)
+{
+    insertWidget(-1, widget);
+}
+
+void
 WidgetListView::removeWidget(QWidget* widget)
 {
     m_scrollLayout->removeWidget(widget);
+    delete widget;
 
     emit widgetRemoved();
 }
 
 void
-WidgetListView::clearWidgets()
+WidgetListView::clear()
 {
     for (auto widget : widgets())
     {

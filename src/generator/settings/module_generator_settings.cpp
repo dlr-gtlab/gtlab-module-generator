@@ -15,7 +15,7 @@
 #include <QFont>
 
 const QString
-ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.1.0"));
+ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.1.1"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
 const QRegularExpression
@@ -62,15 +62,21 @@ ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP(QStringLiteral("GTlabConsole") +
 
 ModuleGeneratorSettings::ModuleGeneratorSettings()
 {
+    QElapsedTimer timer;
+    timer.start();
+
     deserializeUserData();
 
-    m_preLoader.searchForInterfaces();
+    m_preLoader.loadInterfaceData();
+    m_preLoader.loadTypeInfo();
 
     // defaults
     if (m_moduleClass.version.isEmpty())
     {
         m_moduleClass.version = QStringLiteral("0.0.1");
     }
+
+    LOG_INDENT("Setup took " + QString::number(timer.elapsed()) + " ms");
 }
 
 bool
@@ -148,12 +154,12 @@ ModuleGeneratorSettings::gtlabMajorVersion() const
 }
 
 QStringList
-ModuleGeneratorSettings::supportedVersions() const
+ModuleGeneratorSettings::supportedVersions()
 {
     QStringList retVal;
 
     retVal << QVersionNumber{1,7,0}.toString();
-    retVal << QVersionNumber{2,0,0}.toString() + " (DP4)";
+    retVal << QVersionNumber{2,0,0}.toString() + " (DP5)";
 
     return retVal;
 }
@@ -232,7 +238,7 @@ ModuleGeneratorSettings::preLoad()
 {
     if (m_lastPreLoadPath != gtlabPath() || m_preLoader.prefixes().isEmpty())
     {
-        m_preLoader.searchForPrefixes(devToolsPath());
+        m_preLoader.findPrefixData(devToolsPath());
     }
 
     if (m_lastPreLoadPath != gtlabPath() || m_preLoader.dependencies().isEmpty())
@@ -241,7 +247,7 @@ ModuleGeneratorSettings::preLoad()
         auto function = [](auto* loader, auto const& path)
         {
             int status = -1;
-            loader->searchForDependencies(path, &status);
+            loader->findDependencies(path, &status);
             return status;
         };
 
@@ -260,6 +266,31 @@ ModuleGeneratorSettings::reservedPrefixes() const {
 ClassDataList const&
 ModuleGeneratorSettings::availableInterfaces() const {
     return m_preLoader.interfaces();
+}
+
+TypeInfo
+ModuleGeneratorSettings::typeInfo(QString const& returnType) const
+{
+    // first check for complete match
+    for (auto const& info :  qAsConst(m_preLoader.typeInfo()))
+    {
+        if (info.returnType == returnType)
+        {
+            return info;
+        }
+    }
+
+    // check by reg exp
+    for (auto const& info :  qAsConst(m_preLoader.typeInfo()))
+    {
+        QRegularExpression regExp{"^" + info.returnType + "$"};
+        if (regExp.match(returnType).hasMatch())
+        {
+            return info;
+        }
+    }
+
+    return {};
 }
 
 DependencyDataList const&
@@ -299,7 +330,7 @@ ModuleGeneratorSettings::serializeUserData() const
 
     QJsonObject moduleObject;
     moduleObject["target_version"] = m_version;
-    moduleObject["use_compability_macros"] = m_useCompabilityMacros;
+    moduleObject["use_compatibility_macros"] = m_useCompatibilityMacros;
 
 //    moduleObject["prefix"]  = m_modulePrefix;
 //    moduleObject["ident"]  = m_moduleClass.ident;
@@ -356,9 +387,9 @@ ModuleGeneratorSettings::deserializeUserData()
     {
         m_version = moduleObject["target_version"].toString();
     }
-    if (moduleObject.contains("use_compability_macros"))
+    if (moduleObject.contains("use_compatibility_macros"))
     {
-        m_useCompabilityMacros = moduleObject["use_compability_macros"].toBool();
+        m_useCompatibilityMacros = moduleObject["use_compatibility_macros"].toBool();
     }
 
 //    m_modulePrefix = moduleObject["prefix"].toString();

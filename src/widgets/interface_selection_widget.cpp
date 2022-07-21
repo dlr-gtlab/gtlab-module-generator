@@ -32,7 +32,7 @@ InterfaceSelectionWidget::isChecked() const
 }
 
 void
-InterfaceSelectionWidget::setChecked(const bool value) const
+InterfaceSelectionWidget::setChecked(bool value) const
 {
     m_nameCheckBox->setChecked(value);
 }

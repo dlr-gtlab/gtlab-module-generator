@@ -6,7 +6,7 @@
   [
     {
       "name": "allowsMultipleInstances",
-      "returnValue": "bool",
+      "returnType": "bool",
       "const": true,
       "tooltip": "Whether a new Mdi Item should be spawned each time its opened",
       "description":

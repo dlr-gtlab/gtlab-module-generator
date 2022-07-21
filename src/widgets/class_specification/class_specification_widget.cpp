@@ -117,13 +117,17 @@ ClassSpecificationWidget::ClassSpecificationWidget(ClassData const& baseClass,
         objectNamelabel->setVisible(false);
         m_objectNameEdit->setVisible(false);
         m_autoEditCheckBox->setVisible(false);
+        setWindowTitle("Exisitng " + className);
     }
     // widget is used for creating a new class
     else
     {
         m_autoEditCheckBox->setChecked(true);
         autoComplete();
+        setWindowTitle("New " + className);
     }
+
+    setMinimumWidth(300);
 
     // append function data
     if (!baseClass.functions.isEmpty())
@@ -140,30 +144,36 @@ ClassSpecificationWidget::ClassSpecificationWidget(ClassData const& baseClass,
                           Qt::AlignRight | Qt::AlignBottom);
 
     setLayout(baseLayout);
-    setWindowTitle(className);
     setWindowFlags(windowFlags() & ~Qt::WindowMaximizeButtonHint);
     setWindowFlags(windowFlags() & ~Qt::WindowMinimizeButtonHint);
 
-    // hack for the package naming problem (issue #153 in Core)
+    // hack for the package naming problem (issue #153 in Core) -> fixed
     if (baseClass.className == QStringLiteral("GtPackage"))
     {
         // auto generate the package file and class name
         m_objectNameEdit->setText(QStringLiteral("Package"));
         m_autoEditCheckBox->setChecked(true);
-        onAutoCompleteChanged(true);
-
+        autoComplete();
         // set the correct object name
-        m_autoEditCheckBox->setChecked(false);
-        m_autoEditCheckBox->setEnabled(false);
         m_objectNameEdit->setText(settings->moduleClass().ident);
-        m_objectNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
+        m_autoEditCheckBox->setChecked(false);
 
-        m_objectNameEdit->setEnabled(false);
-        m_fileNameEdit->setEnabled(false);
-        m_classNameEdit->setEnabled(false);
+        // if module requires backwards compatibility package class cannot be
+        // changed
+        if (settings->gtlabMajorVersion() < 2 ||
+            settings->useCompatibilityMacros())
+        {
+            m_autoEditCheckBox->setEnabled(false);
+            m_objectNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
+            m_classNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
+            m_fileNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
+
+            m_objectNameEdit->setEnabled(false);
+            m_fileNameEdit->setEnabled(false);
+            m_classNameEdit->setEnabled(false);
+        }
 
         emit hidden();
-        return;
     }
 }
 
@@ -230,6 +240,8 @@ ClassSpecificationWidget::initFunctionWidget(QGridLayout& layout, int& row,
     // fix wierd scaling issues
     line->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     m_functionWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    setMinimumWidth(400);
+    setMinimumHeight(220);
 //    m_functionWidget->setMinimumHeight(I_FUNCTION_WIDGET_HEIGHT);
 }
 

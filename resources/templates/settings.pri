@@ -33,6 +33,21 @@ INCLUDEPATH += $${GTLAB_PHYSICS_PATH}/include/physics
 LIBS        += -L$${GTLAB_PHYSICS_PATH}/lib/physics
 DEPENDPATH  += $${GTLAB_PHYSICS_PATH}/lib/physics
 
+## HDF5
+#INCLUDEPATH += $${HDF5_PATH}/include
+#CONFIG(debug, debug|release) {
+#    LIBS        += -L$${HDF5_PATH}/libDebug
+#    DEPENDPATH  += $${HDF5_PATH}/libDebug
+#} else {
+#    LIBS        += -L$${HDF5_PATH}/lib
+#    DEPENDPATH  += $${HDF5_PATH}/lib
+#}
+
+## HDF5 Wrapper
+#INCLUDEPATH += $${GENH5_PATH}/include/h5
+#LIBS        += -L$${GENH5_PATH}/lib/h5
+#DEPENDPATH  += $${GENH5_PATH}/lib/h5
+
 ### COLLECTIONS ###
 INCLUDEPATH += $${GTLAB_FUELCOLLECTION_PATH}/include/fuelcollection
 LIBS        += -L$${GTLAB_FUELCOLLECTION_PATH}/lib/fuelcollection

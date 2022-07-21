@@ -1,13 +1,18 @@
 {
+  this interface is no longer required, as its enabled by default
   "name": "GtInitModuleInterface",
   "fileName": "gt_initmoduleinterface",
   "displayName": "Init",
   "tooltip": "For implementing a dedicated startup routine",
+  "version":
+  {
+    "max": "1.9.9"
+  },
   "functions": 
   [
     {
       "name": "init",
-      "returnValue": "void",
+      "returnType": "void",
       "description":
       [
         "@brief Initializes module. Called on application startup."

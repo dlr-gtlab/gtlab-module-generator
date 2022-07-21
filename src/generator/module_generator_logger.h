@@ -23,7 +23,7 @@ public:
     ModuleGeneratorLogger(QString const& text = {}, const Type& type = Info);
     ~ModuleGeneratorLogger();
 
-    inline void setType(const Type& type) { m_type = type; }
+    inline void setType(Type const& type) { m_type = type; }
 
     // operators
     ModuleGeneratorLogger& operator<<(const QString& text);

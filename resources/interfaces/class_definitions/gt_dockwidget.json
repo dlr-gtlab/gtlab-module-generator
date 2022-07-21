@@ -6,7 +6,7 @@
   [
     {
       "name": "getDockWidgetArea",
-      "returnValue": "Qt::DockWidgetArea",
+      "returnType": "Qt::DockWidgetArea",
       "tooltip": "Recommended position in the main window",
       "description":
       [

@@ -1,7 +1,7 @@
 #ifndef CLASSSPECIFICATIONITEM_H
 #define CLASSSPECIFICATIONITEM_H
 
-#include "abstract_type_specifier.h"
+#include "abstract_type_specification_item.h"
 
 #include "class_specification_widget.h"
 
@@ -11,7 +11,7 @@
 class QPushButton;
 class ModuleGeneratorSettings;
 class ClassSpecificationItem : public QWidget,
-                               public AbstractTypeSpecifier
+                               public AbstractTypeSpecificationItem
 {
     Q_OBJECT
 
@@ -20,18 +20,14 @@ class ClassSpecificationItem : public QWidget,
 
     static const QString S_CLASS_BTN_TOOLTIP;
 
-    static const QString S_DELETE_BTN_ICON_PATH;
-
 public:
 
     ClassSpecificationItem(FunctionData function,
+                           TypeInfo typeInfo,
                            ModuleGeneratorSettings* settings,
-                           bool deletable  = false,
                            QWidget* parent = nullptr);
 
-    bool deleteable() const { return m_deletable; }
-
-    QStringList implementationCode() override;
+    QStringList codeImplementation() override;
     QStringList additionalIncludes() override;
     ClassDataList derivedClasses() override;
     ClassDataList linkedClasses() override;
@@ -39,7 +35,6 @@ public:
 private:
 
     FunctionData m_functionData{};
-    bool m_deletable{false};
 
     ModuleGeneratorSettings* m_settings{};
     QPushButton* m_derivedClassButton{};
@@ -56,18 +51,11 @@ private:
 
 private slots:
 
-    void onDeleteBtnPressed();
-
     void onDerivedClassBtnPressed();
     void onHideDerivedClassWidget();
 
     void onLinkedClassBtnPressed();
     void onHideLinkedClassWidget();
-
-signals:
-
-    void deleted(ClassSpecificationItem*);
-
 };
 
 #endif // CLASSSPECIFICATIONITEM_H

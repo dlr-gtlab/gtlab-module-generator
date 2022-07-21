@@ -144,7 +144,7 @@ SummaryPage::createSummary()
     auto moduleClass = settings()->moduleClass();
 
     content << "moudle prefix:\t" + settings()->modulePrefix();
-    content << "module name:\t" + moduleClass.ident;
+    content << "module name:  \t" + moduleClass.ident;
     content << "module class name:\t" + moduleClass.className;
     content << "module file name:\t" + moduleClass.fileName;
     content << "module description:\t" + moduleClass.description;
@@ -159,8 +159,8 @@ SummaryPage::createSummary()
 
     content << "";
     content << "Output directory:\t" + outputPath;
-    content << "GTlab directory:\t" + settings()->gtlabPath();
     content << "DevTools directory:\t" + settings()->devToolsPath();
+    content << "GTlab directory:\t" + settings()->gtlabPath();
     content << "GTlab target version:\t" + settings()->gtlabVersion();
 
     content << "";

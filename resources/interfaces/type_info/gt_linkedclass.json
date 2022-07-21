@@ -1,0 +1,8 @@
+{
+  "returnType": "const char*, QMetaObject",
+  "widgetType": "ClassLinked",
+  "implementation": 
+  [
+    "GT_CLASSNAME($$LINKED_VALUE$$),\n\t           GT_METADATA($$CLASS_NAME$$)"
+  ]
+}

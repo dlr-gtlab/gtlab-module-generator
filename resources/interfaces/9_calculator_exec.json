@@ -7,7 +7,7 @@
   [
     {
       "name": "executorId",
-      "returnValue": "QString",
+      "returnType": "QString",
       "tooltip": "Executor identification string",
       "description":
       [
@@ -17,7 +17,7 @@
     },
     {
       "name": "executorDescription",
-      "returnValue": "QString",
+      "returnType": "QString",
       "tooltip": "Executor description",
       "description":
       [
@@ -27,7 +27,7 @@
     },
     {
       "name": "executor",
-      "returnValue": "QMetaObject",
+      "returnType": "QMetaObject",
       "tooltip": "Executor class",
       "description":
       [
@@ -38,8 +38,9 @@
     },
     {
       "name": "executorSettings",
-      "returnValue": "QList<GtAbstractProperty*>",
+      "returnType": "QList<GtAbstractProperty*>",
       "tooltip": "List of Executor settings",
+      "hidden": true,
       "description":
       [
         "@brief Returns list of executor settings.",

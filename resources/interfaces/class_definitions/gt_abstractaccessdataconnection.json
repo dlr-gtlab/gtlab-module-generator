@@ -6,7 +6,7 @@
   [
     {
       "name": "testConnection",
-      "returnValue": "bool",
+      "returnType": "bool",
       "protected": true,
       "parameters":
       [

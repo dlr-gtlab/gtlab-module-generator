@@ -21,6 +21,10 @@ public:
     InterfaceSpecificationsPage(ModuleGeneratorSettings* settings,
                                 QWidget* parent = nullptr);
 
+public slots:
+
+    void clearInterfaceTabs();
+
 protected:
 
     void initializePage() override;
@@ -36,8 +40,6 @@ private:
     QTabWidget* m_interfaceTabBar{};
 
     void initInterfaces();
-
-//    void clearInterfaceTabs();
 
     void setInterfaceImplementation();
 

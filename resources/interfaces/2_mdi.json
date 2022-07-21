@@ -2,12 +2,12 @@
   "name": "GtMdiInterface",
   "fileName": "gt_mdiinterface",
   "displayName": "Mdi",
-  "tooltip": "Used for registering custom dock widgets, editors, viewers, object ui items etc.",
+  "tooltip": "Used to register custom dock widgets, editors, viewers, object ui items etc.",
   "functions": 
   [
     {
       "name": "mdiItems",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "tooltip": "List of Mdi items",
       "description":
       [
@@ -18,7 +18,7 @@
     },
     {
       "name": "dockWidgets",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "tooltip": "List of Dock Widgets",
       "description":
       [
@@ -29,7 +29,7 @@
     },
     {
       "name": "uiItems",
-      "returnValue": "QMap<const char*, QMetaObject>",
+      "returnType": "QMap<const char*, QMetaObject>",
       "tooltip": "Map of data classes and ui items",
       "description":
       [
@@ -40,7 +40,7 @@
     },
     {
       "name": "postItems",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "tooltip": "List of post items",
       "description":
       [
@@ -51,7 +51,7 @@
     },
     {
       "name": "postPlots",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "tooltip": "List of post plots",
       "description":
       [

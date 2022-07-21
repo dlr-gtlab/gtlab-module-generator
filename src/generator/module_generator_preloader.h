@@ -20,13 +20,15 @@ public:
     /**
      * @brief Parses interface json files and generates a list of class structs
      */
-    void searchForInterfaces();
+    void loadInterfaceData();
+
+    void loadTypeInfo();
 
     /**
      * @brief searches in devtools for reserved prefixes (gt, gtp, etc.)
      * @param devToolsPath path to dev tools
      */
-    void searchForPrefixes(QString const& devToolsPath);
+    void findPrefixData(QString const& devToolsPath);
 
     /**
      * @brief asks GtlabConsole for modules to generate dependencies.
@@ -34,35 +36,37 @@ public:
      * @param gtlabPath path to gtlab
      * @param status return code of process
      */
-    void searchForDependencies(QString const& gtlabPath, int* status = nullptr);
+    void findDependencies(QString const& gtlabPath, int* status = nullptr);
 
     ClassDataList const& interfaces() const { return m_interfaces; }
+    TypeInfoList const& typeInfo() const { return m_typeInfo; }
     DependencyDataList const& dependencies() const { return m_dependencies; }
     QStringList const& prefixes() const { return m_prefixes; }
 
 private:
 
-    QStringList m_prefixes{};
     ClassDataList m_interfaces{};
+    TypeInfoList m_typeInfo{};
     DependencyDataList m_dependencies{};
+    QStringList m_prefixes{};
 
     /**
      * @brief Parses json object to a class struct
      * @param classJObject json object for class
      * @return class struct
      */
-    ClassData searchForClass(QJsonObject const& classJObject);
-    ClassData searchForClass(QString const& fileName);
+    ClassData loadClassData(QJsonObject const& classJObject);
+    ClassData loadClassData(QString const& fileName);
 
-    Constructors searchForConstructors(QJsonArray const& constructorJArray);
+    Constructors loadConstructorData(QJsonArray const& constructorJArray);
 
-    FunctionDataList searchForFunctions(QJsonArray const& functionsJArray);
+    FunctionDataList loadFunctionData(QJsonArray const& functionsJArray);
 
-    QStringList parseStringJArray(QJsonArray const& jArray);
+    QStringList parseStringJArray(QJsonArray const& array);
+
+    VersionData parseVersionJObject(QJsonObject const& version);
 
     QString parseDescription(QJsonArray const& descriptionJArray);
-
-    void clearInterfaceStructs();
 };
 
 #endif // MODULEGENERATORPRELOADER_H

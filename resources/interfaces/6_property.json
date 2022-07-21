@@ -7,16 +7,12 @@
   [
     {
       "name": "propertyItems",
-      "returnValue": "QMap<const char*, QMetaObject>",
+      "returnType": "QMap<const char*, QMetaObject>",
       "tooltip": "Map of properties and property items",
       "description":
       [
         "@brief Returns static meta objects of property item classes.",
         "@return list of meta objects of property item classes."
-      ],
-      "includes":
-      [
-        "QMap"
       ],
       "linkedClass": "gt_property",
       "baseClass": "gt_abstractpropertyitem"

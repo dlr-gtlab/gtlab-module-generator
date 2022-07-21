@@ -7,7 +7,7 @@
   [
     {
       "name": "importer",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "const": true,
       "tooltip": "List of importers",
       "description":

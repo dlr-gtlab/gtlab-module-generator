@@ -1,32 +1,40 @@
 #include "class_specification_list.h"
 
 #include "class_specification_item.h"
-
 #include "module_generator_logger.h"
+#include "module_generator_settings.h"
+#include "module_generator_utils.h"
+#include "module_generator.h"
 
 #include "widget_list_view.h"
 
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QRegularExpression>
 
 const int
 ClassSpecificationList::I_LIST_HEIGTH = 100;
 
 const QString
-ClassSpecificationList::S_ADD_CLASS_BTN =
-        QStringLiteral("Add Class ...");
+ClassSpecificationList::S_ADD_BTN =
+        QStringLiteral("Add ...");
+
+const QString
+DeletableSpecificationItem::S_DELETE_BTN_ICON_PATH =
+        QStringLiteral(":/images/crossIcon_16.png");
 
 ClassSpecificationList::ClassSpecificationList(const FunctionData& function,
+                                               TypeInfo typeInfo,
                                                ModuleGeneratorSettings* settings,
                                                QWidget *parent) :
     QWidget(parent),
-    AbstractTypeSpecifier(function.implementation),
+    AbstractTypeSpecificationItem(function.implementation, std::move(typeInfo)),
     m_functionData(function),
     m_settings(settings)
 {
     auto* baseLayout = new QVBoxLayout;
 
-    m_addButton = new QPushButton{S_ADD_CLASS_BTN};
+    m_addButton = new QPushButton{S_ADD_BTN};
     m_widgetListView = new WidgetListView;
     m_widgetListView->setMinimumHeight(I_LIST_HEIGTH);
 
@@ -41,53 +49,84 @@ ClassSpecificationList::ClassSpecificationList(const FunctionData& function,
 }
 
 QStringList
-ClassSpecificationList::implementationCode()
+ClassSpecificationList::codeImplementation()
 {
     QStringList lines;
 
-    // create variable -> QList<...> retVal
-    lines << QString{m_functionData.returnType + " retVal"};
+    QString const& returnType = m_functionData.returnType;
+
+    // validity check
+    if (!typeInfo().isValid())
+    {
+        LOG_INDENT_ERR("No type info found for '" + returnType + "'!");
+        return {};
+    }
+    // implementation.size() == 3:
+    // 1. Variable declaration (e.g. QList<...> list)
+    // 2. Return value (e.g. list)
+    if (typeInfo().implementation.size() != 2 || typeInfo().values.size() != 1)
+    {
+        LOG_INDENT_ERR("Invalid type info for '" + returnType + "'!");
+        return {};
+    }
+
+    // typeInfo.implementation is intended as the variable Name
+    QString retValDecl = typeInfo().implementation.first();
+    utils::replaceIdentifier(retValDecl, {S_ID_RETURN_TYPE, returnType});
+
+    lines << retValDecl;
     lines << QString{};
 
     for (auto* w : m_widgetListView->widgets())
     {
-        auto* widget = qobject_cast<ClassSpecificationItem*>(w);
+        auto* item = qobject_cast<DeletableSpecificationItem*>(w);
+        if (!item) continue;
+        auto* spec = dynamic_cast<AbstractTypeSpecificationItem*>(item->widget());
+        if (!spec) continue;
 
-        if (!widget) continue;
-
-        QStringList implementation = widget->implementationCode();
-
+        QStringList implementation = spec->codeImplementation();
         if (implementation.isEmpty()) continue;
 
         // implementation contains multiple lines
+        // -> only last line is the one we will add to our list
+        // -> mostly relevant for tasks and calculators
         if (implementation.length() > 1)
         {
-            if (lines.length() > 2) lines << QString{}; // for nicer indent
+            // for nicer indent
+            if (lines.length() > 2) lines << QString{};
+
             lines << implementation.mid(0, implementation.length() - 1);
             lines << QString{};
         }
 
-        // should have one entry
-        auto linkedClass = widget->linkedClasses().last();
+        IdentifierPairs idents;
+        // value is last entry of implementation
+        idents.append({S_ID_VALUE, implementation.last()});
 
-        // append implementation to retVal
-        if (linkedClass.className.isEmpty())
+        // only necessary for linked classes
+//        if (typeInfo().widgetType == S_WIDGET_TYPE_MULTILINKED)
+//        {
+        ClassDataList linkedClasses = spec->linkedClasses();
+
+        if (!linkedClasses.isEmpty() && linkedClasses.first().isValid())
         {
-            // QList
-            lines << QString{"retVal << " + implementation.last()};
+            idents.append({S_ID_LINKED_VALUE,
+                           linkedClasses.first().className});
         }
-        else
-        {
-            // QMap
-            lines << QString{"retVal.insert(GT_CLASSNAME(" +
-                             linkedClass.className + "), " +
-                             implementation.last() + ')'};
-        }
+//        }
+
+        // will add a new entry to our list (i.e. list << "entry")
+        QString value = typeInfo().values.first();
+        utils::replaceIdentifier(value, idents);
+
+        lines << value;
     }
 
-    // return variable
-    if (lines.length() > 2) lines << QString{}; // for nicer indent
-    lines << "retVal";
+    // for nicer indent
+    if (lines.length() > 2) lines << QString{};
+
+    // last line is return variable
+    lines << typeInfo().implementation.last();
 
     return lines;
 }
@@ -99,11 +138,12 @@ ClassSpecificationList::additionalIncludes()
 
     for (auto* w : m_widgetListView->widgets())
     {
-        auto* widget = qobject_cast<ClassSpecificationItem*>(w);
+        auto* item = qobject_cast<DeletableSpecificationItem*>(w);
+        if (!item) continue;
+        auto* spec = dynamic_cast<AbstractTypeSpecificationItem*>(item->widget());
+        if (!spec) continue;
 
-        if (!widget) continue;
-
-        includes << widget->additionalIncludes();
+        includes << spec->additionalIncludes(); // may have multiple entries
     }
 
     return includes;
@@ -116,11 +156,12 @@ ClassSpecificationList::derivedClasses()
 
     for (auto* w : m_widgetListView->widgets())
     {
-        auto* widget = dynamic_cast<ClassSpecificationItem*>(w);
+        auto* item = qobject_cast<DeletableSpecificationItem*>(w);
+        if (!item) continue;
+        auto* spec = dynamic_cast<AbstractTypeSpecificationItem*>(item->widget());
+        if (!spec) continue;
 
-        if (!widget) continue;
-
-        classes << widget->derivedClasses()[0]; // must have one entry
+        classes << spec->derivedClasses(); // may have one entry
     }
 
     return classes;
@@ -133,11 +174,12 @@ ClassSpecificationList::linkedClasses()
 
     for (auto* w : m_widgetListView->widgets())
     {
-        auto* widget = dynamic_cast<ClassSpecificationItem*>(w);
+        auto* item = qobject_cast<DeletableSpecificationItem*>(w);
+        if (!item) continue;
+        auto* spec = dynamic_cast<AbstractTypeSpecificationItem*>(item->widget());
+        if (!spec) continue;
 
-        if (!widget) continue;
-
-        classes << widget->linkedClasses(); // may have one entry
+        classes << spec->linkedClasses(); // may have one entry
     }
 
     return classes;
@@ -148,10 +190,42 @@ ClassSpecificationList::onAddButtonPressed()
 {
     LOG_INDENT("Adding new class for '" + m_functionData.name + "'...");
 
-    auto* widget = new ClassSpecificationItem(m_functionData,
-                                              m_settings, true);
+    auto typeInfo = this->typeInfo().innerType(m_functionData.inputType);
 
-    m_widgetListView->insertWidget(-1, widget);
+    auto* widget = generateFunctionSpecification(m_settings,
+                                                 m_functionData,
+                                                 typeInfo);
+    auto* inputWidget = dynamic_cast<QWidget*>(widget);
+
+    if (inputWidget)
+    {
+        auto* wrapperWidget = new DeletableSpecificationItem(inputWidget);
+        m_widgetListView->appendWidget(wrapperWidget);
+    }
 
     LOG_INFO << "done!";
+}
+
+DeletableSpecificationItem::DeletableSpecificationItem(QWidget* inputWidget,
+                                                       QWidget*parent) :
+    QWidget(parent),
+    m_inputWidget(inputWidget)
+{
+    auto* deleteButton = new QPushButton;
+    QIcon deleteIcon{S_DELETE_BTN_ICON_PATH};
+    deleteButton->setIcon(deleteIcon);
+    deleteButton->setFixedSize({16, 16});
+    deleteButton->setIconSize({16, 16});
+
+    auto* lay = new QHBoxLayout;
+    lay->setContentsMargins(4, 2, 2, 2);
+    lay->setSpacing(2);
+    lay->addWidget(deleteButton);
+    lay->addWidget(inputWidget);
+
+    setLayout(lay);
+
+    connect(deleteButton, &QPushButton::clicked, [&](){
+        this->deleteLater();
+    });
 }

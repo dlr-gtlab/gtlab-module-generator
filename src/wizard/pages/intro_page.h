@@ -36,6 +36,6 @@ protected:
 private:
 
     QRadioButton* m_createRBtn{};
-    QRadioButton* m_editRBtn{};
+//    QRadioButton* m_editRBtn{};
 };
 #endif // INTROPAGE_H

@@ -2,6 +2,7 @@
 
 #include "class_specification_widget.h"
 #include "module_generator_logger.h"
+#include "module_generator_utils.h"
 #include "module_generator.h"
 
 #include <QPushButton>
@@ -14,48 +15,31 @@ const QString
 ClassSpecificationItem::S_LINKED_CLASS_BTN_TEXT =
         QStringLiteral("<Edit linked class definition>");
 const QString
-S_LINKED_CLASS_ALT_BTN_TEXT =
-        QStringLiteral("<Edit class to extend>");
+S_CLASS_ALT_BTN_TEXT =
+        QStringLiteral("<Set existing class>");
+//        QStringLiteral("<Class definition to extend>");
 const QString
 ClassSpecificationItem::S_CLASS_BTN_TOOLTIP =
         QStringLiteral("Edit class definition");
-const QString
-ClassSpecificationItem::S_DELETE_BTN_ICON_PATH =
-        QStringLiteral(":/images/cross.png");
 
 ClassSpecificationItem::ClassSpecificationItem(FunctionData function,
+                                               TypeInfo typeInfo,
                                                ModuleGeneratorSettings* settings,
-                                               bool deletable,
                                                QWidget* parent) :
     QWidget(parent),
-    AbstractTypeSpecifier(function.implementation),
+    AbstractTypeSpecificationItem(function.implementation, std::move(typeInfo)),
     m_functionData(std::move(function)),
-    m_deletable(deletable),
     m_settings(settings)
 {
     auto* baseLayout  = new QHBoxLayout;
-    auto* deleteButton = new QPushButton;
 
     m_derivedClassButton = new QPushButton{S_DERIVED_CLASS_BTN_TEXT};
     m_linkedClassButton  = new QPushButton{S_LINKED_CLASS_BTN_TEXT};
     m_derivedClassButton->setToolTip(S_CLASS_BTN_TOOLTIP);
     m_linkedClassButton->setToolTip(S_CLASS_BTN_TOOLTIP);
 
-    deleteButton->setIconSize({16, 16});
-    deleteButton->setFixedSize(16, 16);
-    deleteButton->setIcon(QIcon{S_DELETE_BTN_ICON_PATH});
+    baseLayout->setContentsMargins(0, 0, 0, 0);
 
-    if (!deletable)
-    {
-        deleteButton->hide();
-        baseLayout->setContentsMargins(0, 0, 0, 0);
-    }
-    else
-    {
-        baseLayout->setContentsMargins(2, 2, 2, 2);
-    }
-
-    baseLayout->addWidget(deleteButton);
     baseLayout->addWidget(m_linkedClassButton);
     baseLayout->setStretchFactor(m_linkedClassButton, 1);
     baseLayout->addWidget(m_derivedClassButton);
@@ -64,7 +48,7 @@ ClassSpecificationItem::ClassSpecificationItem(FunctionData function,
     setLayout(baseLayout);
 
     if (!m_functionData.linkedClass.isValid() &&
-        !m_functionData.returnType.startsWith("QMap<"))
+        !(this->typeInfo().widgetType == S_WIDGET_TYPE_CLASSLINKED))
     {
         m_linkedClassButton->setVisible(false);
     }
@@ -78,8 +62,6 @@ ClassSpecificationItem::ClassSpecificationItem(FunctionData function,
     setupSpecificationsWidget(*m_derivedClassWidget);
     setupSpecificationsWidget(*m_linkedClassWidget);
 
-    connect(deleteButton, SIGNAL(pressed()),
-            this, SLOT(onDeleteBtnPressed()));
     connect(m_derivedClassButton, SIGNAL(pressed()),
             this, SLOT(onDerivedClassBtnPressed()));
     connect(m_derivedClassWidget.get(), SIGNAL(hidden()),
@@ -96,11 +78,12 @@ ClassSpecificationItem::ClassSpecificationItem(FunctionData function,
 }
 
 void
-ClassSpecificationItem::setupSpecificationsWidget(ClassSpecificationWidget& widget)
+ClassSpecificationItem::setupSpecificationsWidget(
+        ClassSpecificationWidget& widget)
 {
     widget.setWindowFlag(Qt::Dialog);
     widget.setWindowModality(Qt::ApplicationModal);
-    widget.setMinimumWidth(300);
+//    widget.setMinimumWidth(330);
 }
 
 void
@@ -108,12 +91,7 @@ ClassSpecificationItem::updateSpecificationButton(QPushButton& button,
                                                   ClassData const& implClass,
                                                   bool isLinkedBtn)
 {
-    auto text = isLinkedBtn ?
-                    m_functionData.linkedClass.isValid() ?
-                        S_LINKED_CLASS_BTN_TEXT :
-                        S_LINKED_CLASS_ALT_BTN_TEXT :
-                    S_DERIVED_CLASS_BTN_TEXT;
-
+    QString text{};
     QPalette palette{};
 
     if (implClass.isValid())
@@ -128,6 +106,18 @@ ClassSpecificationItem::updateSpecificationButton(QPushButton& button,
     else
     {
         palette.setColor(QPalette::ButtonText, Qt::blue);
+        if (isLinkedBtn)
+        {
+            text = m_functionData.linkedClass.isValid() ?
+                        S_LINKED_CLASS_BTN_TEXT :
+                        S_CLASS_ALT_BTN_TEXT;
+        }
+        else
+        {
+            text = m_functionData.baseClass.isValid() ?
+                        S_DERIVED_CLASS_BTN_TEXT :
+                        S_CLASS_ALT_BTN_TEXT;
+        }
     }
 
     button.setText(text);
@@ -135,7 +125,7 @@ ClassSpecificationItem::updateSpecificationButton(QPushButton& button,
 }
 
 QStringList
-ClassSpecificationItem::implementationCode()
+ClassSpecificationItem::codeImplementation()
 {
 //    LOG_INSTANCE("retrieving single class implemenation values...");
 
@@ -143,92 +133,62 @@ ClassSpecificationItem::implementationCode()
 
     if (!implementation.isValid())
     {
-        LOG_INDENT_ERR("invalid implementation!");
+        LOG_INDENT_WARN("invalid implementation!");
         return {};
     }
 
-    QString returnValue = m_functionData.returnType;
+    QString returnType = m_functionData.returnType;
 
-    // QMap<const char*, QMetaObject> -> QMetaObject
-    QRegExp regExp{QStringLiteral("QMap<.+,\\s?")};
-
-    returnValue.remove("QList");
-    returnValue.remove(regExp);
-    returnValue.remove("<");
-    returnValue.remove(">");
-
-    QStringList lines;
-
-    // simple return types
-    if (returnValue == QStringLiteral("QMetaObject"))
+    if (!typeInfo().isValid())
     {
-        lines << QString{"GT_METADATA(" + implementation.className + ")"};
+        LOG_INDENT_ERR("No type info found for '" + returnType + "'!");
+        return {};
     }
-    else if (returnValue.endsWith('*'))
+    if (typeInfo().implementation.isEmpty())
     {
-        lines << QString{"new " + implementation.className + "{}"};
+        LOG_INDENT_ERR("Invalid type info for '" + returnType + "'!");
+        return {};
     }
-    else if (returnValue == QStringLiteral("GtCalculatorData") ||
-             returnValue == QStringLiteral("GtTaskData"))
+
+    // we use identifiers to set certain data (e.g. class name to return etc)
+    IdentifierPairs idents;
+
+    idents.append({ModuleGenerator::S_ID_CLASS_NAME,
+                   implementation.className});
+    // mostly necessary for task and calculator data
+    idents.append({ModuleGenerator::S_ID_OBJECT_NAME,
+                   implementation.objectName});
+    // will be set when generating
+    /*
+    idents.append({ModuleGenerator::S_ID_MODULE_NAME,
+                   m_settings->moduleClass().ident});
+    idents.append({ModuleGenerator::S_ID_AUTHOR,
+                   m_settings->authorDetails().name});
+    idents.append({ModuleGenerator::S_ID_AUTHOR_EMAIL,
+                   m_settings->authorDetails().email});
+    */
+    // create a variable name using the object name
+    QString varName = implementation.objectName;
+    varName.remove(' ');
+    if (!varName.isEmpty())
     {
-        bool isTask = returnValue.contains(QStringLiteral("Task"));
-        // GT_EXTENDED_TASK_DATA or GT_EXTENDED_CALC_DATA
-        QString makroName = isTask ?
-                    QStringLiteral("GT_EXTENDED_TASK_DATA") :
-                    QStringLiteral("GT_EXTENDED_CALC_DATA");
-
-        // generate valid variable name
-        QString varName = implementation.objectName;
-        varName.remove(' ');
-        varName.replace(0, 1, varName.at(0).toLower());
-
-        // create variable
-        lines << QString{"auto " + varName + " = " +
-                          makroName + "(" + implementation.className + ")\t"};
-        lines << QString{};
-        // proces id
-        lines << QString{varName + "->id = " + "QStringLiteral(\""+
-                          implementation.objectName + "\")"};
-        // process category
-        lines << QString{varName + "->category = " + "QStringLiteral(\""+
-                        ModuleGenerator::S_ID_MODULE_NAME + "\")"};
-        // author
-        lines << QString{varName + "->author = " + "QStringLiteral(\""+
-                        ModuleGenerator::S_ID_AUTHOR + "\")"};
-        // contact
-        lines << QString{varName + "->contact = " + "QStringLiteral(\""+
-                        ModuleGenerator::S_ID_AUTHOR_EMAIL + "\")"};
-        // icon and version
-        if (isTask)
-        {
-            lines << ModuleGenerator::S_2_0_VERSION_CHECK;
-            lines << varName + "->icon = gtApp->icon(QStringLiteral(\""
-                               "processIcon.png\"))";
-            lines << varName + "->version = 1";
-            lines << "#else";
-            lines << varName + "->icon = GtGUI::Icon::process16()";
-            lines << varName + "->version = GtVersionNumber(0, 0, 1)";
-            lines << "#endif";
-        }
-        else
-        {
-            lines << ModuleGenerator::S_2_0_VERSION_CHECK;
-            lines << varName + "->icon = gtApp->icon(QStringLiteral(\""
-                               "calculatorIcon.png\"))";
-            lines << "#else";
-            lines << varName + "->icon = GtGUI::Icon::process16()";
-            lines << "#endif";
-            lines << varName + "->version = GtVersionNumber(0, 0, 1)";
-        }
-        // status
-        lines << QString{varName + "->status = GtAbstractProcessData::PROTOTYPE"};
-        // return variable
-        lines << varName;
+        auto c = varName.at(0).toLower();
+        varName.replace(0, 1, c);
+        idents.append({S_ID_VARIABLE_NAME, varName});
     }
-    else
+
+    // linked class
+    auto linkedClass = m_linkedClassWidget->implementedClass();
+    if (m_functionData.linkedClass.isValid() && linkedClass.isValid())
     {
-        LOG_INDENT_ERR("return value not implemented: " + returnValue);
-        return  {};
+        idents.append({S_ID_LINKED_VALUE, linkedClass.className});
+    }
+
+    // replace all identifiers in the implementation
+    QStringList lines = typeInfo().implementation;
+    for (auto& line : lines)
+    {
+        utils::replaceIdentifier(line, idents);
     }
 
     return lines;
@@ -238,21 +198,24 @@ ClassSpecificationItem::implementationCode()
 QStringList
 ClassSpecificationItem::additionalIncludes()
 {
-    // for version check
-    if (m_functionData.returnType.contains(QStringLiteral("Task")) ||
-        m_functionData.returnType.contains(QStringLiteral("Calc")))
-    {
-        return ModuleGenerator::S_2_0_ICON_INCLUDES;
-    }
-    auto linkedClass = m_linkedClassWidget->implementedClass();
+    // includes from type info
+    QStringList includes{typeInfo().includes};
 
-    // generate include if linked class was used for specifing external class
+    // generate include for extended classes
+    auto derivedClasses = m_derivedClassWidget->implementedClass();
+    if (!m_functionData.baseClass.isValid() && derivedClasses.isValid())
+    {
+        includes << derivedClasses.fileName;
+    }
+
+    // generate include for linked class
+    auto linkedClass = m_linkedClassWidget->implementedClass();
     if (!m_functionData.linkedClass.isValid() && linkedClass.isValid())
     {
-        return { linkedClass.fileName };
+        includes << linkedClass.fileName;
     }
 
-    return {};
+    return includes;
 }
 
 
@@ -269,16 +232,6 @@ ClassSpecificationItem::linkedClasses()
 }
 
 void
-ClassSpecificationItem::onDeleteBtnPressed()
-{
-    emit deleted(this);
-
-    disconnect(this);
-
-    this->deleteLater();
-}
-
-void
 ClassSpecificationItem::onDerivedClassBtnPressed()
 {
     m_derivedClassWidget->show();
@@ -288,8 +241,7 @@ void
 ClassSpecificationItem::onHideDerivedClassWidget()
 {
     updateSpecificationButton(*m_derivedClassButton,
-                              m_derivedClassWidget->implementedClass(),
-                              false);
+                              m_derivedClassWidget->implementedClass(), false);
 }
 
 void
@@ -301,7 +253,6 @@ ClassSpecificationItem::onLinkedClassBtnPressed()
 void
 ClassSpecificationItem::onHideLinkedClassWidget()
 {
-    auto impl = m_linkedClassWidget->implementedClass();
-
-    updateSpecificationButton(*m_linkedClassButton, impl, true);
+    updateSpecificationButton(*m_linkedClassButton,
+                              m_linkedClassWidget->implementedClass(), true);
 }

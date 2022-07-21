@@ -17,11 +17,15 @@ public:
 
     QWidget* at(int index) const;
 
+    int count() const;
+
     void insertWidget(int index, QWidget* widget);
+
+    void appendWidget(QWidget* widget);
 
     void removeWidget(QWidget* widget);
 
-    void clearWidgets();
+    void clear();
 
     QLayout* layout();
 

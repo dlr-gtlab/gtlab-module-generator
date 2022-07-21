@@ -39,7 +39,7 @@
   [
     {
       "name": "valueToVariant",
-      "returnValue": "QVariant",
+      "returnType": "QVariant",
       "parameters":
       [
         "const QString& unit",
@@ -60,7 +60,7 @@
     },
     {
       "name": "setValueFromVariant",
-      "returnValue": "bool",
+      "returnType": "bool",
       "parameters":
       [
         "const QVariant& val",

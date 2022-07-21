@@ -1,6 +1,7 @@
 #include <QWizardPage>
 #include <QLabel>
 #include <QGridLayout>
+#include <QPushButton>
 
 #include "interface_selection_page.h"
 
@@ -55,7 +56,7 @@ InterfaceSelectionPage::initializePage()
 {
     LOG_INDENT("interface page...");
 
-    if (m_widgetListView->widgets().isEmpty())
+    if (settings()->selectedInterfaces().empty())
     {
         initInterfaces();
     }
@@ -76,7 +77,7 @@ InterfaceSelectionPage::validatePage()
 
     LOG_INFO << "selected " << QString::number(list.count()) << " interfaces..." << ENDL;
 
-    for (auto const& item : list)
+    for (auto const& item : qAsConst(list))
     {
         LOG_INFO << item.className << ENDL;
     }
@@ -91,13 +92,17 @@ InterfaceSelectionPage::validatePage()
 void
 InterfaceSelectionPage::initInterfaces()
 {
+    m_widgetListView->clear();
+
     auto interfaces = settings()->availableInterfaces();
 
     for (auto const& interfaceStruct : interfaces)
     {
-        auto widget = new InterfaceSelectionWidget(interfaceStruct);
-
-        m_widgetListView->insertWidget(-1, widget);
+        if (interfaceStruct.isEnabled(settings()->gtlabVersion()))
+        {
+            auto widget = new InterfaceSelectionWidget(interfaceStruct);
+            m_widgetListView->appendWidget(widget);
+        }
     }
 }
 

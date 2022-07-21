@@ -1,16 +1,16 @@
 {
-  "name": "GtAbstractCollectionSettings",
-  "fileName": "gt_abstractcollectionsettings",
+  "name": "GtCollectionSettings",
+  "fileName": "gt_collectionsettings",
   "outputPath": "collections",
   "includes":
   [
     "gt_object"
   ],
-  "functions": 
+  "functions->disabled-as-these-methods-are-not-pure-virtual":
   [
     {
       "name": "localCollectionWidget",
-      "returnValue": "QWidget*",
+      "returnType": "QWidget*",
       "parameters":
       [
         "QWidget* parent"
@@ -24,7 +24,7 @@
     },
     {
       "name": "setLocalCollectionData",
-      "returnValue": "void",
+      "returnType": "void",
       "parameters":
       [
         "QWidget* widget",
@@ -47,7 +47,7 @@
     },
     {
       "name": "browserWidget",
-      "returnValue": "GtAbstractBrowserWidget*",
+      "returnType": "GtAbstractBrowserWidget*",
       "parameters":
       [
         "QWidget* parent"
@@ -61,7 +61,7 @@
     },
     {
       "name": "setBrowserWidgetData",
-      "returnValue": "void",
+      "returnType": "void",
       "parameters":
       [
         "GtAbstractBrowserWidget* widget",

@@ -32,7 +32,7 @@ protected:
      * @param settings
      * @param parent
      */
-    AbstractWizardPage(ModuleGeneratorSettings* settings, QWidget* parent = 0)
+    AbstractWizardPage(ModuleGeneratorSettings* settings, QWidget* parent = {})
         : QWizardPage(parent), m_settings(settings) { }
     ~AbstractWizardPage() { }
 
