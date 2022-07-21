@@ -1,0 +1,26 @@
+{
+  "returnType": "QIcon",
+  "widgetType": "ComboBox",
+  "values":
+  [
+    "list",
+    "export",
+    "import",
+    "collection",
+    "process",
+    "calculator",
+    "plugin"
+  ],
+  "includes":
+  [
+    "$$2_0_INCLUDE_ICON$$"
+  ],
+  "implementation":
+  [
+    "#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))",
+    "return gtApp->icon(QStringLiteral(\"$$VALUE$$Icon.png\"))",
+    "#else",
+    "return GtGUI::Icon::$$VALUE$$16()",
+    "#endif"
+  ]
+}

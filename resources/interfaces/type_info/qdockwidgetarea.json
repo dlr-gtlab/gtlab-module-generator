@@ -1,0 +1,15 @@
+{
+  "returnType": "Qt::DockWidgetArea",
+  "widgetType": "ComboBox",
+  "values": 
+  [
+    "Right",
+    "Left",
+    "Top",
+    "Bottom"
+  ],
+  "implementation": 
+  [
+    "Qt::$$VALUE$$DockWidgetArea"
+  ]
+}

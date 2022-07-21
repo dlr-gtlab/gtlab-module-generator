@@ -7,7 +7,7 @@
   [
     {
       "name": "package",
-      "returnValue": "QMetaObject",
+      "returnType": "QMetaObject",
       "tooltip": "Package class",
       "description":
       [
@@ -18,7 +18,7 @@
     },
     {
       "name": "data",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "tooltip": "List of data classes",
       "description":
       [
@@ -29,7 +29,7 @@
     },
     {
       "name": "standAlone",
-      "returnValue": "bool",
+      "returnType": "bool",
       "tooltip": "is the module standalone and has its own data model structure?",
       "description":
       [

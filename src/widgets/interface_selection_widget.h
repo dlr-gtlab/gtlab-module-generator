@@ -22,7 +22,8 @@ public:
     ClassData const& interface() const { return m_interface; }
 
     bool isChecked() const;
-    void setChecked(const bool value) const;
+
+    void setChecked(bool value) const;
 
 signals:
 

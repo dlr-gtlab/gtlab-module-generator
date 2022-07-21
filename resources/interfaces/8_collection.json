@@ -7,7 +7,7 @@
   [
     {
       "name": "collectionIcon",
-      "returnValue": "QIcon",
+      "returnType": "QIcon",
       "const": true,
       "tooltip": "Collection specific icon",
       "description":
@@ -18,7 +18,7 @@
     },
     {
       "name": "collectionId",
-      "returnValue": "QString",
+      "returnType": "QString",
       "const": true,
       "tooltip": "Identification string of the collection.\nId is used to generate access point data within the network interface",
       "description":
@@ -30,7 +30,7 @@
     },
     {
       "name": "collectionSettings",
-      "returnValue": "QMetaObject",
+      "returnType": "QMetaObject",
       "const": true,
       "tooltip": "Collection settings",
       "description":
@@ -46,7 +46,7 @@
     },
     {
       "name": "collectionStructure",
-      "returnValue": "QMap<QString, QMetaType::Type>",
+      "returnType": "QMap<QString, QMetaType::Type>",
       "const": true,
       "description":
       [

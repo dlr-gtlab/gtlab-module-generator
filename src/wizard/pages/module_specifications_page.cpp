@@ -177,9 +177,16 @@ ModuleSpecificationsPage::isComplete() const
     if (settings()->reservedPrefixes().contains(prefix.toLower()))
     {
         palette.setColor(QPalette::Text, Qt::red);
-        m_modulePrefixEdit->setPalette(palette);
+//        m_modulePrefixEdit->setPalette(palette);
+        m_modulePrefixEdit->setToolTip(QStringLiteral("This prefix is already "
+                                                      "in use by another module"
+                                                      "/GTlab."));
 
-        return false;
+//        return false;
+    }
+    else
+    {
+        m_modulePrefixEdit->setToolTip({});
     }
 
     m_modulePrefixEdit->setPalette(palette);
@@ -205,24 +212,38 @@ ModuleSpecificationsPage::validatePage()
 {
     LOG_INDENT("validated!");
 
-    settings()->setModulePrefix(m_modulePrefixEdit->text());
+    QString prefix = m_modulePrefixEdit->text();
 
-    ModuleData moduleClass;
+    ModuleData moduleData;
+    moduleData.ident       = m_moduleNameEdit->text().simplified();
+    moduleData.className   = m_classNameEdit->text();
+    moduleData.fileName    = m_fileNameEdit->text();
+    moduleData.description = m_descriptionEdit->text();
+    moduleData.version     = m_versionEdit->text();
 
-    moduleClass.ident       = m_moduleNameEdit->text().simplified();
-    moduleClass.className   = m_classNameEdit->text();
-    moduleClass.fileName    = m_fileNameEdit->text();
-    moduleClass.description = m_descriptionEdit->text();
-    moduleClass.version     = m_versionEdit->text();
+    static QString version{};
+    ModuleData oldModuleData = settings()->moduleClass();
 
-    settings()->setModuleClass(moduleClass);
+    if (settings()->gtlabVersion() != version ||
+        oldModuleData.ident        != moduleData.ident ||
+        oldModuleData.className    != moduleData.className ||
+        settings()->modulePrefix() != prefix)
+    {
+        version = settings()->gtlabVersion();
+        // clear old interface selection
+        settings()->setSelectedInterfaces({});
+        emit moduleDataChanged();
+    }
 
-    LOG_INFO << "prefix             " << settings()->modulePrefix() << ENDL;
-    LOG_INFO << "module name        " << moduleClass.ident << ENDL;
-    LOG_INFO << "class name         " << moduleClass.className << ENDL;
-    LOG_INFO << "file name          " << moduleClass.fileName << ENDL;
-    LOG_INFO << "module description " << moduleClass.description << ENDL;
-    LOG_INFO << "module version     " << moduleClass.version << ENDL;
+    settings()->setModulePrefix(prefix);
+    settings()->setModuleClass(moduleData);
+
+    LOG_INFO << "prefix             " << prefix << ENDL;
+    LOG_INFO << "module name        " << moduleData.ident << ENDL;
+    LOG_INFO << "class name         " << moduleData.className << ENDL;
+    LOG_INFO << "file name          " << moduleData.fileName << ENDL;
+    LOG_INFO << "module description " << moduleData.description << ENDL;
+    LOG_INFO << "module version     " << moduleData.version << ENDL;
 
     return true;
 }

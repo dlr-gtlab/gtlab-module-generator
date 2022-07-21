@@ -20,7 +20,8 @@ GTLAB_CORE_PATH                 = $${DEV_TOOLS}
 GTLAB_LOGGING_PATH              = $${DEV_TOOLS}
 GTLAB_NUMERICS_PATH             = $${DEV_TOOLS}
 GTLAB_PHYSICS_PATH              = $${DEV_TOOLS}
-GTLAB_H5_PATH                   = $${DEV_TOOLS}
+
+GENH5_PATH                      = $${DEV_TOOLS}
 
 # Collections
 GTLAB_FUELCOLLECTION_PATH       = $${DEV_TOOLS}

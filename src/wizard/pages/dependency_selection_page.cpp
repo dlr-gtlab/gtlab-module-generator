@@ -170,27 +170,27 @@ DependencySelectionPage::addStandardDependencies()
         switch (status)
         {
         case -1:
-            statusText = QStringLiteral("The process of retrieving "
+            statusText = QStringLiteral("The process for fetching the existing "
                                         "dependencies failed to start!");
             break;
         case 0:
-            statusText = QStringLiteral("The process of retrieving dependencies "
-                                        "timed out!");
+            statusText = QStringLiteral("The process for fetching the existing "
+                                        "dependencies timed out!");
             break;
         case 1:
-            statusText = QStringLiteral("The process of retrieving dependencies "
-                                        "failed! Could not parse xml output! "
-                                        "The GTlab version may be incompatible "
-                                        "with this feature.");
+            statusText = QStringLiteral("The process for fetching the existing "
+                                        "dependencies failed! Could not parse "
+                                        "the XML output. The GTlab version may "
+                                        "be incompatible with this feature.");
             break;
         case 2:
-            statusText = QStringLiteral("The process of retrieving dependencies is "
-                                        "still in progress! Reload this page "
-                                        "to update the list.");
+            statusText = QStringLiteral("The process for fetching the existing "
+                                        "dependencies is still in progress! "
+                                        "Reload this page to update the list.");
             break;
         default:
-            statusText = QStringLiteral("The process of retrieving dependencies "
-                                        "failed!");
+            statusText = QStringLiteral("The process for fetching the existing "
+                                        "dependencies failed!");
             LOG_ERR << "invalid dependency resolve status!";
         }
 
@@ -217,7 +217,7 @@ void DependencySelectionPage::addDependency(const DependencyStruct& name,
     connect(widget, SIGNAL(completeChanged()),
             this, SIGNAL(completeChanged()));
 
-    m_widgetListView->insertWidget(-1, widget);
+    m_widgetListView->appendWidget(widget);
 
     emit completeChanged();
 }

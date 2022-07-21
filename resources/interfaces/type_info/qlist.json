@@ -1,0 +1,13 @@
+{
+  "returnType": "QList<(.+?)>",
+  "widgetType": "Multi",
+  "values":
+  [
+    "list << $$VALUE$$"
+  ],
+  "implementation": 
+  [
+    "$$RETURN_TYPE$$ list",
+    "list"
+  ]
+}

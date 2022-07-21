@@ -59,25 +59,6 @@ InterfaceSpecificationsPage::initializePage()
 
     LOG_INDENT("interface specifications page...");
 
-//    // only regenerate the widgets if the selection changed
-//    bool reload = false;
-//    auto& interfaces = settings()->selectedInterfaces();
-
-//    for (auto& interface : interfaces)
-//    {
-//        if (!m_activeInterfaces.contains(interface.className))
-//        {
-//            reload = true;
-//            break;
-//        }
-//    }
-
-//    if (reload || m_activeInterfaces.length() != interfaces.length())
-//    {
-//        LOG_INFO << "reloading all widgets!" << ENDL;
-//        initInterfaces();
-//    }
-
     initInterfaces();
 
     LOG_INFO << "done! Took " << QString::number(timer.elapsed())
@@ -107,9 +88,6 @@ InterfaceSpecificationsPage::validatePage()
 void
 InterfaceSpecificationsPage::initInterfaces()
 {
-//    m_activeInterfaces.clear();
-//    clearInterfaceTabs();
-
     LOG_INDENT("setting up selected interfaces...");
 
     auto interfaces = settings()->selectedInterfaces();
@@ -120,6 +98,7 @@ InterfaceSpecificationsPage::initInterfaces()
         activeInterfaces.append(m_interfaceTabBar->tabText(i));
     }
 
+    // add newly selected interfaces
     for (auto& interface : interfaces)
     {
         if (activeInterfaces.removeAll(interface.objectName))
@@ -136,7 +115,7 @@ InterfaceSpecificationsPage::initInterfaces()
         {
             interface.functions = widget->implementedFunctions();
 
-            LOG_WARN << "no widget to register!";
+            LOG_WARN << "no widget to register! " << interface.objectName;
             continue;
         }
 
@@ -157,8 +136,10 @@ InterfaceSpecificationsPage::initInterfaces()
 
             LOG_INDENT("removing interface: " + interface);
 
-            delete m_interfaceTabBar->widget(i);
+            auto* widget = m_interfaceTabBar->widget(i);
             m_interfaceTabBar->removeTab(i);
+            delete widget;
+            break;
         }
     }
 
@@ -177,26 +158,16 @@ InterfaceSpecificationsPage::initInterfaces()
     LOG_INFO << "done!";
 }
 
-//void
-//InterfaceSpecificationsPage::clearInterfaceTabs()
-//{
-//    LOG_INDENT("clearing interfaces...");
-
-//    for (int i = 0; i < m_interfaceTabBar->count(); i++)
-//    {
-//        auto* widget = m_interfaceTabBar->widget(i);
-
-//        if (!widget)
-//        {
-//            LOG_ERR << "null widget!";
-//            continue;
-//        }
-
-//        delete widget;
-//    }
-
-//    m_interfaceTabBar->clear();
-//}
+void
+InterfaceSpecificationsPage::clearInterfaceTabs()
+{
+    for (int i = m_interfaceTabBar->count() - 1; i >= 0; --i)
+    {
+        auto* widget = m_interfaceTabBar->widget(i);
+        m_interfaceTabBar->removeTab(i);
+        delete widget;
+    }
+}
 
 void
 InterfaceSpecificationsPage::setInterfaceImplementation()
@@ -238,6 +209,8 @@ InterfaceSpecificationsPage::checkClassImplementation(ClassData const& base,
 {
     for (const auto& function : base.functions)
     {
+        if (!function.baseClass.isValid()) continue;
+
         for (const auto& derived : function.implementation.derivedClasses)
         {
             if (derived.className.isEmpty() &&

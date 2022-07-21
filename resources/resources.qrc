@@ -1,10 +1,8 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/cross.png</file>
-        <file>images/error.png</file>
-        <file>images/error_original.png</file>
-        <file>images/warning.png</file>
-        <file>images/warning_original.png</file>
+        <file>images/crossIcon.png</file>
+        <file>images/crossIcon_24.png</file>
+        <file>images/crossIcon_16.png</file>
         <file>templates/basic_derived_class.cpp</file>
         <file>templates/basic_derived_class.h</file>
         <file>templates/basic_module_class.cpp</file>
@@ -42,5 +40,22 @@
         <file>interfaces/class_definitions/gt_posttemplateitem.json</file>
         <file>interfaces/class_definitions/gt_property.json</file>
         <file>interfaces/class_definitions/gt_task.json</file>
+        <file>interfaces/type_info/bool.json</file>
+        <file>interfaces/type_info/gt_calculatordata.json</file>
+        <file>interfaces/type_info/gt_classname.json</file>
+        <file>interfaces/type_info/gt_linkedclass.json</file>
+        <file>interfaces/type_info/gt_metaobject.json</file>
+        <file>interfaces/type_info/gt_taskdata.json</file>
+        <file>interfaces/type_info/pointers.json</file>
+        <file>interfaces/type_info/qdockwidgetarea.json</file>
+        <file>interfaces/type_info/qicon.json</file>
+        <file>interfaces/type_info/qlist.json</file>
+        <file>interfaces/type_info/qmap.json</file>
+        <file>interfaces/type_info/qstring.json</file>
+        <file>interfaces/type_info/qstringlist.json</file>
+        <file>interfaces/type_info/qvariant.json</file>
+        <file>interfaces/type_info/void.json</file>
+        <file>images/gt-logo.png</file>
+        <file>interfaces/type_info/gt_classname.json</file>
     </qresource>
 </RCC>

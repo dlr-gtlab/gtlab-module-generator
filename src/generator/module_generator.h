@@ -24,9 +24,13 @@ public:
 
     const static QString S_ID_SIGNATURE;
     const static QString S_ID_GENERATOR_VERSION;
+    /// include for header file
     const static QString S_ID_INCLUDE_FILE;
+    /// qt inlcude (for <...> styled includes)
     const static QString S_ID_QT_INCLUDE_FILE;
+    /// additional include (for "..." styled includes)
     const static QString S_ID_ADD_INCLUDE_FILE;
+    /// forward declarations
     const static QString S_ID_CLASS_FORWARD_DECL;
 
     const static QString S_ID_BASE_CLASS;
@@ -56,19 +60,24 @@ public:
     const static QString S_ID_PRO_INCLUDE_PATH;
     const static QString S_ID_PRO_HEADER_PATH;
     const static QString S_ID_PRO_SOURCE_PATH;
+    /// link release libs
     const static QString S_ID_PRO_LIBS;
+    /// link debug libs
     const static QString S_ID_PRO_LIBS_D;
 
     const static QString S_ID_AUTHOR;
     const static QString S_ID_AUTHOR_EMAIL;
 
+    /// for ncier indent of method parameters
     const static QString S_ID_INDENT;
 
     // compatability
-    const static QString S_CONSTREF_MACRO;
+    const static QString S_ID_2_0_INCLUDE_ICON;
+
     const static QString S_2_0_VERSION_CHECK;
-    const static QStringList S_2_0_ICON_INCLUDES;
-    const static QStringList S_2_0_CONSTREF;
+//    const static QString S_2_0_CONST_REF_MACRO;
+    const static QStringList S_2_0_INCLUDE_ICON_LIST;
+//    const static QStringList S_2_0_INCLUDE_CONSTREF_LIST;
 
     ModuleGeneratorSettings const* settings() const;
     ModuleGeneratorSettings* settings();
@@ -122,7 +131,7 @@ private:
                             ClassData const& derived);
 
     void generateIncludes(QString& sourceString,
-                          QStringList const& includes);
+                          QStringList includes);
 
     void generateForwardDeclarations(QString& headerString,
                                      QStringList const& forwardDecls);
@@ -138,7 +147,7 @@ private:
 
     void clearFileString(QString& fileString);
 
-    void clearCompabilityMacros(QString& fileString);
+    void clearCompatibilityMacros(QString& fileString);
 
     void clearProjectFileIdentifiers();
 };

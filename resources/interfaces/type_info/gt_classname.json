@@ -1,0 +1,8 @@
+{
+  "returnType": "GT_CLASSNAME",
+  "widgetType": "ClassName",
+  "implementation": 
+  [
+    "GT_CLASSNAME($$CLASS_NAME$$)"
+  ]
+}

@@ -6,7 +6,7 @@
   [
     {
       "name": "run",
-      "returnValue": "bool",
+      "returnType": "bool",
       "tooltip": "Should the process succeed by default?",
       "description":
       [

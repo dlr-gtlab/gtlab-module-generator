@@ -13,18 +13,23 @@ $$QT_INCLUDE_FILE$$
 GtVersionNumber
 $$CLASS_NAME$$::version()
 {
-    return GtVersionNumber($$MODULE_VERSION$$);
+    return GtVersionNumber{$$MODULE_VERSION$$};
 }
 
 QString
 $$CLASS_NAME$$::ident() const
 {
-    return "$$MODULE_NAME$$";
+    return QStringLiteral("$$MODULE_NAME$$");
 }
 
 QString
 $$CLASS_NAME$$::description() const
 {
-    return "$$MODULE_DESCRIPTION$$";
+    return QStringLiteral("$$MODULE_DESCRIPTION$$");
 }
-$$FUNCTION$$
+
+void
+$$CLASS_NAME$$::init()
+{
+    // TODO: code to execute on init
+}$$FUNCTION$$

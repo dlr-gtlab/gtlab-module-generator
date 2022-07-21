@@ -12,7 +12,7 @@
 #include <QRegularExpressionValidator>
 
 const QString
-DependencySelectionWidget::S_DELETE_BTN_ICON_PATH = QStringLiteral(":/images/cross.png");
+DependencySelectionWidget::S_DELETE_BTN_ICON_PATH = QStringLiteral(":/images/crossIcon_24.png");
 
 const QString
 DependencySelectionWidget::S_DELETE_BTN_TOOLTIP = QStringLiteral("delete");

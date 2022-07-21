@@ -55,10 +55,10 @@ CONFIG(debug, debug|release){
     LIBS += -lGTlabNumerics-d
 
     greaterThan(MAJOR_VERSION, 1) {
-        LIBS += -lGTlabCore-d -lGTlabGui-d -lGTlabDataProcessor-d
+        LIBS += -lGTlabDataProcessor-d -lGTlabCore-d -lGTlabGui-d
     } else {
-        LIBS += -lGTlabCalculators-d -lGTlabCore-d
-        LIBS += -lGTlabMdi-d -lGTlabDatamodel-d -lGTlabNetwork-d
+        LIBS += -lGTlabDatamodel-d -lGTlabCore-d -lGTlabCalculators-d
+        LIBS += -lGTlabMdi-d  -lGTlabNetwork-d
     }
     # MODULES$$PRO_LIBS_D$$
 } else {
@@ -67,13 +67,23 @@ CONFIG(debug, debug|release){
     LIBS += -lGTlabNumerics
 
     greaterThan(MAJOR_VERSION, 1) {
-        LIBS += -lGTlabCore -lGTlabGui -lGTlabDataProcessor
+        LIBS += -lGTlabDataProcessor -lGTlabCore -lGTlabGui
     } else {
-        LIBS += -lGTlabCalculators -lGTlabCore
-        LIBS += -lGTlabMdi -lGTlabDatamodel -lGTlabNetwork
+        LIBS += -lGTlabDatamodel -lGTlabCore -lGTlabCalculators
+        LIBS += -lGTlabMdi -lGTlabNetwork
     }
     # MODULES$$PRO_LIBS$$
 }
+
+# HDF5
+#CONFIG(debug, debug|release) {
+#    win32:LIBS += -lhdf5_D -lhdf5_cpp_D
+#    unix:LIBS += -lhdf5 -lhdf5_cpp
+#    LIBS += -lGenH5-d
+#} else {
+#    LIBS += -lhdf5 -lhdf5_cpp
+#    LIBS += -lGenH5
+#}
 
 unix:{
     # suppress the default RPATH if you wish

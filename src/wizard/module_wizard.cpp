@@ -16,7 +16,7 @@ const QString
 ModuleWizard::S_MODULE_GENERATOR_NAME = QStringLiteral("Module Generator");
 
 const QSize
-ModuleWizard::S_SIZE_WIZARD = QSize(570, 475);
+ModuleWizard::S_SIZE_WIZARD = QSize(585, 475);
 
 ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent),
     m_generator{std::make_unique<ModuleGenerator>()}
@@ -49,10 +49,15 @@ ModuleWizard::ModuleWizard(QWidget* parent) : QWizard(parent),
     setPage(PAGE::SIGNATURE_PAGE, m_signaturePage);
     setPage(PAGE::SUMMARY_PAGE, m_summaryPage);
 
+    // cnnect generate signals
     connect(m_summaryPage, SIGNAL(validated()),
             m_generator.get(), SLOT(generate()));
     connect(m_generator.get(), SIGNAL(generationFinished()),
             m_summaryPage, SLOT(onGenerationFinished()));
+
+    // connect helper signals
+    connect(m_moduleSpecificationPage, SIGNAL(moduleDataChanged()),
+            m_interfaceSpecificationsPage, SLOT(clearInterfaceTabs()));
 
     // wizard gui
     setWindowTitle(S_MODULE_GENERATOR_NAME + " (v. " +

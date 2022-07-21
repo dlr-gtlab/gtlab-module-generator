@@ -15,7 +15,9 @@ class ModuleGeneratorSettings
 
 public:
 
+    /// module generator version
     const static QString S_VERSION;
+    /// regular expression for common tasks
     const static QRegularExpression REG_PREFIX;
     const static QRegularExpression REG_OBJECT_NAME;
     const static QRegularExpression REG_CLASS_NAME;
@@ -24,9 +26,12 @@ public:
     const static QRegularExpression REG_AUTHOR;
     const static QRegularExpression REG_AUTHOR_EMAIL;
 
+    /// mono font
     const static QFont F_MONO_FONT;
+    /// signature base string
     const static QString S_SIGNATURE;
 
+    /// exec
     const static QString S_EXEC_SUFFIX;
     const static QString S_GTLAB_APP;
     const static QString S_GTLAB_CONSOLE_APP;
@@ -54,10 +59,10 @@ public:
     QString const& gtlabVersion() const { return m_version; }
     void setGTlabVersion(QString const& version) { m_version = version; }
 
-    bool useCompabilityMacros() const  { return m_useCompabilityMacros; }
-    void setUseCompabilityMacros(bool yes) { m_useCompabilityMacros = yes; }
+    bool useCompatibilityMacros() const  { return m_useCompatibilityMacros; }
+    void setUseCompatibilityMacros(bool yes) { m_useCompatibilityMacros = yes; }
 
-    QStringList supportedVersions() const;
+    static QStringList supportedVersions();
 
     // settings
     QString const& outputPath() const { return m_outputPath; }
@@ -96,6 +101,7 @@ public:
 
     QStringList const& reservedPrefixes() const;
     ClassDataList const& availableInterfaces() const;
+    TypeInfo typeInfo(QString const& returnType) const;
     DependencyDataList const& availableDependencies() const;
 
     int dependencyResolveStatus() const;
@@ -115,7 +121,7 @@ private:
     QString m_version{};
 
     bool m_createGitFiles{true};
-    bool m_useCompabilityMacros{true};
+    bool m_useCompatibilityMacros{true};
 
     QString m_outputPath{};
     QString m_gtlabPath{};

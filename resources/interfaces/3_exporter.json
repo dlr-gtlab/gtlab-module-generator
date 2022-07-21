@@ -7,7 +7,7 @@
   [
     {
       "name": "exporter",
-      "returnValue": "QList<QMetaObject>",
+      "returnType": "QList<QMetaObject>",
       "const": true,
       "tooltip": "List of exporters",
       "description":

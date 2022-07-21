@@ -6,8 +6,10 @@
   [
     {
       "name": "targets",
-      "returnValue": "QStringList",
+      "returnType": "QStringList",
+      "inputType": "QList<GT_CLASSNAME>",
       "const": true,
+      "tooltip": "Target class names to export data from",
       "description":
       [
         "@brief Returns list of allowed target class names for this exporter.",
@@ -16,7 +18,7 @@
     },
     {
       "name": "icon",
-      "returnValue": "QIcon",
+      "returnType": "QIcon",
       "const": true,
       "tooltip": "Icon of the exporter",
       "description":
@@ -27,7 +29,7 @@
     },
     {
       "name": "extension",
-      "returnValue": "QString",
+      "returnType": "QString",
       "const": true,
       "tooltip": "File extensions (e.g.: *.txt, *.csv, ...)",
       "description":
@@ -38,7 +40,7 @@
     },
     {
       "name": "doExport",
-      "returnValue": "bool",
+      "returnType": "bool",
       "parameters":
       [
         "GtObject* data, QFile& file"

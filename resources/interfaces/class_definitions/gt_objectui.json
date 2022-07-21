@@ -2,11 +2,11 @@
   "name": "GtObjectUI",
   "fileName": "gt_objectui",
   "outputPath": "gui/ui",
-  "functions":
+  "functions->icon-method-does-not-work-currently":
   [
     {
       "name": "icon",
-      "returnValue": "QIcon",
+      "returnType": "QIcon",
       "tooltip": "Icon of the Object",
       "const": true,
       "parameters":
@@ -16,7 +16,7 @@
       "description":
       [
         "@brief Specifies object icon.",
-        "@param Oobj Object",
+        "@param obj Object",
         "@return Object specific icon"
       ]
     }

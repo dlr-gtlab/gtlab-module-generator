@@ -7,31 +7,23 @@
   [
     {
       "name": "calculators",
-      "returnValue": "QList<GtCalculatorData>",
+      "returnType": "QList<GtCalculatorData>",
       "tooltip": "List of calculators",
       "description":
       [
         "@brief Returns static meta objects of calculator classes.",
-        "@return list including meta objects."
-      ],
-      "includes":
-      [
-        "gt_extendedcalculatordata"
+        "@return list of meta objects."
       ],
       "baseClass": "gt_calculator"
     },
     {
       "name": "tasks",
-      "returnValue": "QList<GtTaskData>",
+      "returnType": "QList<GtTaskData>",
       "tooltip": "List of tasks",
       "description":
       [
         "@brief Returns static meta objects of task classes.",
-        "@return list including meta objects."
-      ],
-      "includes":
-      [
-        "gt_extendedtaskdata"
+        "@return list of meta objects."
       ],
       "baseClass": "gt_task"
     }

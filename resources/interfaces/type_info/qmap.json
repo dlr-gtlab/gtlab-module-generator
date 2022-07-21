@@ -1,0 +1,17 @@
+{
+  "returnType": "QMap<(.+?)>",
+  "widgetType": "Multi",
+  "includes":
+  [
+    "QMap"
+  ],
+  "values":
+  [
+    "map.insert($$VALUE$$)"
+  ],
+  "implementation": 
+  [
+    "$$RETURN_TYPE$$ map",
+    "map"
+  ]
+}

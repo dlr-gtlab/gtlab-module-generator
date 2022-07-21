@@ -55,10 +55,10 @@ SettingsPage::S_USE_MACRO_LABEL =
         QStringLiteral("Use compatibility macros for other versions");
 const QString
 SettingsPage::S_USE_MACRO_TOOLTIP =
-        QStringLiteral("Macros may be added to the implementations, which "
-                       "enable/disable version specific code.\nThus, the same "
-                       "module may easily compile against different "
-                       "versions of GTlab.");
+        QStringLiteral("Macros will be added to the implementation to disable "
+                       "version specific code depending on the current GTlab "
+                       "version.\nThus, the same module may easily compile for "
+                       "different versions of GTlab.");
 
 const QString
 SettingsPage::S_DIR_BTN_TOOLTIP = QStringLiteral("select directory");
@@ -182,7 +182,7 @@ SettingsPage::initializePage()
     m_devToolsDirEdit->setText(QDir::toNativeSeparators(
                                    settings()->devToolsPath()));
 
-    m_useMacroBox->setChecked(settings()->useCompabilityMacros());
+    m_useMacroBox->setChecked(settings()->useCompatibilityMacros());
 
     // register versions
     auto versions = settings()->supportedVersions();
@@ -194,6 +194,7 @@ SettingsPage::initializePage()
         versions.prepend(lastVersion);
     }
 
+    m_versionBox->clear();
     m_versionBox->addItems(versions);
 }
 
@@ -236,12 +237,12 @@ SettingsPage::validatePage()
         settings()->setGTlabPath(path);
         settings()->setDevToolsPath(m_devToolsDirEdit->text());
         settings()->setGTlabVersion(m_versionBox->currentText());
-        settings()->setUseCompabilityMacros(m_useMacroBox->isChecked());
+        settings()->setUseCompatibilityMacros(m_useMacroBox->isChecked());
 
         LOG_INFO << "target version: " << settings()->gtlabVersion() << ENDL;
         LOG_INFO << "major version:  "
                  << QString::number(settings()->gtlabMajorVersion()) << ENDL;
-        LOG_INFO << "use macros:     "
+        LOG_INFO << "use compatibility macros: "
                  << QString{m_useMacroBox->isChecked() ? "true":"false"};
     }
 

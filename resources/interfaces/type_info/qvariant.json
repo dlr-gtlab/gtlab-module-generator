@@ -1,0 +1,7 @@
+{
+  "returnType": "QVariant",
+  "includes":
+  [
+    "QVariant"
+  ]
+}

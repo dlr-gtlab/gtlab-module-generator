@@ -51,6 +51,9 @@ protected:
 
     bool validatePage() override;
 
+signals:
+
+    void moduleDataChanged();
 
 private:
 

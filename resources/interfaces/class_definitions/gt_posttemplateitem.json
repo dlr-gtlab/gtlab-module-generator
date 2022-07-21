@@ -6,7 +6,7 @@
   [
     {
       "name": "createUI",
-      "returnValue": "GtAbstractPostWidget*",
+      "returnType": "GtAbstractPostWidget*",
       "parameters":
       [
         "GtPostTemplateItem* dm",

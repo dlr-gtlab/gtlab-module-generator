@@ -36,14 +36,16 @@ SOURCES += \
     generator/module_generator.cpp \
     generator/module_generator_logger.cpp \
     generator/module_generator_preloader.cpp \
+    generator/module_generator_structs.cpp \
     generator/module_generator_utils.cpp \
     main.cpp \
     generator/settings/module_generator_settings.cpp \
+    widgets/class_specification/abstract_type_specification_item.cpp \
+    widgets/class_specification/basic_type_specification_items.cpp \
     widgets/class_specification/class_specification_item.cpp \
     widgets/class_specification/class_specification_list.cpp \
     widgets/class_specification/function_specification_widget.cpp \
     widgets/class_specification/class_specification_widget.cpp \
-    widgets/class_specification/type_specification_widget.cpp \
     widgets/dependency_selection_widget.cpp \
     widgets/interface_selection_widget.cpp \
     widgets/widget_list_view.cpp \
@@ -64,12 +66,12 @@ HEADERS += \
     generator/module_generator_structs.h \
     generator/module_generator_utils.h \
     generator/settings/module_generator_settings.h \
-    widgets/class_specification/abstract_type_specifier.h \
+    widgets/class_specification/abstract_type_specification_item.h \
+    widgets/class_specification/basic_type_specification_items.h \
     widgets/class_specification/class_specification_item.h \
     widgets/class_specification/class_specification_list.h \
     widgets/class_specification/function_specification_widget.h \
     widgets/class_specification/class_specification_widget.h \
-    widgets/class_specification/type_specification_widget.h \
     widgets/dependency_selection_widget.h \
     widgets/interface_selection_widget.h \
     widgets/widget_list_view.h \
