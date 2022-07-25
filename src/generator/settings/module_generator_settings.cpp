@@ -159,7 +159,7 @@ ModuleGeneratorSettings::supportedVersions()
     QStringList retVal;
 
     retVal << QVersionNumber{1,7,0}.toString();
-    retVal << QVersionNumber{2,0,0}.toString() + " (DP5)";
+    retVal << QVersionNumber{2,0,0}.toString()/* + " (DP5)"*/;
 
     return retVal;
 }

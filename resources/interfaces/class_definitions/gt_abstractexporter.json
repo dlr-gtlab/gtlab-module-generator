@@ -31,7 +31,7 @@
       "name": "extension",
       "returnType": "QString",
       "const": true,
-      "tooltip": "File extensions (e.g.: *.txt, *.csv, ...)",
+      "tooltip": "File extensions. E.g.: Text (*.txt *.dat)",
       "description":
       [
         "@brief Returns file extensions of exporter.",

@@ -51,35 +51,6 @@ public:
      */
     QString description() const override;
 
-#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))
-#else
-    /**
-     * @brief In some cases, it is necessary to upgrade the data stored in the
-     * project when the module version is updated. This function can be used to
-     * add your own update routines to the framework.
-     * @return List of all upgrade routines of the module.
-     */
-    QList<VersionUpgradeRoutine> upgradeRoutines() const override {
-        return {};
-    }
-
-    /**
-     * @brief Returns the functions that the module likes to share.
-     *
-     * A shared function is a special kind of function that can be
-     * used by other modules or the core framework without the need
-     * to compile against this modules.
-     * This is possible since a shared function of type InterfaceFunction
-     * has a fixed function signature:
-     * QVariantList sharedFunction(const QVariantList&).
-     *
-     * @return shared functions
-     */
-    QList<gtlab::InterfaceFunction> sharedFunctions() const override {
-        return {};
-    }
-#endif
-
     /**
      * @brief Initializes module. Called on application startup.
      */
