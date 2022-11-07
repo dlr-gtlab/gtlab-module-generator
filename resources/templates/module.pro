@@ -12,7 +12,6 @@ include(settings.pri)
 
 TEMPLATE = subdirs
 CONFIG += ordered console
-CONFIG += c++14
 
 #### Interface ####
 contains(BUILD_MODULE, true) {

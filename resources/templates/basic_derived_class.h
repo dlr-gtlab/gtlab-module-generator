@@ -15,8 +15,8 @@ $$CLASS_FORWARD_DECL$$
  */
 class $$CLASS_NAME$$ : $$BASE_CLASS$$
 {
-	Q_OBJECT
-	
+    Q_OBJECT
+
 public:$$CONSTRUCTOR$$$$FUNCTION$$
 };
 

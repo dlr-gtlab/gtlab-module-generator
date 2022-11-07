@@ -11,7 +11,6 @@
 #### LOCAL SETTINGS
 include(local_settings.pri)
 
-
 #### GTlab - LIBRARIES
 ### CORE ###
 INCLUDEPATH += $${GTLAB_CORE_PATH}/include/core
@@ -33,20 +32,10 @@ INCLUDEPATH += $${GTLAB_PHYSICS_PATH}/include/physics
 LIBS        += -L$${GTLAB_PHYSICS_PATH}/lib/physics
 DEPENDPATH  += $${GTLAB_PHYSICS_PATH}/lib/physics
 
-## HDF5
-#INCLUDEPATH += $${HDF5_PATH}/include
-#CONFIG(debug, debug|release) {
-#    LIBS        += -L$${HDF5_PATH}/libDebug
-#    DEPENDPATH  += $${HDF5_PATH}/libDebug
-#} else {
-#    LIBS        += -L$${HDF5_PATH}/lib
-#    DEPENDPATH  += $${HDF5_PATH}/lib
-#}
-
-## HDF5 Wrapper
-#INCLUDEPATH += $${GENH5_PATH}/include/h5
-#LIBS        += -L$${GENH5_PATH}/lib/h5
-#DEPENDPATH  += $${GENH5_PATH}/lib/h5
+# HDF5 Wrapper
+INCLUDEPATH += $${GENH5_PATH}/include/h5
+LIBS        += -L$${GENH5_PATH}/lib/h5
+DEPENDPATH  += $${GENH5_PATH}/lib/h5
 
 ### COLLECTIONS ###
 INCLUDEPATH += $${GTLAB_FUELCOLLECTION_PATH}/include/fuelcollection
@@ -104,9 +93,17 @@ INCLUDEPATH += $${GTLAB_RCE_MODULE_PATH}/include/rce
 LIBS        += -L$${GTLAB_RCE_MODULE_PATH}/lib/rce
 DEPENDPATH  += $${GTLAB_RCE_MODULE_PATH}/lib/rce
 
-
-
 #### THIRD PARTY LIBRARIES
+# HDF5
+INCLUDEPATH += $${HDF5_PATH}/include
+CONFIG(debug, debug|release) {
+    LIBS        += -L$${HDF5_PATH}/libDebug
+    DEPENDPATH  += $${HDF5_PATH}/libDebug
+} else {
+    LIBS        += -L$${HDF5_PATH}/lib
+    DEPENDPATH  += $${HDF5_PATH}/lib
+}
+
 # MINPACK
 INCLUDEPATH += $${GTLAB_MINPACK_PATH}/include
 LIBS        += -L$${GTLAB_MINPACK_PATH}/lib

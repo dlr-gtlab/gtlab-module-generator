@@ -9,7 +9,8 @@
     "collection",
     "process",
     "calculator",
-    "plugin"
+    "plugin",
+    "empty"
   ],
   "includes":
   [
@@ -17,10 +18,10 @@
   ],
   "implementation":
   [
-    "#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))",
+    "#ifdef COMPAT_VERSION_1_X",
     "return gtApp->icon(QStringLiteral(\"$$VALUE$$Icon.png\"))",
     "#else",
-    "return GtGUI::Icon::$$VALUE$$16()",
+    "return gt::gui::icon::$$VALUE$$16()",
     "#endif"
   ]
 }

@@ -65,9 +65,9 @@
       "parameters":
       [
         "GtAbstractBrowserWidget* widget",
-        "QList<GtCollectionNetworkItem> GT_2_0_CONSTREF installedItems",
-        "QList<GtCollectionNetworkItem> GT_2_0_CONSTREF availableItems",
-        "QList<GtCollectionNetworkItem> GT_2_0_CONSTREF updataAvailableItems"
+        "QList<GtCollectionNetworkItem> GT_CONST_REF installedItems",
+        "QList<GtCollectionNetworkItem> GT_CONST_REF availableItems",
+        "QList<GtCollectionNetworkItem> GT_CONST_REF updataAvailableItems"
       ],
       "description":
       [
@@ -79,6 +79,7 @@
       ],
       "includes":
       [
+        "$$COMPT_FILE$$",
         "gt_collectionnetworkitem"
       ],
       "forwardDecl":

@@ -3,11 +3,11 @@ $$SIGNATURE$$
 #ifndef $$HEADER_NAME$$_H
 #define $$HEADER_NAME$$_H
 
-#include "gt_globals.h"
+#include "$$COMPAT_FILE$$.h"
 
 #include "gt_moduleinterface.h"
 $$INCLUDE_FILE$$
-#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))
+#ifdef COMPAT_VERSION_1_X
 #include "gt_initmoduleinterface.h"
 #endif
 
@@ -18,16 +18,16 @@ $$CLASS_FORWARD_DECL$$
  */
 class $$CLASS_NAME$$ : public QObject,
         public GtModuleInterface$$DERIVE_BASE_CLASS$$
-#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))
+#ifdef COMPAT_VERSION_1_X
         ,public GtInitModuleInterface
 #endif
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "de.dlr.gtlab.GtModuleInterface/0.1"
-                      FILE "$$FILE_NAME$$.json")
+
+    GT_MODULE("$$FILE_NAME$$.json")
 
     Q_INTERFACES(GtModuleInterface)
-#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))
+#ifdef COMPAT_VERSION_1_X
     Q_INTERFACES(GtInitModuleInterface)
 #endif
     $$INTERFACE_MACRO$$
@@ -40,12 +40,6 @@ public:
     GtVersionNumber version() override;
 
     /**
-     * @brief Returns module identification string.
-     * @return identification string
-     */
-    QString ident() const override;
-
-    /**
      * @brief Returns module description
      * @return description
      */
@@ -54,7 +48,18 @@ public:
     /**
      * @brief Initializes module. Called on application startup.
      */
-    void init() override;$$FUNCTION$$
+    void init() override;
+
+#ifdef COMPAT_VERSION_2_0
+    /**
+     * @brief Passes additional module information to the framework.
+     *
+     * NOTE: A reference to the author can significantly help the user to
+     * know who to contact in case of issues or other request.
+     * @return module meta information.
+     */
+    MetaInformation metaInformation() const override;
+#endif$$FUNCTION$$
 };
 
 #endif // $$HEADER_NAME$$_H

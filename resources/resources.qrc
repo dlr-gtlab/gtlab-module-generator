@@ -57,5 +57,7 @@
         <file>interfaces/type_info/void.json</file>
         <file>images/gt-logo.png</file>
         <file>interfaces/type_info/gt_classname.json</file>
+        <file>templates/compat.h</file>
+        <file>interfaces/class_definitions/gt_object_post.json</file>
     </qresource>
 </RCC>

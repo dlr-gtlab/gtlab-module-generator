@@ -12,6 +12,7 @@
 #include <QRegularExpressionValidator>
 #include <QCheckBox>
 #include <QPushButton>
+#include <QCloseEvent>
 
 //const static int I_MINIMAL_WIDTH = 320;
 
