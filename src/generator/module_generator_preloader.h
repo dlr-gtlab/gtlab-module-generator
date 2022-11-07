@@ -3,17 +3,15 @@
 
 #include "module_generator_structs.h"
 
+class QJsonObject;
+class QJsonArray;
 class QString;
 class ModuleGeneratorPreLoader
 {
     static const QString S_INCLUDE_CORE_PATH;
     static const QString S_INCLUDE_PATH;
 
-    static const QStringList S_GTLAB_CONSOLE_ARGS;
-
     static const int I_PROCESS_TIMEOUT_MS;
-
-    static const QRegularExpression REGEXP_PREFIX;
 
 public:
 

@@ -68,16 +68,19 @@ public:
     const static QString S_ID_AUTHOR;
     const static QString S_ID_AUTHOR_EMAIL;
 
-    /// for ncier indent of method parameters
+    /// for nicer indent of method parameters
     const static QString S_ID_INDENT;
+
+    /// for compatibility
+    const static QString S_ID_COMPAT_FILE;
 
     // compatability
     const static QString S_ID_2_0_INCLUDE_ICON;
 
+    const static QString S_1_7_VERSION_CHECK;
     const static QString S_2_0_VERSION_CHECK;
-//    const static QString S_2_0_CONST_REF_MACRO;
+
     const static QStringList S_2_0_INCLUDE_ICON_LIST;
-//    const static QStringList S_2_0_INCLUDE_CONSTREF_LIST;
 
     ModuleGeneratorSettings const* settings() const;
     ModuleGeneratorSettings* settings();
@@ -94,7 +97,7 @@ private:
 
     ModuleGeneratorSettings m_settings{};
 
-    QStringList m_proFileIncludePaths{};
+    QStringList m_proFileIncludePaths{"."};
     QDir m_srcDir{};
     QDir m_moduleDir{};
     QDir m_featuresDir{};
@@ -138,10 +141,18 @@ private:
 
     void generateConstructors(QString& headerString,
                               QString& sourceString,
-                              ClassData const& base);
+                              ClassData const& base,
+                              QString const& derivedName);
 
     void appendFileToProjectFile(QString const& fileName,
-                                 QString const& path);
+                                 QString const& path,
+                                 bool headerOnly = false);
+
+    void appendFileToProjectFile(QString const& fileName,
+                                 bool headerOnly = false)
+    {
+        appendFileToProjectFile(fileName, QString{"."}, headerOnly);
+    }
 
     void appendLibToProjectFile(QString const& name);
 

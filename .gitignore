@@ -2,6 +2,7 @@ Makefile*
 build/
 debug/
 release/
+.qtc_clangd/
 
 *.pro.user
 *.autosave

@@ -10,6 +10,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QVersionNumber>
 
 #include <QProcess>
 #include <QStringList>
@@ -20,11 +21,8 @@ ModuleGeneratorPreLoader::S_INCLUDE_CORE_PATH = QStringLiteral("core");
 const QString
 ModuleGeneratorPreLoader::S_INCLUDE_PATH      = QStringLiteral("include");
 
-const QStringList
-ModuleGeneratorPreLoader::S_GTLAB_CONSOLE_ARGS{QStringLiteral("--footprint")};
-
 const int
-ModuleGeneratorPreLoader::I_PROCESS_TIMEOUT_MS = 15000;
+ModuleGeneratorPreLoader::I_PROCESS_TIMEOUT_MS = 15 * 1000;
 
 /*
 // intended for auto detecting interfaces and functions
@@ -38,9 +36,6 @@ const QRegularExpression REGEXP_VIRTUAL_FUNCTION(
                        "\\((.*)?\\)\\s+" // parameter
                        "(const)?\\s?=\\s+0")); // const and pure virtual
 */
-const QRegularExpression
-ModuleGeneratorPreLoader::REGEXP_PREFIX(QStringLiteral("(\\w+?)_\\w+\\.h"));
-
 
 void
 ModuleGeneratorPreLoader::loadInterfaceData()
@@ -83,7 +78,7 @@ ModuleGeneratorPreLoader::loadTypeInfo()
     auto entries = tmpDir.entryList(QStringList{"*.json"},
                                     QDir::Files, QDir::SortFlag::Name);
 
-    for (auto& entry : entries)
+    for (auto const& entry : qAsConst(entries))
     {
         LOG_INDENT(entry);
 
@@ -186,7 +181,7 @@ ModuleGeneratorPreLoader::loadConstructorData(QJsonArray const& constructorJArra
 
     Constructors constructors;
 
-    for (auto ctorJObj : constructorJArray)
+    for (auto const& ctorJObj : constructorJArray)
     {
         auto ctorJObject = ctorJObj.toObject();
 
@@ -229,7 +224,7 @@ ModuleGeneratorPreLoader::loadFunctionData(QJsonArray const& functionsJArray)
 
     FunctionDataList functions;
 
-    for (auto functionJValue : functionsJArray)
+    for (auto const& functionJValue : functionsJArray)
     {
         auto functionJObject = functionJValue.toObject();
 
@@ -299,7 +294,7 @@ QStringList
 ModuleGeneratorPreLoader::parseStringJArray(QJsonArray const& array)
 {
     QStringList retVal;
-    for (auto valueJObj : array)
+    for (auto const& valueJObj : array)
     {
         retVal << valueJObj.toString();
     }
@@ -371,9 +366,13 @@ ModuleGeneratorPreLoader::findPrefixData(QString const& devToolsPath)
 
         while (iterator.hasNext())
         {
+            static const QRegularExpression regExp{
+                QStringLiteral("(\\w+?)_\\w+\\.h")
+            };
+
             QString fileName = iterator.next();
 
-            auto match = REGEXP_PREFIX.match(fileName);
+            auto match = regExp.match(fileName);
 
             QString prefix = match.captured(1);
 
@@ -390,6 +389,24 @@ ModuleGeneratorPreLoader::findPrefixData(QString const& devToolsPath)
 
     LOG_INFO << QString::number(m_prefixes.count())
              << " reserved prefixes found!";
+}
+
+QString
+findVersion(QString const& processPath)
+{
+    // get version of gtlab
+    QProcess versionProcess;
+    versionProcess.start(processPath, {"--version"});
+
+    if (!versionProcess.waitForFinished(2 * 1000))
+    {
+        return {};
+    }
+    static const QRegularExpression versionRegExp{QStringLiteral(
+            R"(\d+\.\d+\.\d+)"
+    )};
+    QString versionOutput = versionProcess.readAllStandardOutput();
+    return versionRegExp.match(versionOutput).captured(0);
 }
 
 void
@@ -412,6 +429,8 @@ ModuleGeneratorPreLoader::findDependencies(QString const& gtlabPath,
 
     QString processName(ModuleGeneratorSettings::S_GTLAB_CONSOLE_APP);
 
+    QString processPath = gtlabDir.absoluteFilePath(processName);
+
     if (!gtlabDir.exists(processName))
     {
         LOG_ERR << "invalid path to GTlabConsole ("
@@ -420,9 +439,24 @@ ModuleGeneratorPreLoader::findDependencies(QString const& gtlabPath,
         return;
     }
 
+    // get version of GTlab
+    auto version = QVersionNumber::fromString(findVersion(processPath));
+
+    if (version.isNull())
+    {
+        LOG_ERR << "aux process timeout!";
+        *status = -1;
+        return;
+    }
+
+    LOG_INFO << "GTlab version: " << version.toString() << ENDL;
+
     // start process
     QProcess process;
-    process.start(gtlabDir.absoluteFilePath(processName), S_GTLAB_CONSOLE_ARGS);
+    process.start(processPath, {
+        version.majorVersion() < 2 ? QString{"--footprint"} :
+                                     QString{"footprint"}
+    });
 
     if (!process.waitForFinished(I_PROCESS_TIMEOUT_MS))
     {
@@ -451,6 +485,8 @@ ModuleGeneratorPreLoader::findDependencies(QString const& gtlabPath,
     }
 
     QDomNodeList list(root.elementsByTagName(QStringLiteral("module")));
+
+    LOG_INFO << "dependencies:" << ENDL;
 
     for (int i = 0; i < list.length(); ++i)
     {

@@ -17,12 +17,6 @@ $$CLASS_NAME$$::version()
 }
 
 QString
-$$CLASS_NAME$$::ident() const
-{
-    return QStringLiteral("$$MODULE_NAME$$");
-}
-
-QString
 $$CLASS_NAME$$::description() const
 {
     return QStringLiteral("$$MODULE_DESCRIPTION$$");
@@ -32,4 +26,20 @@ void
 $$CLASS_NAME$$::init()
 {
     // TODO: code to execute on init
-}$$FUNCTION$$
+}
+
+#ifdef COMPAT_VERSION_2_0
+$$CLASS_NAME$$::MetaInformation
+$$CLASS_NAME$$::metaInformation() const
+{
+    MetaInformation m;
+
+    m.author =        QStringLiteral("$$AUTHOR$$");
+    m.authorContact = QStringLiteral("$$AUTHOR_EMAIL$$");
+
+    // TODO: set license
+    // m.licenseShort = ...;
+
+    return m;
+}
+#endif$$FUNCTION$$

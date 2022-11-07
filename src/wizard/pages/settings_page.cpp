@@ -52,12 +52,12 @@ const QString
 SettingsPage::S_VERSION_TOOLTIP = QStringLiteral("Target version of GTlab");
 const QString
 SettingsPage::S_USE_MACRO_LABEL =
-        QStringLiteral("Use compatibility macros for other versions");
+        QStringLiteral("Keep compatibility to other versions");
 const QString
 SettingsPage::S_USE_MACRO_TOOLTIP =
-        QStringLiteral("Macros will be added to the implementation to disable "
-                       "version specific code depending on the current GTlab "
-                       "version.\nThus, the same module may easily compile for "
+        QStringLiteral("Macros will be added to the implementation to\ndisable "
+                       "and enable code depending on the current\nGTlab "
+                       "version. Thus the same module may be used\nfor "
                        "different versions of GTlab.");
 
 const QString

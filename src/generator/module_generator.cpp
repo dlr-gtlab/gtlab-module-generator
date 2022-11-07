@@ -4,7 +4,7 @@
 #include "module_generator_settings.h"
 #include "module_generator_logger.h"
 
-#include <QTime>
+#include <QElapsedTimer>
 #include <QDir>
 #include <QDirIterator>
 #include <QRegularExpression>
@@ -14,8 +14,6 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QVersionNumber>
-
-#include "qstring.h"
 
 const QString
 ModuleGenerator::S_ID_SIGNATURE(QStringLiteral("$$SIGNATURE$$"));
@@ -93,28 +91,25 @@ ModuleGenerator::S_ID_AUTHOR_EMAIL(QStringLiteral("$$AUTHOR_EMAIL$$"));
 const QString
 ModuleGenerator::S_ID_INDENT = QStringLiteral("$$INDENT$$");
 
-const ConstructorData
-ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
-    {}, // params
-    { QStringLiteral("setObjectName(\"") + S_ID_OBJECT_NAME +
-      QStringLiteral("\")") },
-    {} // init list
-};
+const QString
+ModuleGenerator::S_ID_COMPAT_FILE = QStringLiteral("$$COMPAT_FILE$$");
 
 const QString
 ModuleGenerator::S_ID_2_0_INCLUDE_ICON = QStringLiteral("$$2_0_INCLUDE_ICON$$");
-//const QString
-//ModuleGenerator::S_2_0_CONST_REF_MACRO = QStringLiteral("GT_2_0_CONSTREF");
+
+const QString
+ModuleGenerator::S_1_7_VERSION_CHECK =
+        QStringLiteral("#ifdef COMPAT_VERSION_1_X");
 
 const QString
 ModuleGenerator::S_2_0_VERSION_CHECK =
-        QStringLiteral("#if (GT_VERSION < GT_VERSION_CHECK(2, 0, 0))");
+        QStringLiteral("#ifdef COMPAT_VERSION_2_0");
 
 const QStringList
 ModuleGenerator::S_2_0_INCLUDE_ICON_LIST{
-    "gt_globals",
+    "$$COMPAT_FILE$$",
     // prior GTlab 2.0
-    S_2_0_VERSION_CHECK + "\n"
+    S_1_7_VERSION_CHECK + "\n"
     "#include \"gt_application.h\"\n"
     "#else\n"
     "#include \"gt_icons.h\"\n"
@@ -122,16 +117,13 @@ ModuleGenerator::S_2_0_INCLUDE_ICON_LIST{
     "QIcon"
 };
 
-//const QStringList
-//ModuleGenerator::S_2_0_INCLUDE_CONSTREF_LIST{
-//    "gt_globals",
-//    // prior GTlab 2.0
-//    S_2_0_VERSION_CHECK + "\n"
-//    "#define " + S_2_0_CONST_REF_MACRO + "\n"
-//    "#else\n"
-//    "#define " + S_2_0_CONST_REF_MACRO + " const&\n"
-//    "#endif\n"
-//};
+const ConstructorData
+ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
+    {}, // params
+    { QStringLiteral("setObjectName(\"") + S_ID_OBJECT_NAME +
+      QStringLiteral("\")") },
+    {} // init list
+};
 
 // paths
 const QString
@@ -177,14 +169,14 @@ ModuleGenerator::settings()
 bool
 ModuleGenerator::generate()
 {
-    QTime time;
-    time.start();
+    QElapsedTimer timer;
+    timer.start();
 
     LOG_INDENT("generating...");
 
     bool result = generateHelper();
 
-    LOG_INFO << "time passed: " << QString::number(time.elapsed()) + " (ms)"
+    LOG_INFO << "time passed: " << QString::number(timer.elapsed()) + " (ms)"
              << ENDL;
     LOG_INFO << "module creation " << (result ? "succeeded!":"failed!");
 
@@ -344,6 +336,7 @@ ModuleGenerator::generateModuleProjectFile()
     QDir gtlabDir(settings()->gtlabPath());
     auto moduleClass(settings()->moduleClass());
 
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
     identifierPairs.append({ S_ID_GTLAB_INSTALL_SUB_DIR, gtlabDir.dirName() });
@@ -441,7 +434,7 @@ ModuleGenerator::generateModuleDependencies()
         LOG_INFO << "done!";
     }
 
-    for (auto dependency : settings()->selectedDependencies())
+    for (auto const& dependency : settings()->selectedDependencies())
     {
         appendLibToProjectFile(dependency.name);
     }
@@ -453,7 +446,7 @@ ModuleGenerator::generateModuleDependencies()
 
 bool
 ModuleGenerator::generateModule()
-{
+{    
     LOG_INDENT("generating module files...");
 
     auto headerString = utils::readFile(S_TEMPLATES_PATH +
@@ -466,6 +459,21 @@ ModuleGenerator::generateModule()
     // set the filename for the include to the module header file
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME,
                                              moduleClass.fileName });
+
+    QString compatFileName = settings()->fileNamingScheme("compat");
+
+    // only generate file if compatibility is enabled or 1.7 is targeted
+    if (settings()->gtlabMajorVersion() < 2 ||
+        settings()->useCompatibilityMacros())
+    {
+        LOG_INFO << "generating compatibility file..." << ENDL;
+
+        auto compatFileString = utils::readFile(S_TEMPLATES_PATH + "compat.h");
+
+        appendFileToProjectFile(compatFileName, true);
+
+        utils::writeStringToFile(compatFileString, m_srcDir, compatFileName + ".h");
+    }
 
     IdentifierPairs identifierPairs;
 
@@ -522,6 +530,7 @@ ModuleGenerator::generateModule()
     identifierPairs.append({ S_ID_HEADER_NAME, moduleClass.fileName.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
+    identifierPairs.append({ S_ID_COMPAT_FILE, compatFileName });
 
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleVersion });
@@ -564,7 +573,7 @@ ModuleGenerator::generateFunction(QString& headerString,
 
     // add ident for each parameter
     int indent = 2 + function.name.length();
-    indent += isConstructor ? S_Q_INVOKABLE.length()-1 :
+    indent += isConstructor ? S_Q_INVOKABLE.length() - 1 :
                               function.returnType.length();
 
     functionString += "(";
@@ -616,7 +625,9 @@ ModuleGenerator::generateFunction(QString& headerString,
     LOG_INFO << "building cpp function definition..." << ENDL;
 
     // remove default parameters in the cpp function declaration
-    QRegularExpression defaultParamReg("\\s?=\\s?(\\w|:|\\d|\\(\\)|\\{\\})+");
+    static const QRegularExpression defaultParamReg{
+        "\\s?=\\s?(\\w|:|\\d|\\(\\)|\\{\\})+"
+    };
     functionString.remove(defaultParamReg);
 
     // replace indent with identifier
@@ -756,7 +767,7 @@ ModuleGenerator::generateBasicClass(ClassData const& base,
     // set the filename for the include to the module header file
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME, derived.fileName });
 
-    generateConstructors(headerString, sourceString, base);
+    generateConstructors(headerString, sourceString, base, derived.className);
 
     IdentifierPairs identifierPairs;
 
@@ -785,6 +796,8 @@ ModuleGenerator::generateBasicClass(ClassData const& base,
                              QStringLiteral("public ") + base.className });
     identifierPairs.append({ S_ID_HEADER_NAME, derived.className.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, derived.className });
+    identifierPairs.append({ S_ID_COMPAT_FILE, settings()->fileNamingScheme("compat") });
+
     identifierPairs.append({ S_ID_OBJECT_NAME, derived.objectName });
     identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
     identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
@@ -892,7 +905,7 @@ ModuleGenerator::generateForwardDeclarations(QString& headerString,
 
     IdentifierPairs identifiers;
 
-    for (QString decl : forwardDecls)
+    for (QString const& decl : forwardDecls)
     {
         LOG_INFO << decl << ENDL;
 
@@ -922,7 +935,8 @@ ModuleGenerator::generateForwardDeclarations(QString& headerString,
 void
 ModuleGenerator::generateConstructors(QString& headerString,
                                       QString& sourceString,
-                                      ClassData const& base)
+                                      ClassData const& base,
+                                      QString const& derivedName)
 {
     LOG_INDENT("generating constructors...");
 
@@ -936,7 +950,7 @@ ModuleGenerator::generateConstructors(QString& headerString,
     for (auto& ctor : qAsConst(constructors))
     {
         FunctionData fCtor;
-        fCtor.name = S_ID_CLASS_NAME;
+        fCtor.name = derivedName;
         fCtor.parameters = ctor.parameters;
 
         fCtor.implementation.lines = ctor.implementation;
@@ -964,7 +978,8 @@ ModuleGenerator::generateConstructors(QString& headerString,
 
 void
 ModuleGenerator::appendFileToProjectFile(QString const& fileName,
-                                         QString const& path)
+                                         QString const& path,
+                                         bool headerOnly)
 {
     LOG_INDENT("adding class to project file...");
 
@@ -985,12 +1000,24 @@ ModuleGenerator::appendFileToProjectFile(QString const& fileName,
                                  S_ID_PRO_INCLUDE_PATH });
     }
 
+    // no need to write "./my_file"
+    if (includePath == QStringLiteral("."))
+    {
+        includePath.clear();
+    }
+    includePath.append(QStringLiteral("/"));
+
+    // append identifieres
     identifierPairs.append({ S_ID_PRO_HEADER_PATH,
-                             S_PRO_ENDL + includePath + '/' + fileName + ".h " +
+                             S_PRO_ENDL + includePath + fileName + ".h " +
                              S_ID_PRO_HEADER_PATH });
-    identifierPairs.append({ S_ID_PRO_SOURCE_PATH,
-                             S_PRO_ENDL + includePath + '/' + fileName + ".cpp " +
-                             S_ID_PRO_SOURCE_PATH });
+
+    if (!headerOnly)
+    {
+        identifierPairs.append({ S_ID_PRO_SOURCE_PATH,
+                                 S_PRO_ENDL + includePath + fileName + ".cpp " +
+                                 S_ID_PRO_SOURCE_PATH });
+    }
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
@@ -1012,7 +1039,7 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
     QDirIterator iterator(settings()->gtlabPath() + "/modules",
                           QDir::Files, QDirIterator::NoIteratorFlags);
 
-    QStringList nameParts(name.split(" ", QString::SkipEmptyParts));
+    QStringList nameParts(name.split(QChar{' '}, QString::SkipEmptyParts));
 
     bool success(false);
 
@@ -1060,10 +1087,13 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
 void
 ModuleGenerator::clearFileString(QString& fileString)
 {
+    static const QRegularExpression idsRegExp{"\\$\\$.+\\$\\$"};
+    static const QRegularExpression nlRegExp{"[\\n\\r]{3,}"};
+
     clearCompatibilityMacros(fileString);
 
     // remove identifiers
-    fileString.remove(QRegularExpression{"\\$\\$.+\\$\\$"});
+    fileString.remove(idsRegExp);
 
     // preprocessor should start at line beginning
     fileString.replace("\t#", "#");
@@ -1072,7 +1102,32 @@ ModuleGenerator::clearFileString(QString& fileString)
     fileString.replace("\t", "    ");
 
     // condense new lines
-    fileString.replace(QRegularExpression{"[\\n\\r]{3,}"}, "\n\n");
+    fileString.replace(nlRegExp, "\n\n");
+}
+
+void
+clearCompatibilityMacroHelper(QRegularExpression const& regExp,
+                              QString& fileString,
+                              int group2keep)
+{
+    auto matchIter = regExp.globalMatch(fileString);
+    while (matchIter.hasNext())
+    {
+        auto match = matchIter.next();
+        // use if block
+        int start = match.capturedStart(0);
+        int end = match.capturedEnd(0);
+
+        // find text to keep
+        QString text = match.captured(group2keep);
+        text.replace(QString{" "}.repeated(8), // fix indentation
+                     QString{" "}.repeated(4));
+
+        fileString.replace(start, end - start, text);
+
+        // update iter
+        matchIter = regExp.globalMatch(fileString);
+    }
 }
 
 void
@@ -1082,39 +1137,34 @@ ModuleGenerator::clearCompatibilityMacros(QString& fileString)
     {
         return;
     }
-    //greaterThan\(MAJOR_VERSION, 1\)\s{((\s+.*?)\s+)+}\selse\s{((\s+.*?)\s+)+}
+
     // gt_lobals.h for version dependent code
     fileString.remove("#include \"gt_globals.h\"\n");
 
-//    // const ref macro
-//    fileString.remove(S_2_0_INCLUDE_CONSTREF_LIST.last());
+    // first block  = group 1
+    // second block = group 4
+    static const QRegularExpression regExp_1_7{QStringLiteral(
+            R"(#ifdef\sCOMPAT_VERSION_1_X\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
+    )};
+    static const QRegularExpression regExp_2_0{QStringLiteral(
+            R"(#ifdef\sCOMPAT_VERSION_2_0\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
+    )};
 
-    if (settings()->gtlabMajorVersion() < 2)
+    bool is_1_7 = settings()->gtlabMajorVersion() < 2;
+
+    clearCompatibilityMacroHelper(regExp_1_7, fileString,  is_1_7 ? 1 : 4);
+    clearCompatibilityMacroHelper(regExp_2_0, fileString, !is_1_7 ? 1 : 4);
+
+    if (!is_1_7)
     {
-        // use if case
-        QRegularExpression regExp{
-            QStringLiteral("(#else\\n(.*\\n)+?)?#endif\\n")};
+        static const QRegularExpression compatRegExp{QStringLiteral(
+                R"(#include "\w*?compat\.h"\n)"
+        )};
+        fileString.remove(compatRegExp);
 
-        fileString.remove(regExp);
-        fileString.remove(S_2_0_VERSION_CHECK + '\n');
-
-//        // remove const ref
-//        fileString.remove("#define " + S_2_0_CONST_REF_MACRO);
-//        fileString.remove(S_2_0_CONST_REF_MACRO + ' ');
-        return;
+//        // const ref macros
+//        fileString.replace("#GT_CONST_REF", "const&");
     }
-
-    // use else case
-    QRegularExpression regExp{
-        QStringLiteral("#if\\s.+\\n(.+\\n)*?(#else|#endif)\\n")};
-
-    fileString.remove(regExp);
-    fileString.remove("#endif\n");
-    // will not remove trailing endif for header files
-
-//    // replace const ref
-//    fileString.remove("\n#define " + S_2_0_CONST_REF_MACRO);
-//    fileString.replace(S_2_0_CONST_REF_MACRO, "const&");
 }
 
 void
@@ -1123,11 +1173,13 @@ ModuleGenerator::clearProjectFileIdentifiers()
     // src.pro
     auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
 
+    bool is_1_7 = settings()->gtlabMajorVersion() < 2;
+
     // bit hacky and currently only works for major version 1 and 2
     // remove version dependent code blocks
     if (!settings()->useCompatibilityMacros())
     {
-        QRegularExpression regExp{
+        static const QRegularExpression regExp{
             "greaterThan\\(MAJOR_VERSION, 1\\)\\s{\\s+" // version check
             "((\\s|.)+?)" // if block (group 1)
             "\\s+}\\selse\\s{\\s+"
@@ -1135,22 +1187,7 @@ ModuleGenerator::clearProjectFileIdentifiers()
             "\\s+}"
         };
 
-        auto matchIter = regExp.globalMatch(fileString);
-        while (matchIter.hasNext())
-        {
-            auto match = matchIter.next();
-            // use if block
-            int start = match.capturedStart(0);
-            int end = match.capturedEnd(0);
-            QString text = settings()->gtlabMajorVersion() < 2 ?
-                        match.captured(3): // group 3
-                        match.captured(1); // group 1
-            text.replace(QString{" "}.repeated(8), // fix indentation
-                         QString{" "}.repeated(4));
-            fileString.replace(start, end - start, text);
-
-            matchIter = regExp.globalMatch(fileString);
-        }
+        clearCompatibilityMacroHelper(regExp, fileString, is_1_7 ? 3 : 1);
     }
 
     clearFileString(fileString);

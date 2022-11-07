@@ -21,9 +21,13 @@ CONFIG(debug, debug|release) {
 
 QT += core widgets xml
 
+# global define for module id
+DEFINES += GT_MODULE_ID='"\\\"$$MODULE_NAME$$\\\""'
+
 TEMPLATE = lib
 CONFIG += plugin
 CONFIG += silent
+CONFIG += c++14
 
 CONFIG(debug, debug|release) {
     OBJECTS_DIR = $${MOC_BUILD_DEST}/debug-app/obj
@@ -60,7 +64,7 @@ CONFIG(debug, debug|release){
         LIBS += -lGTlabDatamodel-d -lGTlabCore-d -lGTlabCalculators-d
         LIBS += -lGTlabMdi-d  -lGTlabNetwork-d
     }
-    # MODULES$$PRO_LIBS_D$$
+    # Other$$PRO_LIBS_D$$
 } else {
     # GTLAB CORE
     LIBS += -lGTlabLogging
@@ -72,16 +76,20 @@ CONFIG(debug, debug|release){
         LIBS += -lGTlabDatamodel -lGTlabCore -lGTlabCalculators
         LIBS += -lGTlabMdi -lGTlabNetwork
     }
-    # MODULES$$PRO_LIBS$$
+    # Other$$PRO_LIBS$$
 }
 
 # HDF5
 #CONFIG(debug, debug|release) {
+#    # C/C+ API
 #    win32:LIBS += -lhdf5_D -lhdf5_cpp_D
 #    unix:LIBS += -lhdf5 -lhdf5_cpp
+#    # Wrapper
 #    LIBS += -lGenH5-d
 #} else {
+#    # C/C+ API
 #    LIBS += -lhdf5 -lhdf5_cpp
+#    # Wrapper
 #    LIBS += -lGenH5
 #}
 
@@ -89,7 +97,7 @@ unix:{
     # suppress the default RPATH if you wish
     QMAKE_LFLAGS_RPATH=
     # add your own with quoting gyrations to make sure $ORIGIN gets to the command line unexpanded
-    QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN\''
+    QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN:\$$ORIGIN/..\''
 }
 
 ######################################################################

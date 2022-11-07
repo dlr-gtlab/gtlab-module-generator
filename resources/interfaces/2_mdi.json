@@ -47,7 +47,7 @@
         "@brief postItems",
         "@return"
       ],
-      "baseClass": "gt_object"
+      "baseClass": "gt_object_post"
     },
     {
       "name": "postPlots",
