@@ -10,6 +10,10 @@
 
 #### LOCAL SETTINGS
 include(local_settings.pri)
+include(deployment.pri)
+
+TARGET_DIR_NAME = $$TARGET_DIR_NAME$$
+LIB_BUILD_DEST  = lib/$${TARGET_DIR_NAME}
 
 #### GTlab - LIBRARIES
 ### CORE ###
@@ -18,6 +22,8 @@ LIBS        += -L$${GTLAB_CORE_PATH}/lib/core
 DEPENDPATH  += $${GTLAB_CORE_PATH}/lib/core
 
 ### LOGGING ###
+DEFINES += GT_LOG_USE_QT_BINDINGS
+
 INCLUDEPATH += $${GTLAB_LOGGING_PATH}/include/logging
 LIBS        += -L$${GTLAB_LOGGING_PATH}/lib/logging
 DEPENDPATH  += $${GTLAB_LOGGING_PATH}/lib/logging

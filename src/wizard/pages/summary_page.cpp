@@ -8,7 +8,6 @@
 #include <QFont>
 #include <QCoreApplication>
 
-
 #include "summary_page.h"
 
 #include "module_generator_settings.h"
@@ -96,7 +95,7 @@ SummaryPage::validatePage()
 {
     if (wizard()->buttonText(QWizard::FinishButton) == S_DONE_BUTTON_TEXT &&
         m_isComplete)
-    {        
+    {
         ModuleGeneratorLogger::unregisterLoggingFunction();
 
         return true;
@@ -276,7 +275,7 @@ SummaryPage::printSummary()
 }
 
 void
-updateSummary(QString const&text, ModuleGeneratorLogger::Type type, int indent)
+updateSummary(QString const& text, ModuleGeneratorLogger::Type type, int indent)
 {
     if (!s_summaryEdit) return;
 

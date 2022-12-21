@@ -54,8 +54,9 @@ public:
     const static QString S_ID_GTLAB_MAJOR_VERSION;
 
     const static QString S_ID_GTLAB_INSTALL_DIR;
-    const static QString S_ID_GTLAB_INSTALL_SUB_DIR;
+    const static QString S_ID_GTLAB_INSTALL_BIN_DIR;
     const static QString S_ID_DEVTOOLS_INSTALL_DIR;
+    const static QString S_ID_TARGET_DIR_NAME;
 
     const static QString S_ID_PRO_INCLUDE_PATH;
     const static QString S_ID_PRO_HEADER_PATH;

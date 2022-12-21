@@ -10,6 +10,7 @@
         <file>templates/local_settings.pri</file>
         <file>templates/module.pro</file>
         <file>templates/settings.pri</file>
+        <file>templates/deployment.pri</file>
         <file>interfaces/0_datamodel.json</file>
         <file>interfaces/1_process.json</file>
         <file>interfaces/2_mdi.json</file>
