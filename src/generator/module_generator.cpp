@@ -68,9 +68,11 @@ ModuleGenerator::S_ID_GTLAB_MAJOR_VERSION(QStringLiteral("$$GTLAB_MAJOR_VERSION$
 const QString
 ModuleGenerator::S_ID_GTLAB_INSTALL_DIR(QStringLiteral("$$GTLAB_INSTALL_DIR$$"));
 const QString
-ModuleGenerator::S_ID_GTLAB_INSTALL_SUB_DIR(QStringLiteral("$$GTLAB_INSTALL_SUB_DIR$$"));
+ModuleGenerator::S_ID_GTLAB_INSTALL_BIN_DIR(QStringLiteral("$$GTLAB_INSTALL_BIN_DIR$$"));
 const QString
 ModuleGenerator::S_ID_DEVTOOLS_INSTALL_DIR(QStringLiteral("$$DEVTOOLS_INSTALL_DIR$$"));
+const QString
+ModuleGenerator::S_ID_TARGET_DIR_NAME(QStringLiteral("$$TARGET_DIR_NAME$$"));
 
 const QString
 ModuleGenerator::S_ID_PRO_INCLUDE_PATH(QStringLiteral("$$PRO_INCLUDEPATH$$"));
@@ -283,10 +285,23 @@ ModuleGenerator::generateModuleSettingsFiles()
 {
     LOG_INDENT("generating .pri files...");
 
+
     // settings.pri
     auto fileString = utils::readFile(S_TEMPLATES_PATH + "settings.pri");
 
+    auto const& prefix = settings()->modulePrefix();
+    auto targetDirName = prefix.isEmpty() ? settings()->moduleClass().ident :
+                                            prefix;
+
+    utils::replaceIdentifier(fileString,
+                             { S_ID_TARGET_DIR_NAME, targetDirName.remove(' ') });
+
     utils::writeStringToFile(fileString, m_moduleDir, "settings.pri");
+
+    // deployment.pri
+    fileString = utils::readFile(S_TEMPLATES_PATH + "deployment.pri");
+
+    utils::writeStringToFile(fileString, m_moduleDir, "deployment.pri");
 
     // features/local_setting.pri
     fileString = utils::readFile(S_TEMPLATES_PATH + "local_settings.pri");
@@ -301,6 +316,12 @@ ModuleGenerator::generateModuleSettingsFiles()
 
     QDir gtlabDir{settings()->gtlabPath()};
 
+    identifierPairs.append({ S_ID_GTLAB_INSTALL_BIN_DIR, gtlabDir.dirName() });
+    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR,
+                             QDir::cleanPath(settings()->devToolsPath()) });
+    identifierPairs.append({ S_ID_GTLAB_MAJOR_VERSION,
+                             QString::number(settings()->gtlabMajorVersion())});
+
     if (!(gtlabDir.cdUp() && gtlabDir.exists()))
     {
         LOG_ERR  << "could not set a valid path to GTlab install dir!" << ENDL;
@@ -309,10 +330,6 @@ ModuleGenerator::generateModuleSettingsFiles()
     }
 
     identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, gtlabDir.absolutePath() });
-    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR,
-                             QDir::cleanPath(settings()->devToolsPath()) });
-    identifierPairs.append({ S_ID_GTLAB_MAJOR_VERSION,
-                             QString::number(settings()->gtlabMajorVersion())});
 
     utils::replaceIdentifier(fileString, identifierPairs);
 
@@ -333,13 +350,11 @@ ModuleGenerator::generateModuleProjectFile()
 
     IdentifierPairs identifierPairs;
 
-    QDir gtlabDir(settings()->gtlabPath());
-    auto moduleClass(settings()->moduleClass());
+    auto const& moduleClass = settings()->moduleClass();
 
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
-    identifierPairs.append({ S_ID_GTLAB_INSTALL_SUB_DIR, gtlabDir.dirName() });
 
     utils::replaceIdentifier(fileStringPro, identifierPairs);
     utils::replaceIdentifier(fileStringSrc, identifierPairs);
@@ -446,7 +461,7 @@ ModuleGenerator::generateModuleDependencies()
 
 bool
 ModuleGenerator::generateModule()
-{    
+{
     LOG_INDENT("generating module files...");
 
     auto headerString = utils::readFile(S_TEMPLATES_PATH +
@@ -470,7 +485,12 @@ ModuleGenerator::generateModule()
 
         auto compatFileString = utils::readFile(S_TEMPLATES_PATH + "compat.h");
 
+        utils::replaceIdentifier(compatFileString,
+                                 { S_ID_HEADER_NAME, compatFileName.toUpper() });
+
         appendFileToProjectFile(compatFileName, true);
+
+        clearFileString(compatFileString);
 
         utils::writeStringToFile(compatFileString, m_srcDir, compatFileName + ".h");
     }
@@ -1001,11 +1021,14 @@ ModuleGenerator::appendFileToProjectFile(QString const& fileName,
     }
 
     // no need to write "./my_file"
-    if (includePath == QStringLiteral("."))
+    if (includePath.isEmpty() || includePath == QStringLiteral("."))
     {
         includePath.clear();
     }
-    includePath.append(QStringLiteral("/"));
+    else
+    {
+        includePath.append(QStringLiteral("/"));
+    }
 
     // append identifieres
     identifierPairs.append({ S_ID_PRO_HEADER_PATH,
@@ -1047,6 +1070,12 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
     {
         QFileInfo fileInfo(iterator.next());
         QString lib(fileInfo.baseName());
+
+        // strip -d in case of debug build
+        if (lib.endsWith("-d"))
+        {
+            lib = lib.mid(0, lib.size() - 2);
+        }
 
         // e.g. "Post Processing": libname is GTlabPost
         // 1. check if postprocessing is in libname

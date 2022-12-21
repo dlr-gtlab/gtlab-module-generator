@@ -5,10 +5,10 @@
 #          \____/ /_/ /_/\__,_/_.___/              
 
 # path to dev tools
-DEV_TOOLS = $$DEVTOOLS_INSTALL_DIR$$
+DEV_TOOLS = "$$DEVTOOLS_INSTALL_DIR$$"
 
 #  path to GTlab
-GTLAB_DIR = $$GTLAB_INSTALL_DIR$$
+GTLAB_DIR = "$$GTLAB_INSTALL_DIR$$"
 
 # target major version
 MAJOR_VERSION = $$GTLAB_MAJOR_VERSION$$
@@ -47,4 +47,4 @@ NLOPT_PATH          = $${DEV_TOOLS}/ThirdPartyLibraries/NLopt
 HDF5_PATH           = $${DEV_TOOLS}/ThirdPartyLibraries/hdf5
 
 # Deployment
-GTLAB_ENVIRONMENT_PATH =
+GTLAB_ENVIRONMENT_PATH = "$${GTLAB_DIR}/$$GTLAB_INSTALL_BIN_DIR$$"

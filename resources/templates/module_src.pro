@@ -10,9 +10,6 @@
 
 include($${PWD}/../settings.pri)
 
-BUILD_DEST     = $${GTLAB_DIR}/$$GTLAB_INSTALL_SUB_DIR$$/modules
-MOC_BUILD_DEST = ../build
-
 CONFIG(debug, debug|release) {
     TARGET = $$CLASS_NAME$$-d
 } else {
@@ -30,18 +27,16 @@ CONFIG += silent
 CONFIG += c++14
 
 CONFIG(debug, debug|release) {
-    OBJECTS_DIR = $${MOC_BUILD_DEST}/debug-app/obj
-    MOC_DIR = $${MOC_BUILD_DEST}/debug-app/moc
-    RCC_DIR = $${MOC_BUILD_DEST}/debug-app/rcc
-    UI_DIR  = $${MOC_BUILD_DEST}/debug-app/ui
+    MOC_BUILD_DEST = ../build/debug/obj
 } else {
-    OBJECTS_DIR = $${MOC_BUILD_DEST}/release-app/obj
-    MOC_DIR = $${MOC_BUILD_DEST}/release-app/moc
-    RCC_DIR = $${MOC_BUILD_DEST}/release-app/rcc
-    UI_DIR  = $${MOC_BUILD_DEST}/release-app/ui
+    MOC_BUILD_DEST = ../build/release/obj
 }
 
-DESTDIR = $${BUILD_DEST}
+OBJECTS_DIR = $${MOC_BUILD_DEST}/obj
+MOC_DIR = $${MOC_BUILD_DEST}/moc
+RCC_DIR = $${MOC_BUILD_DEST}/rcc
+UI_DIR  = $${MOC_BUILD_DEST}/ui
+DESTDIR = ../$${LIB_BUILD_DEST}
 
 INCLUDEPATH += . $$PRO_INCLUDEPATH$$
 
@@ -99,5 +94,10 @@ unix:{
     # add your own with quoting gyrations to make sure $ORIGIN gets to the command line unexpanded
     QMAKE_LFLAGS += '-Wl,-rpath,\'\$$ORIGIN:\$$ORIGIN/..\''
 }
+
+######################################################################
+
+copyHeaders($$HEADERS)
+copyToEnvironmentPathModules()
 
 ######################################################################
