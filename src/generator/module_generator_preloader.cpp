@@ -243,6 +243,7 @@ ModuleGeneratorPreLoader::loadFunctionData(QJsonArray const& functionsJArray)
         QJsonArray includes     = functionJObject["includes"].toArray();
         QJsonArray forwardDecls     = functionJObject["forwardDecl"].toArray();
         QJsonArray descriptionArray = functionJObject["description"].toArray();
+        auto versionJObject = functionJObject["version"].toObject();
 
         auto baseClassName = functionJObject["baseClass"].toString();
         auto linkedClassName = functionJObject["linkedClass"].toString();
@@ -268,6 +269,7 @@ ModuleGeneratorPreLoader::loadFunctionData(QJsonArray const& functionsJArray)
         function.parameters  = parseStringJArray(parameter);
         function.description = parseDescription(descriptionArray);
         function.tooltip     = std::move(tooltip);
+        function.version     = parseVersionJObject(versionJObject);
         function.implementation = std::move(implementation);
 
         if (!baseClassName.isEmpty())
@@ -324,8 +326,7 @@ ModuleGeneratorPreLoader::parseDescription(QJsonArray const& descriptionJArray)
 {
     if (descriptionJArray.isEmpty()) return {};
 
-    QString description{"\n"
-                        "\t/**\n"
+    QString description{"\t/**\n"
                         "\t * "};
 
     description += parseStringJArray(descriptionJArray).join("\n\t * ");

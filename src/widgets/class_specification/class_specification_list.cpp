@@ -225,7 +225,7 @@ DeletableSpecificationItem::DeletableSpecificationItem(QWidget* inputWidget,
 
     setLayout(lay);
 
-    connect(deleteButton, &QPushButton::clicked, [&](){
+    connect(deleteButton, &QPushButton::clicked, this, [&](){
         this->deleteLater();
     });
 }

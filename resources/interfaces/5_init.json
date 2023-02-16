@@ -6,7 +6,7 @@
   "tooltip": "For implementing a dedicated startup routine",
   "version":
   {
-    "max": "1.9.9"
+    "max": "2.0.0"
   },
   "functions": 
   [

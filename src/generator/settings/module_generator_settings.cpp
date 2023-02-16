@@ -15,9 +15,9 @@
 #include <QFont>
 
 const QString
-ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.1.3"));
+ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.2.0"));
 const QRegularExpression
-ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z]|\\d)*"));
+ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z_]|\\d)*"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_OBJECT_NAME(QStringLiteral("\\s?[A-Za-z]"
                                                         "([\\w\\d]*\\s?)+"));

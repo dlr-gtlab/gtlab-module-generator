@@ -5,20 +5,23 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 TARGET = GtModuleGenerator
 
+TARGET_DIR_NAME = app
 BUILD_DEST = ../build
-DESTDIR = $${BUILD_DEST}
+MOC_BUILD_DEST  = $${BUILD_DEST}
 
 CONFIG(debug, debug|release){
-    OBJECTS_DIR = $${BUILD_DEST}/debug-app/obj
-    MOC_DIR = $${BUILD_DEST}/debug-app/moc
-    RCC_DIR = $${BUILD_DEST}/debug-app/rcc
-    UI_DIR = $${BUILD_DEST}/debug-app/ui
+    MOC_BUILD_DEST = $${MOC_BUILD_DEST}/debug-app
 } else {
-    OBJECTS_DIR = $${BUILD_DEST}/release-app/obj
-    MOC_DIR = $${BUILD_DEST}/release-app/moc
-    RCC_DIR = $${BUILD_DEST}/release-app/rcc
-    UI_DIR = $${BUILD_DEST}/release-app/ui
+    MOC_BUILD_DEST = $${MOC_BUILD_DEST}/release-app
 }
+
+CONFIG(debug, debug|release){
+    MOC_BUILD_DEST = $${MOC_BUILD_DEST}/debug-$${TARGET_DIR_NAME}
+} else {
+    MOC_BUILD_DEST = $${MOC_BUILD_DEST}/release-$${TARGET_DIR_NAME}
+}
+
+DESTDIR = $${BUILD_DEST}
 
 win32 {
     RC_FILE = ./app.rc

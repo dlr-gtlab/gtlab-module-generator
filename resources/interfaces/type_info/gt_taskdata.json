@@ -13,7 +13,7 @@
     "$$VARIABLE_NAME$$->category = QStringLiteral(\"$$MODULE_NAME$$\")",
     "$$VARIABLE_NAME$$->author = QStringLiteral(\"$$AUTHOR$$\")",
     "$$VARIABLE_NAME$$->contact = QStringLiteral(\"$$AUTHOR_EMAIL$$\")",
-    "#ifdef COMPAT_VERSION_1_X",
+    "#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)",
     "$$VARIABLE_NAME$$->icon = gtApp->icon(QStringLiteral(\"processIcon.png\"))",
     "$$VARIABLE_NAME$$->version = 1",
     "#else",

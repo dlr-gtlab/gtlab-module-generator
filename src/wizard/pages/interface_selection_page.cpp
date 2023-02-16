@@ -98,7 +98,7 @@ InterfaceSelectionPage::initInterfaces()
 
     for (auto const& interfaceStruct : interfaces)
     {
-        if (interfaceStruct.isEnabled(settings()->gtlabVersion()))
+        if (interfaceStruct.version.isEnabled(settings()->gtlabVersion()))
         {
             auto widget = new InterfaceSelectionWidget(interfaceStruct);
             m_widgetListView->appendWidget(widget);

@@ -85,10 +85,15 @@ struct TypeInfo
     }
 };
 
-/// Data struct to specify the allowed version of a sginature
+/// Data struct to specify version dependent code
 struct VersionData
 {
     QString min{}, max{};
+
+    bool isEnabled(QString const& vTarget) const
+    {
+        return details::isEnabledHelper(min, max, vTarget);
+    }
 };
 
 /// Data struct that holds the module specifications
@@ -152,11 +157,6 @@ struct ClassData
     /// functions to implement
     QList<FunctionData> functions{};
 
-    bool isEnabled(QString const& vTarget) const
-    {
-        return details::isEnabledHelper(version.min, version.max, vTarget);
-    }
-
     bool isValid() const
     {
         return !className.isEmpty() && !fileName.isEmpty();
@@ -184,6 +184,8 @@ struct FunctionData
     QString description{};
     /// tooltip in input mask
     QString tooltip{};
+    /// version info
+    VersionData version{};
 
     /// denotes the base class of the meta object (if function returns
     /// meta objects)

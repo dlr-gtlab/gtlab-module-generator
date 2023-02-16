@@ -21,12 +21,18 @@ INCLUDEPATH += $${GTLAB_CORE_PATH}/include/core
 LIBS        += -L$${GTLAB_CORE_PATH}/lib/core
 DEPENDPATH  += $${GTLAB_CORE_PATH}/lib/core
 
+# compatibility
+INCLUDEPATH += $${COMPAT_PATH}/include/compatibility
+
 ### LOGGING ###
 DEFINES += GT_LOG_USE_QT_BINDINGS
 
 INCLUDEPATH += $${GTLAB_LOGGING_PATH}/include/logging
 LIBS        += -L$${GTLAB_LOGGING_PATH}/lib/logging
 DEPENDPATH  += $${GTLAB_LOGGING_PATH}/lib/logging
+
+# Use of pre compiled logging header to reduce compile time
+PRECOMPILED_HEADER = $${GTLAB_LOGGING_PATH}/include/logging/gt_logging.h
 
 ### NUMERICS ###
 INCLUDEPATH += $${GTLAB_NUMERICS_PATH}/include/numerics

@@ -18,7 +18,7 @@
   ],
   "implementation":
   [
-    "#ifdef COMPAT_VERSION_1_X",
+    "#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)",
     "return gtApp->icon(QStringLiteral(\"$$VALUE$$Icon.png\"))",
     "#else",
     "return gt::gui::icon::$$VALUE$$16()",

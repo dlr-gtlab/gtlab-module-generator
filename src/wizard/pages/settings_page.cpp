@@ -243,7 +243,42 @@ SettingsPage::validatePage()
         LOG_INFO << "major version:  "
                  << QString::number(settings()->gtlabMajorVersion()) << ENDL;
         LOG_INFO << "use compatibility macros: "
-                 << QString{m_useMacroBox->isChecked() ? "true":"false"};
+                 << QString{m_useMacroBox->isChecked() ? "true":"false"}
+                 << ENDL;
+
+        if (settings()->gtlabMajorVersion() < 2 ||
+            settings()->useCompatibilityMacros())
+        {
+            QDir devtoolsDir = settings()->devToolsPath(); // dev tools path
+            devtoolsDir.cdUp(); // e.g. 2_0
+            devtoolsDir.cdUp(); // root dir
+
+            if (!devtoolsDir.cd("tools") || !devtoolsDir.cd("CompatibilityLib"))
+            {
+                LOG_ERR << "Failed to find compatibility tools!" << ENDL;
+
+                auto btn =
+                QMessageBox::warning(
+                    nullptr,
+                    tr("Compatibility Tools not found"),
+                    tr("Failed to find Compatibility Tools! Path does not exist:\n\n"
+                       "    <DEV_TOOLS>/../../tools/CompatibilityLib\n\n"
+                       "Make sure you have the Compatibility Tools installed using\n"
+                       "the Maintenance Tool if you want to use an older version of\n"
+                       "GTlab or double check the DevTools path!"),
+                    QMessageBox::Cancel | QMessageBox::Ignore,
+                    QMessageBox::Cancel
+                );
+
+                if (btn != QMessageBox::Ignore)
+                {
+                    LOG_INFO << ENDL;
+                    return false;
+                }
+            }
+        }
+
+        LOG_INFO << "done!";
     }
 
     settings()->preLoad();
