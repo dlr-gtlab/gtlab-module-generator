@@ -11,7 +11,7 @@ details::isEnabledHelper(QString const& vMin,
 {
     auto target = QVersionNumber::fromString(vTarget);
     return (vMin.isEmpty() || QVersionNumber::fromString(vMin) <= target) &&
-           (vMax.isEmpty() || QVersionNumber::fromString(vMax) >= target);
+           (vMax.isEmpty() || QVersionNumber::fromString(vMax) > target);
 }
 
 QString

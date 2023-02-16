@@ -3,11 +3,11 @@ $$SIGNATURE$$
 #ifndef $$HEADER_NAME$$_H
 #define $$HEADER_NAME$$_H
 
-#include "$$COMPAT_FILE$$.h"
+#include "gt_compat.h"
 
 #include "gt_moduleinterface.h"
 $$INCLUDE_FILE$$
-#ifdef COMPAT_VERSION_1_X
+#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)
 #include "gt_initmoduleinterface.h"
 #endif
 
@@ -18,7 +18,7 @@ $$CLASS_FORWARD_DECL$$
  */
 class $$CLASS_NAME$$ : public QObject,
         public GtModuleInterface$$DERIVE_BASE_CLASS$$
-#ifdef COMPAT_VERSION_1_X
+#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)
         ,public GtInitModuleInterface
 #endif
 {
@@ -27,7 +27,7 @@ class $$CLASS_NAME$$ : public QObject,
     GT_MODULE("$$FILE_NAME$$.json")
 
     Q_INTERFACES(GtModuleInterface)
-#ifdef COMPAT_VERSION_1_X
+#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)
     Q_INTERFACES(GtInitModuleInterface)
 #endif
     $$INTERFACE_MACRO$$
@@ -50,7 +50,7 @@ public:
      */
     void init() override;
 
-#ifdef COMPAT_VERSION_2_0
+#if GT_VERSION >= GT_VERSION_CHECK(2, 0, 0)
     /**
      * @brief Passes additional module information to the framework.
      *

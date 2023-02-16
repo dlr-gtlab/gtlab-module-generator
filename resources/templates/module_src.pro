@@ -19,7 +19,8 @@ CONFIG(debug, debug|release) {
 QT += core widgets xml
 
 # global define for module id
-DEFINES += GT_MODULE_ID='"\\\"$$MODULE_NAME$$\\\""'
+GT_MODULE_ID = $$MODULE_NAME$$
+DEFINES += GT_MODULE_ID='"\\\"$${GT_MODULE_ID}\\\""'
 
 TEMPLATE = lib
 CONFIG += plugin
@@ -27,9 +28,9 @@ CONFIG += silent
 CONFIG += c++14
 
 CONFIG(debug, debug|release) {
-    MOC_BUILD_DEST = ../build/debug/obj
+    MOC_BUILD_DEST = ../build/debug
 } else {
-    MOC_BUILD_DEST = ../build/release/obj
+    MOC_BUILD_DEST = ../build/release
 }
 
 OBJECTS_DIR = $${MOC_BUILD_DEST}/obj

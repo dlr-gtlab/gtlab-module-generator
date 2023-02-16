@@ -59,6 +59,10 @@
       ]
     },
     {
+      "version":
+      {
+        "max": "2.0.0"
+      },
       "name": "setValueFromVariant",
       "returnType": "bool",
       "parameters":
@@ -73,6 +77,26 @@
         "@param val",
         "@param unit",
         "@param success",
+        "@return success"
+      ]
+    },
+    {
+      "version":
+      {
+        "min": "2.0.0"
+      },
+      "name": "setValueFromVariant",
+      "returnType": "bool",
+      "parameters":
+      [
+        "const QVariant& val",
+        "const QString& unit"
+      ],
+      "description":
+      [
+        "@brief setValueFromVariant",
+        "@param val",
+        "@param unit",
         "@return success"
       ]
     }

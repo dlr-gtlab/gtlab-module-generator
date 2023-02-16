@@ -94,22 +94,19 @@ const QString
 ModuleGenerator::S_ID_INDENT = QStringLiteral("$$INDENT$$");
 
 const QString
-ModuleGenerator::S_ID_COMPAT_FILE = QStringLiteral("$$COMPAT_FILE$$");
-
-const QString
 ModuleGenerator::S_ID_2_0_INCLUDE_ICON = QStringLiteral("$$2_0_INCLUDE_ICON$$");
 
 const QString
 ModuleGenerator::S_1_7_VERSION_CHECK =
-        QStringLiteral("#ifdef COMPAT_VERSION_1_X");
+        QStringLiteral("#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)");
 
 const QString
 ModuleGenerator::S_2_0_VERSION_CHECK =
-        QStringLiteral("#ifdef COMPAT_VERSION_2_0");
+        QStringLiteral("#if GT_VERSION >= GT_VERSION_CHECK(2, 0, 0)");
 
 const QStringList
 ModuleGenerator::S_2_0_INCLUDE_ICON_LIST{
-    "$$COMPAT_FILE$$",
+    "gt_compat",
     // prior GTlab 2.0
     S_1_7_VERSION_CHECK + "\n"
     "#include \"gt_application.h\"\n"
@@ -475,26 +472,6 @@ ModuleGenerator::generateModule()
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME,
                                              moduleClass.fileName });
 
-    QString compatFileName = settings()->fileNamingScheme("compat");
-
-    // only generate file if compatibility is enabled or 1.7 is targeted
-    if (settings()->gtlabMajorVersion() < 2 ||
-        settings()->useCompatibilityMacros())
-    {
-        LOG_INFO << "generating compatibility file..." << ENDL;
-
-        auto compatFileString = utils::readFile(S_TEMPLATES_PATH + "compat.h");
-
-        utils::replaceIdentifier(compatFileString,
-                                 { S_ID_HEADER_NAME, compatFileName.toUpper() });
-
-        appendFileToProjectFile(compatFileName, true);
-
-        clearFileString(compatFileString);
-
-        utils::writeStringToFile(compatFileString, m_srcDir, compatFileName + ".h");
-    }
-
     IdentifierPairs identifierPairs;
 
     LOG_INFO << "implementing interfaces..." << ENDL;
@@ -550,7 +527,6 @@ ModuleGenerator::generateModule()
     identifierPairs.append({ S_ID_HEADER_NAME, moduleClass.fileName.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
-    identifierPairs.append({ S_ID_COMPAT_FILE, compatFileName });
 
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleVersion });
@@ -577,6 +553,40 @@ ModuleGenerator::generateModule()
     return true;
 }
 
+QString
+beginCompatibilityMacro(VersionData const& version)
+{
+    if (!version.min.isEmpty())
+    {
+        auto vers = QVersionNumber::fromString(version.min);
+        return QStringLiteral(
+            "#if GT_VERSION >= GT_VERSION_CHECK(%1, %2, %3)\n")
+            .arg(vers.majorVersion())
+            .arg(vers.minorVersion())
+            .arg(vers.microVersion());
+    }
+    else if (!version.max.isEmpty())
+    {
+        auto vers = QVersionNumber::fromString(version.max);
+        return QStringLiteral(
+            "#if GT_VERSION < GT_VERSION_CHECK(%1, %2, %3)\n")
+            .arg(vers.majorVersion())
+            .arg(vers.minorVersion())
+            .arg(vers.microVersion());
+    }
+    return {};
+}
+
+QString
+endCompatibilityMacro(VersionData const& version)
+{
+    if (!version.min.isEmpty() || !version.max.isEmpty())
+    {
+        return QStringLiteral("\n#endif");
+    }
+    return {};
+}
+
 void
 ModuleGenerator::generateFunction(QString& headerString,
                                   QString& sourceString,
@@ -589,7 +599,8 @@ ModuleGenerator::generateFunction(QString& headerString,
     LOG_INDENT("generating " + fname + "...");
 
     // Build basic function string
-    auto functionString = function.name;
+    QString functionString;
+    functionString += function.name;
 
     // add ident for each parameter
     int indent = 2 + function.name.length();
@@ -619,27 +630,36 @@ ModuleGenerator::generateFunction(QString& headerString,
     // description
     if (!function.description.isEmpty())
     {
+        functionHeader += '\n';
+        functionHeader += beginCompatibilityMacro(function.version);
         functionHeader += function.description;
+    }
+    else
+    {
+        functionHeader += beginCompatibilityMacro(function.version);
     }
 
     functionHeader += "\n\t";
 
     // function declaration
-    if (!isConstructor) {
+    if (!isConstructor)
+    {
         functionHeader += function.returnType + " ";
         functionHeader += functionString;
         functionHeader += S_OVERRIDE;
     }
-    else {
+    else
+    {
         functionHeader += S_Q_INVOKABLE;
         functionHeader += functionString +";";
     }
+
+    functionHeader += endCompatibilityMacro(function.version);
 
     auto indentifier = isConstructor ? S_ID_CONSTRUCTOR : S_ID_FUNCTION;
     functionHeader += indentifier;
 
     utils::replaceIdentifier(headerString, { indentifier, functionHeader});
-
 
     /* CPP */
     LOG_INFO << "building cpp function definition..." << ENDL;
@@ -654,17 +674,25 @@ ModuleGenerator::generateFunction(QString& headerString,
     functionString.replace("\t" + QString{" "}.repeated(indent), S_ID_INDENT);
 
     // function base
-    if (!isConstructor) {
-        functionString.prepend(function.returnType + "\n" +
-                               S_ID_CLASS_NAME + "::");
+    if (isConstructor)
+    {
+        functionString = beginCompatibilityMacro(function.version) +
+                         S_ID_CLASS_NAME + "::" +
+                         functionString +
+                         S_ID_CONSTRUCTOR_INIT_LIST;
     }
-    else {
-        functionString.prepend(S_ID_CLASS_NAME + "::");
-        functionString += S_ID_CONSTRUCTOR_INIT_LIST;
+    else
+    {
+        functionString = beginCompatibilityMacro(function.version) +
+                         function.returnType + "\n" + S_ID_CLASS_NAME + "::" +
+                         functionString;
     }
 
     // implementation
     functionString += "\n{\n\t" + S_ID_IMPLEMENTATION + "\n}";
+
+    functionString += endCompatibilityMacro(function.version);
+
     functionString += indentifier;
     functionString.prepend("\n\n");
 
@@ -689,6 +717,7 @@ ModuleGenerator::generateImplementation(QString& headerString,
     if (implementation.lines.isEmpty())
     {
         LOG_WARN << "skipping invalid implementation!";
+        qDebug() << "SKIPPING 2" << function.name << function.implementation.lines;
         // clear identifier
         utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION, {} });
         return;
@@ -726,9 +755,17 @@ ModuleGenerator::generateImplementation(QString& headerString,
     utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION,
                                              implementationString });
 
-    if (isConstructor) {
-//        LOG_INFO << "done!";
-        return;
+    if (isConstructor) return;
+
+    // hacky way to insert compat file in header and source string
+    // if its missing
+    if (headerString.contains("GT_VERSION"))
+    {
+        generateIncludes(headerString, QStringList{"gt_compat"});
+    }
+    else if (sourceString.contains("GT_VERSION"))
+    {
+        generateIncludes(sourceString, QStringList{"gt_compat"});
     }
 
     generateIncludes(sourceString, implementation.includes);
@@ -816,7 +853,6 @@ ModuleGenerator::generateBasicClass(ClassData const& base,
                              QStringLiteral("public ") + base.className });
     identifierPairs.append({ S_ID_HEADER_NAME, derived.className.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, derived.className });
-    identifierPairs.append({ S_ID_COMPAT_FILE, settings()->fileNamingScheme("compat") });
 
     identifierPairs.append({ S_ID_OBJECT_NAME, derived.objectName });
     identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
@@ -903,11 +939,6 @@ ModuleGenerator::generateIncludes(QString& sourceString,
         {
             LOG_WARN << "duplicate!" << ENDL;
         }
-    }
-
-    for (auto const& ids : identifiers)
-    {
-        qDebug() << "IDS:" << ids.identifier << ids.value;
     }
 
     utils::replaceIdentifier(sourceString, identifiers);
@@ -1173,10 +1204,10 @@ ModuleGenerator::clearCompatibilityMacros(QString& fileString)
     // first block  = group 1
     // second block = group 4
     static const QRegularExpression regExp_1_7{QStringLiteral(
-            R"(#ifdef\sCOMPAT_VERSION_1_X\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
+            R"(#if GT_VERSION < GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
     )};
     static const QRegularExpression regExp_2_0{QStringLiteral(
-            R"(#ifdef\sCOMPAT_VERSION_2_0\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
+            R"(#if GT_VERSION >= GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
     )};
 
     bool is_1_7 = settings()->gtlabMajorVersion() < 2;
@@ -1187,12 +1218,9 @@ ModuleGenerator::clearCompatibilityMacros(QString& fileString)
     if (!is_1_7)
     {
         static const QRegularExpression compatRegExp{QStringLiteral(
-                R"(#include "\w*?compat\.h"\n)"
+                R"(#include "gt_compat\.h"\n)"
         )};
         fileString.remove(compatRegExp);
-
-//        // const ref macros
-//        fileString.replace("#GT_CONST_REF", "const&");
     }
 }
 

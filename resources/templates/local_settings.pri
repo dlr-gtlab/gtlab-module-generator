@@ -20,8 +20,9 @@ GTLAB_CORE_PATH                 = $${DEV_TOOLS}
 GTLAB_LOGGING_PATH              = $${DEV_TOOLS}
 GTLAB_NUMERICS_PATH             = $${DEV_TOOLS}
 GTLAB_PHYSICS_PATH              = $${DEV_TOOLS}
-
 GENH5_PATH                      = $${DEV_TOOLS}
+
+COMPAT_PATH = $${DEV_TOOLS}/../../tools/CompatibilityLib
 
 # Collections
 GTLAB_FUELCOLLECTION_PATH       = $${DEV_TOOLS}
@@ -45,6 +46,7 @@ QWT_PATH            = $${DEV_TOOLS}/ThirdPartyLibraries/Qwt
 MINPACK_PATH        = $${DEV_TOOLS}/ThirdPartyLibraries/minpack
 NLOPT_PATH          = $${DEV_TOOLS}/ThirdPartyLibraries/NLopt
 HDF5_PATH           = $${DEV_TOOLS}/ThirdPartyLibraries/hdf5
+GOOGLE_TEST_PATH    = $${DEV_TOOLS}/ThirdPartyLibraries/GoogleTest
 
 # Deployment
 GTLAB_ENVIRONMENT_PATH = "$${GTLAB_DIR}/$$GTLAB_INSTALL_BIN_DIR$$"

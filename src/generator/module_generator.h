@@ -72,10 +72,7 @@ public:
     /// for nicer indent of method parameters
     const static QString S_ID_INDENT;
 
-    /// for compatibility
-    const static QString S_ID_COMPAT_FILE;
-
-    // compatability
+    /// compatability
     const static QString S_ID_2_0_INCLUDE_ICON;
 
     const static QString S_1_7_VERSION_CHECK;

@@ -127,8 +127,6 @@ ClassSpecificationItem::updateSpecificationButton(QPushButton& button,
 QStringList
 ClassSpecificationItem::codeImplementation()
 {
-//    LOG_INSTANCE("retrieving single class implemenation values...");
-
     ClassData implementation = m_derivedClassWidget->implementedClass();
 
     if (!implementation.isValid())
@@ -158,15 +156,6 @@ ClassSpecificationItem::codeImplementation()
     // mostly necessary for task and calculator data
     idents.append({ModuleGenerator::S_ID_OBJECT_NAME,
                    implementation.objectName});
-    // will be set when generating
-    /*
-    idents.append({ModuleGenerator::S_ID_MODULE_NAME,
-                   m_settings->moduleClass().ident});
-    idents.append({ModuleGenerator::S_ID_AUTHOR,
-                   m_settings->authorDetails().name});
-    idents.append({ModuleGenerator::S_ID_AUTHOR_EMAIL,
-                   m_settings->authorDetails().email});
-    */
     // create a variable name using the object name
     QString varName = implementation.objectName;
     varName.remove(' ');

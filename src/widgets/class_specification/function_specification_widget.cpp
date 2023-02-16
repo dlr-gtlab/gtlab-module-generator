@@ -58,6 +58,8 @@ FunctionSpecificationWidget::implementedFunctions()
         m_specificationWidgets
     };
 
+
+
     while (iterator.hasNext())
     {
         auto item = iterator.next();
@@ -70,10 +72,12 @@ FunctionSpecificationWidget::implementedFunctions()
 
         for (auto& f : m_functions)
         {
-            if (f.name != item.key()) continue;
-
-            f.implementation = item.value()->functionImplementation();
-            break;
+            if (f.name == item.key() &&
+                f.version.isEnabled(m_settings->gtlabVersion()))
+            {
+                f.implementation = item.value()->functionImplementation();
+                break;
+            }
         }
     }
 

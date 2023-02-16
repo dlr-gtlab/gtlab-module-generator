@@ -57,7 +57,9 @@ generateFunctionSpecification(ModuleGeneratorSettings* settings,
     }
 
     // simple return types
-    if (widgetType.isEmpty() || function.isHidden)
+    if (widgetType.isEmpty() ||
+        function.isHidden ||
+        !function.version.isEnabled(settings->gtlabVersion()))
     {
         // use brace initalization by default or in case of list input
         // as we may not now the return type

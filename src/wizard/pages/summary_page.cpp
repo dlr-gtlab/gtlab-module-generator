@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QFont>
 #include <QCoreApplication>
+#include <QScrollBar>
 
 #include "summary_page.h"
 
@@ -305,6 +306,11 @@ updateSummary(QString const& text, ModuleGeneratorLogger::Type type, int indent)
 
     s_summaryEdit->setTextColor(color);
     s_summaryEdit->insertPlainText(actualText);
+    auto* bar = s_summaryEdit->verticalScrollBar();
+    if (bar)
+    {
+        bar->setValue(bar->maximum());
+    }
 
     actualText.remove(ENDL);
     qDebug().noquote() << indendation + actualText;
