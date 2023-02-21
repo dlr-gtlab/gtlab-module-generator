@@ -95,7 +95,7 @@ InterfaceSpecificationsPage::initInterfaces()
     QStringList activeInterfaces;
     for (int i = 0; i < m_interfaceTabBar->count(); ++i)
     {
-        activeInterfaces.append(m_interfaceTabBar->tabText(i));
+        activeInterfaces.append(m_interfaceTabBar->tabText(i).remove('&'));
     }
 
     // add newly selected interfaces
@@ -132,7 +132,7 @@ InterfaceSpecificationsPage::initInterfaces()
     {
         for (int i = 0; i < m_interfaceTabBar->count(); ++i)
         {
-            if (m_interfaceTabBar->tabText(i) != interface) continue;
+            if (m_interfaceTabBar->tabText(i).remove('&') != interface) continue;
 
             LOG_INDENT("removing interface: " + interface);
 
@@ -189,7 +189,7 @@ InterfaceSpecificationsPage::setInterfaceImplementation()
 
         for (auto& interface : interfaces)
         {
-            if (interface.objectName == m_interfaceTabBar->tabText(i))
+            if (interface.objectName == m_interfaceTabBar->tabText(i).remove('&'))
             {
                 LOG_INFO << m_interfaceTabBar->tabText(i) << ENDL;
                 interface.functions = widget->implementedFunctions();
