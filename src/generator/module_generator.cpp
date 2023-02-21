@@ -1147,7 +1147,7 @@ ModuleGenerator::appendLibToProjectFile(const QString& name)
 void
 ModuleGenerator::clearFileString(QString& fileString)
 {
-    static const QRegularExpression idsRegExp{"\\$\\$.+\\$\\$"};
+    static const QRegularExpression idsRegExp{"\\$\\$[\\w\\d_]+\\$\\$"};
     static const QRegularExpression nlRegExp{"[\\n\\r]{3,}"};
 
     clearCompatibilityMacros(fileString);
