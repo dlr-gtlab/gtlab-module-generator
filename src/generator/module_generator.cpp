@@ -196,6 +196,9 @@ ModuleGenerator::generateHelper()
     result = generateModuleProjectFile();
     if (!result) return false;
 
+    result = generateUnittestStructure();
+    // ok to continue
+
     result = generateGitFiles();
     if (!result) return false;
 
@@ -282,7 +285,6 @@ ModuleGenerator::generateModuleSettingsFiles()
 {
     LOG_INDENT("generating .pri files...");
 
-
     // settings.pri
     auto fileString = utils::readFile(S_TEMPLATES_PATH + "settings.pri");
 
@@ -363,6 +365,49 @@ ModuleGenerator::generateModuleProjectFile()
     LOG_INFO << "done!";
 
     return true;
+}
+
+bool
+ModuleGenerator::generateUnittestStructure()
+{
+    LOG_INDENT("generating unittests...");
+
+    auto fileStringPro  = utils::readFile(S_TEMPLATES_PATH + "unittests.pro");
+    auto fileStringMain = utils::readFile(S_TEMPLATES_PATH + "unittests_main.cpp");
+    auto fileStringTest = utils::readFile(S_TEMPLATES_PATH + "unittests_test.cpp");
+
+    IdentifierPairs identifierPairs;
+
+    auto const& moduleClass = settings()->moduleClass();
+
+    identifierPairs.append({ S_ID_SIGNATURE, ModuleGeneratorSettings::S_SIGNATURE });
+    identifierPairs.append({ S_ID_HEADER_NAME, moduleClass.fileName.toUpper() });
+    identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
+    identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
+
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
+    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
+    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
+    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
+
+    utils::replaceIdentifier(fileStringPro, identifierPairs);
+    utils::replaceIdentifier(fileStringMain, identifierPairs);
+    utils::replaceIdentifier(fileStringTest, identifierPairs);
+
+    QDir dir = m_moduleDir;
+    bool success = true;
+    success &= dir.mkpath(QStringLiteral("./tests/unittests"));
+    success &= dir.cd(QStringLiteral("tests/unittests"));
+
+    if (!success) return false;
+
+    utils::writeStringToFile(fileStringPro, dir, "unittests.pro");
+    utils::writeStringToFile(fileStringMain, dir, "main.cpp");
+    utils::writeStringToFile(fileStringTest, dir, "test.cpp");
+
+    LOG_INFO << "done!";
+
+    return success;
 }
 
 bool

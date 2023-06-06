@@ -59,5 +59,8 @@
         <file>images/gt-logo.png</file>
         <file>interfaces/type_info/gt_classname.json</file>
         <file>interfaces/class_definitions/gt_object_post.json</file>
+        <file>templates/unittests_main.cpp</file>
+        <file>templates/unittests.pro</file>
+        <file>templates/unittests_test.cpp</file>
     </qresource>
 </RCC>

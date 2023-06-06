@@ -6,9 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- A unittesting structure will be added by default - #38
+
 ## [1.2.0] - 2023-02-16
 ### Changed
 - support for version GTlab 2.0 Beta - #36
+
+## Fixed 
+- rpath on linux - #37
 
 ## [1.1.3] - 2022-12-21
 ### Changed

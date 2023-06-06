@@ -96,14 +96,9 @@ LIBS        += -L$${GTLAB_PRE_DESIGN_MODULE_PATH}/lib/predesign
 DEPENDPATH  += $${GTLAB_PRE_DESIGN_MODULE_PATH}/lib/predesign
 
 ### PYTHON MODULE ###
-INCLUDEPATH += $${GTLAB_PYTHON_MODULE_PATH}/include/python37
-LIBS        += -L$${GTLAB_PYTHON_MODULE_PATH}/lib/python37
-DEPENDPATH  += $${GTLAB_PYTHON_MODULE_PATH}/lib/python37
-
-### RCE MODULE ###
-INCLUDEPATH += $${GTLAB_RCE_MODULE_PATH}/include/rce
-LIBS        += -L$${GTLAB_RCE_MODULE_PATH}/lib/rce
-DEPENDPATH  += $${GTLAB_RCE_MODULE_PATH}/lib/rce
+INCLUDEPATH += $${GTLAB_PYTHON_MODULE_PATH}/include/python39
+LIBS        += -L$${GTLAB_PYTHON_MODULE_PATH}/lib/python39
+DEPENDPATH  += $${GTLAB_PYTHON_MODULE_PATH}/lib/python39
 
 #### THIRD PARTY LIBRARIES
 # HDF5
@@ -122,14 +117,14 @@ LIBS        += -L$${GTLAB_MINPACK_PATH}/lib
 DEPENDPATH  += $${GTLAB_MINPACK_PATH}/lib
 
 ## QWT
-INCLUDEPATH += $${GTLAB_QWT_PATH}/include
-LIBS        += -L$${GTLAB_QWT_PATH}/lib
-DEPENDPATH  += $${GTLAB_QWT_PATH}/lib
+INCLUDEPATH += $${QWT_PATH}/include
+LIBS        += -L$${QWT_PATH}/lib
+DEPENDPATH  += $${QWT_PATH}/lib
 
 ## NLOPT
-INCLUDEPATH += $${GTLAB_NLOPT_PATH}/include
-LIBS        += -L$${GTLAB_NLOPT_PATH}/lib
-DEPENDPATH  += $${GTLAB_NLOPT_PATH}/lib
+INCLUDEPATH += $${NLOPT_PATH}/include
+LIBS        += -L$${NLOPT_PATH}/lib
+DEPENDPATH  += $${NLOPT_PATH}/lib
 
 
 ######################################################################

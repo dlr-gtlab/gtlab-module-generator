@@ -108,6 +108,8 @@ private:
 
     bool generateModuleProjectFile();
 
+    bool generateUnittestStructure();
+
     bool generateGitFiles();
 
     bool generateModuleDependencies();

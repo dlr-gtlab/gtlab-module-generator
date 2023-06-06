@@ -24,7 +24,6 @@ DEFINES += GT_MODULE_ID='"\\\"$${GT_MODULE_ID}\\\""'
 
 TEMPLATE = lib
 CONFIG += plugin
-CONFIG += silent
 CONFIG += c++14
 
 CONFIG(debug, debug|release) {
@@ -52,7 +51,7 @@ message(Targeting Major Version: $${MAJOR_VERSION})
 CONFIG(debug, debug|release){
     # GTLAB CORE
     LIBS += -lGTlabLogging-d
-    LIBS += -lGTlabNumerics-d
+    #LIBS += -lGTlabNumerics-d
 
     greaterThan(MAJOR_VERSION, 1) {
         LIBS += -lGTlabDataProcessor-d -lGTlabCore-d -lGTlabGui-d
@@ -64,7 +63,7 @@ CONFIG(debug, debug|release){
 } else {
     # GTLAB CORE
     LIBS += -lGTlabLogging
-    LIBS += -lGTlabNumerics
+    #LIBS += -lGTlabNumerics
 
     greaterThan(MAJOR_VERSION, 1) {
         LIBS += -lGTlabDataProcessor -lGTlabCore -lGTlabGui

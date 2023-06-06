@@ -93,7 +93,7 @@ DependencySelectionPage::initializePage()
     if (m_widgetListView->widgets().isEmpty() ||
         !m_resolveStatusLabel->isHidden())
     {
-        addStandardDependencies();
+        addRuntimeDependencies();
     }
 
     LOG_INFO << "done!";
@@ -155,7 +155,7 @@ DependencySelectionPage::selectedDependencies() const
 }
 
 void
-DependencySelectionPage::addStandardDependencies()
+DependencySelectionPage::addRuntimeDependencies()
 {
     LOG_INDENT("adding standard dependencies...");
     auto list  = settings()->availableDependencies();

@@ -47,8 +47,8 @@ private:
     QPushButton* m_addDependencyPushBtn{};
 
     WidgetListView* m_widgetListView{};
-
-    void addStandardDependencies();
+    
+    void addRuntimeDependencies();
 
     void addDependency(const DependencyStruct& name, bool isEditable = true);
 
