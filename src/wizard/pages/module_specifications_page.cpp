@@ -174,19 +174,13 @@ ModuleSpecificationsPage::isComplete() const
     QPalette palette;
     QString prefix = m_modulePrefixEdit->text();
 
+    m_modulePrefixEdit->setToolTip({});
     if (settings()->reservedPrefixes().contains(prefix.toLower()))
     {
         palette.setColor(QPalette::Text, Qt::red);
-//        m_modulePrefixEdit->setPalette(palette);
         m_modulePrefixEdit->setToolTip(QStringLiteral("This prefix is already "
                                                       "in use by another module"
                                                       "/GTlab."));
-
-//        return false;
-    }
-    else
-    {
-        m_modulePrefixEdit->setToolTip({});
     }
 
     m_modulePrefixEdit->setPalette(palette);
