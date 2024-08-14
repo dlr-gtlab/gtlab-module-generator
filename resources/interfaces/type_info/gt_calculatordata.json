@@ -3,7 +3,8 @@
   "widgetType": "Class",
   "includes":
   [
-    "$$2_0_INCLUDE_ICON$$",
+    "gt_icons",
+    "QIcon",
     "gt_extendedcalculatordata"
   ],
   "implementation": 
@@ -12,11 +13,7 @@
     "$$VARIABLE_NAME$$->category = QStringLiteral(\"$$MODULE_NAME$$\")",
     "$$VARIABLE_NAME$$->author = QStringLiteral(\"$$AUTHOR$$\")",
     "$$VARIABLE_NAME$$->contact = QStringLiteral(\"$$AUTHOR_EMAIL$$\")",
-    "#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)",
-    "$$VARIABLE_NAME$$->icon = gtApp->icon(QStringLiteral(\"calculatorIcon.png\"))",
-    "#else",
-    "$$VARIABLE_NAME$$->icon = gt::gui::icon::calculator16()",
-    "#endif",
+    "$$VARIABLE_NAME$$->icon = gt::gui::icon::calculator()",
     "$$VARIABLE_NAME$$->version = GtVersionNumber{0, 0, 1}",
     "$$VARIABLE_NAME$$->status = GtAbstractProcessData::PROTOTYPE",
     "$$VARIABLE_NAME$$"

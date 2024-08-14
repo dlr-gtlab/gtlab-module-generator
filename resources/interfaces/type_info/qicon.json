@@ -4,24 +4,21 @@
   "values":
   [
     "list",
-    "export",
+    "export_",
     "import",
     "collection",
     "process",
     "calculator",
     "plugin",
-    "empty"
+    "objectEmpty"
   ],
   "includes":
   [
-    "$$2_0_INCLUDE_ICON$$"
+    "gt_icons",
+    "QIcon",
   ],
   "implementation":
   [
-    "#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)",
-    "return gtApp->icon(QStringLiteral(\"$$VALUE$$Icon.png\"))",
-    "#else",
-    "return gt::gui::icon::$$VALUE$$16()",
-    "#endif"
+    "return gt::gui::icon::$$VALUE$$()",
   ]
 }

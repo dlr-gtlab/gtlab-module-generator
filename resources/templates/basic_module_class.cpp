@@ -28,7 +28,6 @@ $$CLASS_NAME$$::init()
     // TODO: code to execute on init
 }
 
-#if GT_VERSION >= GT_VERSION_CHECK(2, 0, 0)
 $$CLASS_NAME$$::MetaInformation
 $$CLASS_NAME$$::metaInformation() const
 {
@@ -42,4 +41,4 @@ $$CLASS_NAME$$::metaInformation() const
 
     return m;
 }
-#endif$$FUNCTION$$
+$$FUNCTION$$

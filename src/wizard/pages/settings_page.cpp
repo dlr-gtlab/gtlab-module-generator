@@ -196,6 +196,13 @@ SettingsPage::initializePage()
 
     m_versionBox->clear();
     m_versionBox->addItems(versions);
+
+    if (versions.size() <= 1)
+    {
+        m_useMacroBox->setEnabled(false);
+        m_useMacroBox->setChecked(false);
+        m_versionBox->setEnabled(false);
+    }
 }
 
 
@@ -246,8 +253,7 @@ SettingsPage::validatePage()
                  << QString{m_useMacroBox->isChecked() ? "true":"false"}
                  << ENDL;
 
-        if (settings()->gtlabMajorVersion() < 2 ||
-            settings()->useCompatibilityMacros())
+        if (settings()->useCompatibilityMacros())
         {
             QDir devtoolsDir = settings()->devToolsPath(); // dev tools path
             devtoolsDir.cdUp(); // e.g. 2_0

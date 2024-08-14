@@ -101,7 +101,7 @@ ModuleGeneratorSettings::classNamingScheme(const QString& name,
         stringList << prefix;
     }
 
-    stringList << name.split(" ", QString::SkipEmptyParts);
+    stringList << name.split(" ", Qt::SkipEmptyParts);
 
     QString retString;
     for (auto& string : stringList)
@@ -158,8 +158,7 @@ ModuleGeneratorSettings::supportedVersions()
 {
     QStringList retVal;
 
-    retVal << QVersionNumber{1,7,0}.toString();
-    retVal << QVersionNumber{2,0,0}.toString()/* + " (DP5)"*/;
+    retVal << QVersionNumber{2,0,0}.toString();
 
     return retVal;
 }
@@ -332,13 +331,6 @@ ModuleGeneratorSettings::serializeUserData() const
     moduleObject["target_version"] = m_version;
     moduleObject["use_compatibility_macros"] = m_useCompatibilityMacros;
 
-//    moduleObject["prefix"]  = m_modulePrefix;
-//    moduleObject["ident"]  = m_moduleClass.ident;
-//    moduleObject["version"]     = m_moduleClass.version;
-//    moduleObject["description"] = m_moduleClass.description;
-//    moduleObject["class_name"] = m_moduleClass.className;
-//    moduleObject["file_name"] = m_moduleClass.fileName;
-
     QJsonObject rootObject;
     rootObject["user"]   = userObject;
     rootObject["paths"]  = pathsObject;
@@ -369,7 +361,8 @@ ModuleGeneratorSettings::deserializeUserData()
 
     if (document.isNull())
     {
-        LOG_WARN << "null json document";
+        LOG_WARN << "null json document" << appDir.absoluteFilePath(
+            "module_generator.json") << json;
         return;
     }
 
@@ -391,13 +384,6 @@ ModuleGeneratorSettings::deserializeUserData()
     {
         m_useCompatibilityMacros = moduleObject["use_compatibility_macros"].toBool();
     }
-
-//    m_modulePrefix = moduleObject["prefix"].toString();
-//    m_moduleClass.ident = moduleObject["ident"].toString();
-//    m_moduleClass.version = moduleObject["version"].toString();
-//    m_moduleClass.description = moduleObject["description"].toString();
-//    m_moduleClass.className = moduleObject["class_name"].toString();
-//    m_moduleClass.fileName = moduleObject["file_name"].toString();
 
     LOG_INFO << "done!";
 }
