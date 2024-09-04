@@ -14,7 +14,7 @@
 #include "module_generator_settings.h"
 #include "module_generator_logger.h"
 
-static QTextEdit* s_summaryEdit; // ref for updateSummary methode
+static QTextEdit* s_summaryEdit; // ref for updateSummary method
 
 void updateSummary(QString const&, ModuleGeneratorLogger::Type, int);
 
@@ -29,8 +29,8 @@ const QString
 SummaryPage::S_GIT_CHECK_BOX_TEXT = QStringLiteral("generate additional git "
                                                    "files");
 const QString
-SummaryPage::S_GIT_CHECK_BOX_TOOLTIP = QStringLiteral("README.md, CHANGELOG.md "
-                                                      "and .gitignore");
+SummaryPage::S_GIT_CHECK_BOX_TOOLTIP = QStringLiteral("README.md, CHANGELOG.md, "
+                                                      ".gitignore etc.");
 /*
  * constructor
  */
@@ -179,8 +179,6 @@ SummaryPage::selectedInterfaces()
 
     for (auto& interface : settings()->selectedInterfaces())
     {
-//        if (interface == Q_NULLPTR) continue;
-
         content << interface.className;
     }
 
@@ -225,19 +223,12 @@ SummaryPage::filesToGenerate()
 
     auto moduleClass = settings()->moduleClass();
 
-    content << moduleClass.fileName + ".pro";
-    content << "settings.pri";
-    content << "local_settings.pri";
-    content << "features" + QString(QDir::separator()) + "local_settings.pri";
-    content << baseFolder + "src.pro";
     content << baseFolder + moduleClass.fileName + ".h";
     content << baseFolder + moduleClass.fileName + ".cpp";
     content << baseFolder + moduleClass.fileName + ".json";
 
     for (auto& interface : settings()->selectedInterfaces())
     {
-//        if (interface == Q_NULLPTR) continue;
-
         for (auto& function : interface.functions)
         {
             auto& baseClass  = function.baseClass;

@@ -97,6 +97,19 @@ const QString
 ModuleGenerator::S_ID_2_0_INCLUDE_ICON = QStringLiteral("$$2_0_INCLUDE_ICON$$");
 
 const QString
+ModuleGenerator::S_ID_CMAKE_SOURCE_FILES = QStringLiteral("$$CMAKE_SOURCE_FILES$$");
+const QString
+ModuleGenerator::S_ID_CMAKE_ADDITIONAL_FILES = QStringLiteral("$$CMAKE_ADDITIONAL_FILES$$");
+const QString
+ModuleGenerator::S_ID_CMAKE_MODULE_ALIAS = QStringLiteral("$$CMAKE_MODULE_ALIAS$$");
+const QString
+ModuleGenerator::S_ID_CMAKE_INCLUDE_DIRS = QStringLiteral("$$CMAKE_INCLUDE_DIRS$$");
+const QString
+ModuleGenerator::S_ID_CMAKE_FIND_PACKAGE_DEPS = QStringLiteral("$$CMAKE_FIND_PACKAGE_DEPS$$");
+const QString
+ModuleGenerator::S_ID_CMAKE_TARGET_LINK_LIBRARIES = QStringLiteral("$$CMAKE_TARGET_LINK_LIBRARIES$$");
+
+const QString
 ModuleGenerator::S_1_7_VERSION_CHECK =
         QStringLiteral("#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)");
 
@@ -128,6 +141,8 @@ ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
 const QString
 S_TEMPLATES_PATH = QStringLiteral(":/templates/");
 const QString
+S_CMAKE_PATH = QStringLiteral("/lib/cmake/");
+const QString
 S_SRC_DIR      = QStringLiteral("src");
 const QString
 S_FEATURES_DIR = QStringLiteral("features");
@@ -138,9 +153,9 @@ S_PROTECTED_TAG = QStringLiteral("protected:");
 
 // qt makros
 const QString
-S_INTERFACE_MACRO(
-        QStringLiteral("Q_INTERFACES(") + ModuleGenerator::S_ID_BASE_CLASS +
-        QStringLiteral(")\n\t"));
+S_INTERFACE_MACRO(QStringLiteral("Q_INTERFACES(") +
+                  ModuleGenerator::S_ID_BASE_CLASS +
+                  QStringLiteral(")\n\t"));
 const QString
 S_OVERRIDE(QStringLiteral(" override;"));
 const QString
@@ -148,10 +163,267 @@ S_Q_INVOKABLE(QStringLiteral("Q_INVOKABLE "));
 
 // helper strings
 const QString
-S_DERIVE_BASE_CLASS(
-        QStringLiteral(",\n\t\tpublic ") + ModuleGenerator::S_ID_BASE_CLASS);
+S_DERIVE_BASE_CLASS(QStringLiteral(",\n\t\tpublic ") +
+                    ModuleGenerator::S_ID_BASE_CLASS);
 const QString
-S_PRO_ENDL(QStringLiteral("\\\n\t"));
+S_QMAKE_ENDL(QStringLiteral("\\\n\t"));
+const QString
+S_CMAKE_ENDL(QStringLiteral("\n\t"));
+
+// cmake specifics
+const QString
+S_CMAKE_GIT_SOURCE_FILES(QStringLiteral(
+R"(
+    README_FILE "${PROJECT_SOURCE_DIR}/README.md"
+    CHANGELOG_FILE "${PROJECT_SOURCE_DIR}/CHANGELOG.md")"));
+
+struct ModuleGenerator::CMake
+{
+
+static QString
+getCMakePackageName(const ModuleGeneratorSettings& settings,
+                    const QString& moduleName)
+{
+    QDirIterator iterator(settings.devToolsPath() + S_CMAKE_PATH,
+                          QDir::Dirs, QDirIterator::NoIteratorFlags);
+
+    QString normalizedName = moduleName;
+    normalizedName.replace(" ", "");
+
+    // some well-known exceptions
+    if (normalizedName.startsWith(QStringLiteral("PythonModule")) ||
+        normalizedName.startsWith(QStringLiteral("PythonSetup")))
+    {
+        normalizedName = QStringLiteral("GTlabPython");
+    }
+
+    LOG_INDENT(QObject::tr("Searching cmake package for module '%1'").arg(moduleName));
+
+    bool success = false;
+    while (iterator.hasNext() && !success)
+    {
+        QString const& dirname =  iterator.fileName();
+        if (dirname.contains(normalizedName))
+        {
+            return dirname;
+        }
+
+        iterator.next();
+    }
+
+    LOG_WARN << QObject::tr("CMake package for module %1 not found, assuming package name '%2'")
+                    .arg(moduleName, normalizedName);
+
+    return normalizedName;
+}
+
+/**
+ * @brief Reads in the *-targets.cmake file to find, which library targets exist
+ * @param packageName Name of the cmake package
+ * @return
+ */
+static QStringList
+getCMakePackageTargets(const ModuleGeneratorSettings& settings,
+                       const QString& packageName)
+{
+    LOG_INDENT(QObject::tr("Searching cmake targets for package '%1'").arg(packageName));
+
+    QDir pkgDir(settings.devToolsPath() + S_CMAKE_PATH + packageName);
+
+    if (!pkgDir.exists())
+    {
+        LOG_WARN << QObject::tr("CMake package not found. Assuming target '%1'").arg(packageName);
+        return {packageName};
+    }
+
+    auto targetsFileStr = utils::readFile(pkgDir.absolutePath() + QStringLiteral("/%1-targets.cmake").arg(packageName));
+
+    static const QRegularExpression targetRegex{R"(add_library\((\S+) SHARED IMPORTED\))"};
+
+    QStringList targets;
+
+    auto iter = targetRegex.globalMatch(targetsFileStr);
+    while(iter.hasNext())
+    {
+        auto match = iter.next();
+        targets.push_back(match.captured(1));
+    }
+
+    if (targets.empty())
+    {
+        LOG_WARN << QObject::tr("No cmake targets found for package '%1'. Assuming target '%1'").arg(packageName);
+        return {packageName};
+    }
+
+    return targets;
+}
+
+static QString
+buildFindPackageStr(QString const& targetName, QString const& packageName)
+{
+    return QStringLiteral(
+R"(
+if(NOT TARGET %1)
+   find_package(%2 REQUIRED)
+endif()
+)").arg(targetName, packageName);
+}
+
+static void
+registerCMakeSourceFiles(ModuleGeneratorSettings const& settings,
+                         QStringList sourceFiles,
+                         IdentifierPairs& identifierPairs)
+{
+    identifierPairs.append({ S_ID_CMAKE_SOURCE_FILES, sourceFiles.join(S_CMAKE_ENDL) });
+
+    if (settings.createGitFiles())
+    {
+        // add git source files
+        identifierPairs.append({ S_ID_CMAKE_ADDITIONAL_FILES, S_CMAKE_GIT_SOURCE_FILES});
+    }
+}
+
+static void
+registerCMakeModuleAlias(ModuleGeneratorSettings const& settings,
+                         IdentifierPairs& identifierPairs)
+{
+    auto const& moduleClass = settings.moduleClass();
+
+    if (!settings.modulePrefix().isEmpty())
+    {
+        QString classWithoutPrefix = moduleClass.className;
+        classWithoutPrefix = classWithoutPrefix.remove(settings.modulePrefix());
+
+        QString alias = QStringLiteral("\nadd_library(%1::%2 ALIAS %3)\n")
+                            .arg(settings.modulePrefix(),
+                                 classWithoutPrefix,
+                                 moduleClass.className);
+
+        identifierPairs.append({ S_ID_CMAKE_MODULE_ALIAS, alias});
+    }
+}
+
+static void
+registerCMakePackageDependencies(ModuleGeneratorSettings const& settings,
+                                 IdentifierPairs& identifierPairs)
+{
+    QString targetsToLink;
+    QString findPackageStr;
+
+    for (auto const& dep : settings.selectedDependencies())
+    {
+        auto const& pkgName = getCMakePackageName(settings, dep.name);
+        auto const& targets = getCMakePackageTargets(settings, pkgName);
+
+        for (auto const& target : targets)
+        {
+            targetsToLink += QChar{' '} + target;
+        }
+
+        assert(!targets.empty());
+
+        findPackageStr += CMake::buildFindPackageStr(targets[0], pkgName);
+    }
+
+    if (settings.useCompatibilityMacros())
+    {
+        findPackageStr += CMake::buildFindPackageStr(QStringLiteral("GTlab::Compat"),
+                                                     QStringLiteral("GTlabCompat"));
+        targetsToLink += QChar{' '} + QStringLiteral("GTlab::Compat");
+    }
+
+    identifierPairs.append({ S_ID_CMAKE_TARGET_LINK_LIBRARIES, targetsToLink});
+    identifierPairs.append({ S_ID_CMAKE_FIND_PACKAGE_DEPS, findPackageStr});
+}
+
+static void
+registerCMakeIncludes(QStringList const& includePaths,
+                      IdentifierPairs& identifierPairs)
+{
+    QStringList paths;
+
+    std::transform(includePaths.begin(), includePaths.end(),
+                   std::back_inserter(paths),
+                   [](QString const& path) {
+        return QStringLiteral(R"($<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/%1>)")
+            .arg(path);
+    });
+
+    identifierPairs.append({ S_ID_CMAKE_INCLUDE_DIRS, paths.join(S_CMAKE_ENDL) });
+}
+
+}; // struct cmake
+
+struct ModuleGenerator::QMake
+{
+
+static QString
+getDependencyLibName(ModuleGeneratorSettings& settings,
+                     QString const& name)
+{
+    LOG_INDENT("adding dependency '" + name + "' to project file...");
+
+    QDirIterator iterator(settings.gtlabPath() + "/modules",
+                          QDir::Files, QDirIterator::NoIteratorFlags);
+
+    QStringList nameParts(name.split(QChar{' '}, QString::SkipEmptyParts));
+
+    while (iterator.hasNext())
+    {
+        QFileInfo fileInfo(iterator.next());
+        QString lib(fileInfo.baseName());
+
+        // strip -d in case of debug build
+        if (lib.endsWith("-d"))
+        {
+            lib = lib.mid(0, lib.size() - 2);
+        }
+
+        // e.g. "Post Processing": libname is GTlabPost
+        // 1. check if postprocessing is in libname
+        // 2. check if post is in libname
+        for (int i = nameParts.length(); i > 0; --i)
+        {
+            QString part = nameParts.mid(0, i).join("");
+
+            if (!lib.contains(part, Qt::CaseInsensitive)) continue;
+
+            if (!ModuleGeneratorSettings::isOsWindows() &&
+                lib.startsWith("lib"))
+            {
+                lib = lib.remove(0, 3); // remove lib prefix on unix
+            }
+
+            return lib;
+        }
+    }
+
+    LOG_WARN << "could not find library file!";
+    return {};
+}
+
+static void
+registerDependencies(ModuleGeneratorSettings& settings,
+                     IdentifierPairs& identifierPairs)
+{
+    QString releaseLibs, debugLibs;
+
+    for (auto const& dependency : settings.selectedDependencies())
+    {
+        QString lib = getDependencyLibName(settings, dependency.name);
+        if (!lib.isEmpty())
+        {
+            static QString pattern = QStringLiteral("\n\tLIBS += -l%1");
+            releaseLibs += pattern.arg(lib);
+            debugLibs   += (pattern + QStringLiteral("-d")).arg(lib);
+        }
+    }
+
+    identifierPairs.append({ S_ID_PRO_LIBS, releaseLibs });
+    identifierPairs.append({ S_ID_PRO_LIBS_D, debugLibs });
+}
+
+};
 
 ModuleGeneratorSettings const*
 ModuleGenerator::settings() const
@@ -187,33 +459,26 @@ ModuleGenerator::generate()
 bool
 ModuleGenerator::generateHelper()
 {
-    bool result(generateModulePath());
+    bool result(generateModuleDirs());
     if (!result) return false;
 
-    result = generateModuleSettingsFiles();
+    result = generateModuleMetaFile();
     if (!result) return false;
 
-    result = generateModuleProjectFile();
+    result = generateModuleFiles();
     if (!result) return false;
 
-    result = generateUnittestStructure();
+    result = generateModuleProjectFiles();
+    if (!result) return false;
+
     // ok to continue
-
-    result = generateGitFiles();
-    if (!result) return false;
-
-    result = generateModuleDependencies();
-    if (!result) return false;
-
-    result = generateModule();
-
-    clearProjectFileIdentifiers();
+    generateGitFiles();
 
     return result;
 }
 
 bool
-ModuleGenerator::generateModulePath()
+ModuleGenerator::generateModuleDirs()
 {
     LOG_INDENT("generating module path...");
 
@@ -227,7 +492,7 @@ ModuleGenerator::generateModulePath()
     m_srcDir = QDir::cleanPath(path);
     m_moduleDir = m_srcDir;
     m_srcDir = QDir::cleanPath(path + QDir::separator() + S_SRC_DIR);
-    m_featuresDir = QDir::cleanPath(path + QDir::separator() + S_FEATURES_DIR);
+//    m_featuresDir = QDir::cleanPath(path + QDir::separator() + S_FEATURES_DIR);
 
     // module dir
     if (m_moduleDir.exists() && m_moduleDir.count() > 0)
@@ -266,175 +531,122 @@ ModuleGenerator::generateModulePath()
         return false;
     }
 
-    // features dir
-    m_moduleDir.mkdir(m_featuresDir.absolutePath());
-
-    if (!m_featuresDir.exists())
-    {
-        LOG_ERR << "could not create '" << S_FEATURES_DIR << "/' path!" << ENDL;
-        // not returning false, as issue can be fixed by hand afterwards
-    }
-
     LOG_INFO << "done!";
 
     return m_srcDir.exists();
 }
 
 bool
-ModuleGenerator::generateModuleSettingsFiles()
+ModuleGenerator::generateModuleProjectFiles()
 {
-    LOG_INDENT("generating .pri files...");
+    bool success = false;
+    // either one should succeed
+    success |= generateQMakeFiles();
 
-    // settings.pri
-    auto fileString = utils::readFile(S_TEMPLATES_PATH + "settings.pri");
-
-    auto const& prefix = settings()->modulePrefix();
-    auto targetDirName = prefix.isEmpty() ? settings()->moduleClass().ident :
-                                            prefix;
-
-    utils::replaceIdentifier(fileString,
-                             { S_ID_TARGET_DIR_NAME, targetDirName.remove(' ') });
-
-    utils::writeStringToFile(fileString, m_moduleDir, "settings.pri");
-
-    // deployment.pri
-    fileString = utils::readFile(S_TEMPLATES_PATH + "deployment.pri");
-
-    utils::writeStringToFile(fileString, m_moduleDir, "deployment.pri");
-
-    // features/local_setting.pri
-    fileString = utils::readFile(S_TEMPLATES_PATH + "local_settings.pri");
-
-    QString featuresString = fileString;
-    clearFileString(featuresString);
-
-    utils::writeStringToFile(featuresString, m_featuresDir, "local_settings.pri");
-
-    // local_setting.pri
-    IdentifierPairs identifierPairs;
-
-    QDir gtlabDir{settings()->gtlabPath()};
-
-    identifierPairs.append({ S_ID_GTLAB_INSTALL_BIN_DIR, gtlabDir.dirName() });
-    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR,
-                             QDir::cleanPath(settings()->devToolsPath()) });
-    identifierPairs.append({ S_ID_GTLAB_MAJOR_VERSION,
-                             QString::number(settings()->gtlabMajorVersion())});
-
-    if (!(gtlabDir.cdUp() && gtlabDir.exists()))
-    {
-        LOG_ERR  << "could not set a valid path to GTlab install dir!" << ENDL;
-        LOG_WARN << "continuing!" << ENDL;
-        // not returning false, as issue can be fixed by hand afterwards
-    }
-
-    identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, gtlabDir.absolutePath() });
-
-    utils::replaceIdentifier(fileString, identifierPairs);
-
-    utils::writeStringToFile(fileString, m_moduleDir, "local_settings.pri");
-
-    LOG_INFO << "done!";
-
-    return true;
-}
-
-bool
-ModuleGenerator::generateModuleProjectFile()
-{
-    LOG_INDENT("generating project file...");
-
-    auto fileStringPro = utils::readFile(S_TEMPLATES_PATH + "module.pro");
-    auto fileStringSrc = utils::readFile(S_TEMPLATES_PATH + "module_src.pro");
-
-    IdentifierPairs identifierPairs;
-
-    auto const& moduleClass = settings()->moduleClass();
-
-    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
-    identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
-    identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
-
-    utils::replaceIdentifier(fileStringPro, identifierPairs);
-    utils::replaceIdentifier(fileStringSrc, identifierPairs);
-
-    utils::writeStringToFile(fileStringPro, m_moduleDir,
-                             moduleClass.fileName + ".pro");
-    utils::writeStringToFile(fileStringSrc, m_srcDir, "src.pro");
-
-    LOG_INFO << "done!";
-
-    return true;
-}
-
-bool
-ModuleGenerator::generateUnittestStructure()
-{
-    LOG_INDENT("generating unittests...");
-
-    auto fileStringPro  = utils::readFile(S_TEMPLATES_PATH + "unittests.pro");
-    auto fileStringMain = utils::readFile(S_TEMPLATES_PATH + "unittests_main.cpp");
-    auto fileStringTest = utils::readFile(S_TEMPLATES_PATH + "unittests_test.cpp");
-
-    IdentifierPairs identifierPairs;
-
-    auto const& moduleClass = settings()->moduleClass();
-
-    identifierPairs.append({ S_ID_SIGNATURE, ModuleGeneratorSettings::S_SIGNATURE });
-    identifierPairs.append({ S_ID_HEADER_NAME, moduleClass.fileName.toUpper() });
-    identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
-    identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
-
-    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
-    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
-    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
-    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
-
-    utils::replaceIdentifier(fileStringPro, identifierPairs);
-    utils::replaceIdentifier(fileStringMain, identifierPairs);
-    utils::replaceIdentifier(fileStringTest, identifierPairs);
-
-    QDir dir = m_moduleDir;
-    bool success = true;
-    success &= dir.mkpath(QStringLiteral("./tests/unittests"));
-    success &= dir.cd(QStringLiteral("tests/unittests"));
-
-    if (!success) return false;
-
-    utils::writeStringToFile(fileStringPro, dir, "unittests.pro");
-    utils::writeStringToFile(fileStringMain, dir, "main.cpp");
-    utils::writeStringToFile(fileStringTest, dir, "test.cpp");
-
-    LOG_INFO << "done!";
+    success |= generateCMakeFiles();
 
     return success;
 }
 
 bool
+ModuleGenerator::generateQMakeFiles()
+{
+    LOG_INDENT("generating qmake project files...");
+
+    auto const& moduleClass = settings()->moduleClass();
+    auto const& prefix = settings()->modulePrefix();
+
+    IdentifierPairs identifierPairs;
+
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
+    identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
+
+    auto targetDirName = prefix.isEmpty() ? settings()->moduleClass().ident : prefix;
+    identifierPairs.append({ S_ID_TARGET_DIR_NAME, targetDirName.remove(' ') });
+
+    QDir gtlabDir{settings()->gtlabPath()};
+    identifierPairs.append({ S_ID_GTLAB_INSTALL_BIN_DIR, gtlabDir.dirName() });
+    identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR,
+                            QDir::cleanPath(settings()->devToolsPath()) });
+    identifierPairs.append({ S_ID_GTLAB_MAJOR_VERSION,
+                            QString::number(settings()->gtlabMajorVersion())});
+
+    if (!(gtlabDir.cdUp() && gtlabDir.exists()))
+    {
+        LOG_ERR  << "could not set a valid path to GTlab install dir!" << ENDL;
+        LOG_WARN << "continuing!" << ENDL;
+        // not aborting here as issue is non critical
+    }
+
+    identifierPairs.append({ S_ID_GTLAB_INSTALL_DIR, gtlabDir.absolutePath() });
+
+    // append generated files
+    QStringList sourceFiles, headerFiles;
+    auto const& generatedSourceFiles = this->generatedSourceFiles();
+
+    std::copy_if(generatedSourceFiles.begin(), generatedSourceFiles.end(),
+                 std::back_inserter(sourceFiles), [](QString const& fileName){
+        return fileName.endsWith(".cpp");
+    });
+    std::copy_if(generatedSourceFiles.begin(), generatedSourceFiles.end(),
+                 std::back_inserter(headerFiles), [](QString const& fileName){
+        return fileName.endsWith(".h");
+    });
+
+    identifierPairs.append({ S_ID_PRO_HEADER_PATH, headerFiles.join(S_QMAKE_ENDL) });
+    identifierPairs.append({ S_ID_PRO_SOURCE_PATH, sourceFiles.join(S_QMAKE_ENDL) });
+
+    // append include paths
+    auto const& includePaths = this->generatedIncludePaths();
+    identifierPairs.append({ S_ID_PRO_INCLUDE_PATH, includePaths.join(S_QMAKE_ENDL) });
+
+    QMake::registerDependencies(*settings(), identifierPairs);
+    
+    applyTemplate(S_TEMPLATES_PATH + QStringLiteral("qmake"),
+                   m_moduleDir,
+                   identifierPairs);
+
+    // rename main .pro file
+    QFile file(m_moduleDir.absoluteFilePath("module.pro"));
+    assert(file.exists());
+    file.rename(m_moduleDir.absoluteFilePath(moduleClass.fileName + ".pro"));
+
+    return true;
+}
+
+bool
+ModuleGenerator::generateCMakeFiles()
+{
+    LOG_INDENT("generating cmake files...");
+
+    IdentifierPairs identifierPairs;
+
+    auto const& moduleClass = settings()->moduleClass();
+
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
+    identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
+
+    CMake::registerCMakeModuleAlias(*settings(), identifierPairs);
+    CMake::registerCMakeSourceFiles(*settings(), generatedSourceFiles(), identifierPairs);
+    CMake::registerCMakePackageDependencies(*settings(), identifierPairs);
+    CMake::registerCMakeIncludes(generatedIncludePaths(), identifierPairs);
+    
+    applyTemplate(S_TEMPLATES_PATH + QStringLiteral("cmake"),
+                   m_moduleDir,
+                   identifierPairs);
+
+    LOG_INFO << "done!";
+
+    return true;
+}
+
+bool
 ModuleGenerator::generateGitFiles()
 {
-    if (!settings()->createGitFiles())
-    {
-        return true;
-    }
+    if (!settings()->createGitFiles()) return true;
 
     LOG_INDENT("generating git files...");
 
-    // gitignore
-    LOG_INFO << ".gitignore" << ENDL;
-    auto fileString = utils::readFile(S_TEMPLATES_PATH + ".gitignore");
-
-    utils::writeStringToFile(fileString, m_moduleDir, ".gitignore");
-
-    // changelog
-    LOG_INFO << "CHANGELOG.md" << ENDL;
-    fileString = utils::readFile(S_TEMPLATES_PATH + "CHANGELOG.md");
-
-    utils::writeStringToFile(fileString, m_moduleDir, "CHANGELOG.md");
-
-    // readme
-    LOG_INFO << "README.md" << ENDL;
-    fileString = utils::readFile(S_TEMPLATES_PATH + "README.md");
     IdentifierPairs identifierPairs;
 
     auto moduleClass = settings()->moduleClass();
@@ -444,10 +656,10 @@ ModuleGenerator::generateGitFiles()
     identifierPairs.append({ S_ID_MODULE_DESCRIPTION, moduleClass.description });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleClass.version });
     identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
-
-    utils::replaceIdentifier(fileString, identifierPairs);
-
-    utils::writeStringToFile(fileString, m_moduleDir, "README.md");
+    
+    applyTemplate(S_TEMPLATES_PATH + QStringLiteral("git"),
+                   m_moduleDir,
+                   identifierPairs);
 
     LOG_INFO << "done!";
 
@@ -455,13 +667,13 @@ ModuleGenerator::generateGitFiles()
 }
 
 bool
-ModuleGenerator::generateModuleDependencies()
+ModuleGenerator::generateModuleMetaFile()
 {
-    LOG_INDENT("generating dependencies...");
+    LOG_INDENT("generating module json file...");
 
     // for logging purpose
     {
-        LOG_INDENT("creating json document...");
+        LOG_INDENT("setting dependencies...");
 
         QJsonArray dependenciesJsonArray;
 
@@ -491,18 +703,13 @@ ModuleGenerator::generateModuleDependencies()
         LOG_INFO << "done!";
     }
 
-    for (auto const& dependency : settings()->selectedDependencies())
-    {
-        appendLibToProjectFile(dependency.name);
-    }
-
     LOG_INFO << "done!";
 
     return true;
 }
 
 bool
-ModuleGenerator::generateModule()
+ModuleGenerator::generateModuleFiles()
 {
     LOG_INDENT("generating module files...");
 
@@ -512,6 +719,9 @@ ModuleGenerator::generateModule()
                                         "basic_module_class.cpp");
 
     auto moduleClass = settings()->moduleClass();
+
+    // append module files
+    appendGeneratedSourceFile(moduleClass.fileName);
 
     // set the filename for the include to the module header file
     utils::replaceIdentifier(sourceString, { S_ID_FILE_NAME,
@@ -762,13 +972,10 @@ ModuleGenerator::generateImplementation(QString& headerString,
     if (implementation.lines.isEmpty())
     {
         LOG_WARN << "skipping invalid implementation!";
-        qDebug() << "SKIPPING 2" << function.name << function.implementation.lines;
         // clear identifier
         utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION, {} });
         return;
     }
-
-//    LOG_INFO << "creating implementation string..." << ENDL;
 
     QString implementationString;
 
@@ -795,8 +1002,6 @@ ModuleGenerator::generateImplementation(QString& headerString,
     // dont indent preprocessor
     sourceString.replace("\t#", "#");
 
-//    LOG_INFO << "setting implementation string..." << ENDL;
-
     utils::replaceIdentifier(sourceString, { S_ID_IMPLEMENTATION,
                                              implementationString });
 
@@ -817,19 +1022,19 @@ ModuleGenerator::generateImplementation(QString& headerString,
     generateForwardDeclarations(headerString, implementation.forwardDeclarations);
 
     LOG_INFO << "generating derived classes..." << ENDL;
-    generateImplementationHelper(sourceString, function.baseClass,
-                                 implementation.derivedClasses);
+    generateBasicClassHelper(sourceString, function.baseClass,
+                             implementation.derivedClasses);
     LOG_INFO << "generating linked classes..." << ENDL;
-    generateImplementationHelper(sourceString, function.linkedClass,
-                                 implementation.linkedClasses);
+    generateBasicClassHelper(sourceString, function.linkedClass,
+                             implementation.linkedClasses);
 
 //    LOG_INFO << "done!";
 }
 
 void
-ModuleGenerator::generateImplementationHelper(QString& sourceString,
-                                              ClassData const& baseClass,
-                                              QList<ClassData> const& classes)
+ModuleGenerator::generateBasicClassHelper(QString& sourceString,
+                                          ClassData const& baseClass,
+                                          QList<ClassData> const& classes)
 {
     // linked classes to generate
     for (auto const& classStruct : classes)
@@ -921,10 +1126,11 @@ ModuleGenerator::generateBasicClass(ClassData const& base,
 
     targetDir.mkpath(targetDir.absolutePath());
 
+    // append module files
+    appendGeneratedSourceFile(derived.fileName, base.outputPath);
+
     utils::writeStringToFile(headerString, targetDir, derived.fileName + ".h");
     utils::writeStringToFile(sourceString, targetDir, derived.fileName + ".cpp");
-
-    appendFileToProjectFile(derived.fileName, base.outputPath);
 
     LOG_INFO << "done!";
 }
@@ -1073,142 +1279,60 @@ ModuleGenerator::generateConstructors(QString& headerString,
 }
 
 void
-ModuleGenerator::appendFileToProjectFile(QString const& fileName,
-                                         QString const& path,
-                                         bool headerOnly)
+ModuleGenerator::appendGeneratedSourceFile(QString const& fileName,
+                                           QString const& dir,
+                                           bool headerOnly)
 {
-    LOG_INDENT("adding class to project file...");
-
-    auto moduleClass = settings()->moduleClass();
-
-    auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
-
-    IdentifierPairs identifierPairs;
-
-    QString includePath = path;
-
-    if (!m_proFileIncludePaths.contains(includePath))
-    {
-        m_proFileIncludePaths.append(includePath);
-
-        identifierPairs.append({ S_ID_PRO_INCLUDE_PATH,
-                                 S_PRO_ENDL + includePath + " " +
-                                 S_ID_PRO_INCLUDE_PATH });
-    }
-
-    // no need to write "./my_file"
-    if (includePath.isEmpty() || includePath == QStringLiteral("."))
-    {
-        includePath.clear();
-    }
-    else
-    {
-        includePath.append(QStringLiteral("/"));
-    }
-
-    // append identifieres
-    identifierPairs.append({ S_ID_PRO_HEADER_PATH,
-                             S_PRO_ENDL + includePath + fileName + ".h " +
-                             S_ID_PRO_HEADER_PATH });
-
-    if (!headerOnly)
-    {
-        identifierPairs.append({ S_ID_PRO_SOURCE_PATH,
-                                 S_PRO_ENDL + includePath + fileName + ".cpp " +
-                                 S_ID_PRO_SOURCE_PATH });
-    }
-
-    utils::replaceIdentifier(fileString, identifierPairs);
-
-    utils::writeStringToFile(fileString, m_srcDir, "src.pro");
-
-//    LOG_INFO << "done!";
+    GeneratedSourceFile generatedFile;
+    generatedFile.fileName = fileName;
+    generatedFile.dir = dir;
+    generatedFile.headerOnly = headerOnly;
+    m_generatedSourceFiles.push_back(generatedFile);
 }
 
-void
-ModuleGenerator::appendLibToProjectFile(const QString& name)
+QStringList
+ModuleGenerator::generatedSourceFiles() const
 {
-    LOG_INDENT("adding lib '" + name + "' to project file...");
-
-    auto moduleClass(settings()->moduleClass());
-    auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
-
-    IdentifierPairs identifierPairs;
-
-    QDirIterator iterator(settings()->gtlabPath() + "/modules",
-                          QDir::Files, QDirIterator::NoIteratorFlags);
-
-    QStringList nameParts(name.split(QChar{' '}, QString::SkipEmptyParts));
-
-    bool success(false);
-
-    while (iterator.hasNext() && !success)
+    QStringList generatedFiles;
+    for (auto& data : m_generatedSourceFiles)
     {
-        QFileInfo fileInfo(iterator.next());
-        QString lib(fileInfo.baseName());
+        QString filePath;
 
-        // strip -d in case of debug build
-        if (lib.endsWith("-d"))
+        // no need to write "./my_file"
+        if (!data.dir.isEmpty() && data.dir != QStringLiteral("."))
         {
-            lib = lib.mid(0, lib.size() - 2);
+            filePath += data.dir + QChar{'/'};
         }
 
-        // e.g. "Post Processing": libname is GTlabPost
-        // 1. check if postprocessing is in libname
-        // 2. check if post is in libname
-        for (int i = nameParts.length(); i > 0; --i)
+        filePath += data.fileName;
+
+        generatedFiles.push_back(filePath + QStringLiteral(".h"));
+        if (!data.headerOnly)
         {
-            QString part = nameParts.mid(0, i).join("");
-
-            if (!lib.contains(part, Qt::CaseInsensitive)) continue;
-
-            if (!ModuleGeneratorSettings::isOsWindows() &&
-                lib.startsWith("lib"))
-            {
-                lib = lib.remove(0, 3); // remove lib prefix on unix
-            }
-
-            identifierPairs.append({ S_ID_PRO_LIBS, "\n\tLIBS += -l" + lib +
-                                     S_ID_PRO_LIBS});
-            identifierPairs.append({ S_ID_PRO_LIBS_D, "\n\tLIBS += -l" + lib +
-                                     "-d" + S_ID_PRO_LIBS_D});
-
-            success = true;
-            break;
+            generatedFiles.push_back(filePath + QStringLiteral(".cpp"));
         }
     }
-
-    if (!success)
-    {
-        LOG_WARN << "could not find library file!";
-        return;
-    }
-
-    utils::replaceIdentifier(fileString, identifierPairs);
-
-    utils::writeStringToFile(fileString, m_srcDir, "src.pro");
+    return utils::unique(generatedFiles);
 }
 
-void
-ModuleGenerator::clearFileString(QString& fileString)
+QStringList
+ModuleGenerator::generatedIncludePaths() const
 {
-    static const QRegularExpression idsRegExp{"\\$\\$[\\w\\d_]+\\$\\$"};
-    static const QRegularExpression nlRegExp{"[\\n\\r]{3,}"};
-
-    clearCompatibilityMacros(fileString);
-
-    // remove identifiers
-    fileString.remove(idsRegExp);
-
-    // preprocessor should start at line beginning
-    fileString.replace("\t#", "#");
-
-    // convert tab to blanks
-    fileString.replace("\t", "    ");
-
-    // condense new lines
-    fileString.replace(nlRegExp, "\n\n");
+    QStringList includePaths;
+    for (auto& data : m_generatedSourceFiles)
+    {
+        // no need to write "./my_file"
+        if (!data.dir.isEmpty() && data.dir != QStringLiteral("."))
+        {
+            includePaths.push_back(data.dir);
+        }
+    }
+    qDebug() << __FUNCTION__ << utils::unique(includePaths);
+    return utils::unique(includePaths);
 }
+
+namespace
+{
 
 void
 clearCompatibilityMacroHelper(QRegularExpression const& regExp,
@@ -1236,26 +1360,19 @@ clearCompatibilityMacroHelper(QRegularExpression const& regExp,
 }
 
 void
-ModuleGenerator::clearCompatibilityMacros(QString& fileString)
+clearCompatibilityMacros(QString& fileString, bool is_1_7)
 {
-    if (settings()->useCompatibilityMacros())
-    {
-        return;
-    }
-
     // gt_lobals.h for version dependent code
     fileString.remove("#include \"gt_globals.h\"\n");
 
     // first block  = group 1
     // second block = group 4
     static const QRegularExpression regExp_1_7{QStringLiteral(
-            R"(#if GT_VERSION < GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
-    )};
+        R"(#if GT_VERSION < GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
+        )};
     static const QRegularExpression regExp_2_0{QStringLiteral(
-            R"(#if GT_VERSION >= GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
-    )};
-
-    bool is_1_7 = settings()->gtlabMajorVersion() < 2;
+        R"(#if GT_VERSION >= GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
+        )};
 
     clearCompatibilityMacroHelper(regExp_1_7, fileString,  is_1_7 ? 1 : 4);
     clearCompatibilityMacroHelper(regExp_2_0, fileString, !is_1_7 ? 1 : 4);
@@ -1263,23 +1380,12 @@ ModuleGenerator::clearCompatibilityMacros(QString& fileString)
     if (!is_1_7)
     {
         static const QRegularExpression compatRegExp{QStringLiteral(
-                R"(#include "gt_compat\.h"\n)"
-        )};
+            R"(#include "gt_compat\.h"\n)"
+            )};
         fileString.remove(compatRegExp);
     }
-}
 
-void
-ModuleGenerator::clearProjectFileIdentifiers()
-{
-    // src.pro
-    auto fileString = utils::readFile(m_srcDir.absoluteFilePath("src.pro"));
-
-    bool is_1_7 = settings()->gtlabMajorVersion() < 2;
-
-    // bit hacky and currently only works for major version 1 and 2
-    // remove version dependent code blocks
-    if (!settings()->useCompatibilityMacros())
+    // remove qmake specific compatibility macros
     {
         static const QRegularExpression regExp{
             "greaterThan\\(MAJOR_VERSION, 1\\)\\s{\\s+" // version check
@@ -1291,19 +1397,98 @@ ModuleGenerator::clearProjectFileIdentifiers()
 
         clearCompatibilityMacroHelper(regExp, fileString, is_1_7 ? 3 : 1);
     }
+}
 
-    clearFileString(fileString);
+} // namespace
 
-    utils::writeStringToFile(fileString, m_srcDir, "src.pro");
+void
+ModuleGenerator::clearFileString(QString& fileString)
+{
+    static const QRegularExpression idsRegExp{"\\$\\$[\\w\\d_]+\\$\\$"};
+    static const QRegularExpression nlRegExp{"[\\n\\r]{3,}"};
 
-    // module.pro
-    auto moduleClass = settings()->moduleClass();
+    if (!settings()->useCompatibilityMacros())
+    {
+        bool is_1_7 = settings()->gtlabMajorVersion() < 2;
+        clearCompatibilityMacros(fileString, is_1_7);
+    }
 
-    fileString = utils::readFile(m_moduleDir.absoluteFilePath(
-                                     moduleClass.fileName + ".pro"));
+    // remove identifiers
+    fileString.remove(idsRegExp);
 
-    clearFileString(fileString);
+    // preprocessor should start at line beginning
+    fileString.replace("\t#", "#");
 
-    utils::writeStringToFile(fileString, m_moduleDir,
-                             moduleClass.fileName + ".pro");
+    // convert tab to blanks
+    fileString.replace("\t", "    ");
+
+    // condense new lines
+    fileString.replace(nlRegExp, "\n\n");
+}
+
+bool
+ModuleGenerator::applyTemplate(QDir const& originDirectory,
+                               QDir const& destinationDirectory,
+                               IdentifierPairs const& identifierPairs,
+                               int flags,
+                               QRegularExpression const& filter)
+{
+    LOG_INDENT(QStringLiteral("applying template '%1'...").arg(originDirectory.dirName()));
+
+    if (!originDirectory.exists())
+    {
+        LOG_ERR << "applying template failed, source directory not found!";
+        return false;
+    }
+
+    if (!destinationDirectory.exists())
+    {
+        destinationDirectory.mkpath(".");
+    }
+
+    auto const& files = utils::listFiles(originDirectory, (flags & Recursive), filter);
+
+    for (QString const& fileName : files)
+    {
+        QString targetFileName = destinationDirectory.path() + "/" + fileName;
+
+        LOG_INFO << "applying " << fileName << "..." << ENDL;
+
+        QFileInfo targetFileInfo(targetFileName);
+
+        // qfile does not overwrite files
+        if (targetFileInfo.exists() && (flags & OverwriteFiles))
+        {
+            QFile(targetFileName).remove();
+        }
+
+        if (!targetFileInfo.exists() || (flags & OverwriteFiles))
+        {
+            auto subDir = targetFileInfo.dir();
+            if (!subDir.exists()) QDir{}.mkpath(subDir.absolutePath());
+
+            auto fileString = utils::readFile(originDirectory.path() + "/" + fileName);
+
+            utils::replaceIdentifier(fileString, identifierPairs);
+
+            clearFileString(fileString);
+
+            utils::writeStringToFile(fileString,
+                                     targetFileInfo.absoluteDir(),
+                                     targetFileInfo.fileName());
+        }
+    }
+
+    /*! Possible race-condition mitigation? */
+    QDir finalDestination(destinationDirectory);
+    finalDestination.refresh();
+
+    if (finalDestination.exists())
+    {
+        LOG_INFO << "done!";
+        return true;
+    }
+
+    LOG_WARN << "failed!";
+    return false;
 }

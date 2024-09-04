@@ -166,7 +166,7 @@ struct ClassData
 /// represents a method that must be implemented (exporter, calc, task etc.)
 struct FunctionData
 {
-    /// function anme
+    /// function name
     QString name{};
     /// return type
     QString returnType{};
