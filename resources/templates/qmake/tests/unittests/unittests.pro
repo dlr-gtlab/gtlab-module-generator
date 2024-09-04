@@ -12,7 +12,7 @@ include( $${PWD}/../../settings.pri )
 
 BUILD_DEST = $${PWD}/../../build
 
-TARGET = UnitTest
+TARGET = $$CLASS_NAME$$UnitTest
 
 QT += core xml gui widgets concurrent
 

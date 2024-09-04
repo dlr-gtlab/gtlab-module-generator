@@ -41,10 +41,10 @@ DESTDIR = ../$${LIB_BUILD_DEST}
 INCLUDEPATH += . $$PRO_INCLUDEPATH$$
 
 HEADERS += \
-    $$FILE_NAME$$.h $$PRO_HEADERPATH$$
+    $$PRO_HEADERPATH$$
 
 SOURCES += \
-    $$FILE_NAME$$.cpp $$PRO_SOURCEPATH$$
+    $$PRO_SOURCEPATH$$
 
 message(Targeting Major Version: $${MAJOR_VERSION})
 

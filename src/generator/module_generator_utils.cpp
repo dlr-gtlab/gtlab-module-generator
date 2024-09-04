@@ -4,6 +4,43 @@
 #include <QFile>
 #include <QDir>
 
+#include <set>
+
+
+namespace
+{
+
+void
+dirEntriesImpl(const QDir& dir, const QString& prefix, QStringList& result, bool recursive)
+{
+    if (!dir.exists())
+    {
+        return;
+    }
+
+    auto files = dir.entryList(QDir::Files);
+    std::transform(files.begin(), files.end(), files.begin(),
+                   [&prefix](const QString& fname) {
+                       return prefix + fname;
+                   });
+
+    result.append(std::move(files));
+
+    if (recursive)
+    {
+        for (const QString& directoryName : dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+        {
+            QDir subDir(dir.path() + "/" + directoryName);
+            dirEntriesImpl(subDir, prefix + directoryName + "/", result, true);
+        }
+    }
+
+    return;
+}
+
+} // namespace
+
+
 void
 utils::replaceIdentifier(QString& inputString, const IdentifierPairs& pairs)
 {
@@ -68,4 +105,31 @@ utils::makeInclude(const QString& inlcude,
     }
 
     return {"#include \""+ inlcude + ".h\"\n" + identifier};
+}
+
+QStringList
+utils::listFiles(const QDir& dir, bool recursive, const QRegularExpression& expr)
+{
+    QStringList files;
+    dirEntriesImpl(dir, "", files, recursive);
+
+    // filter according to expr
+    QStringList filesFiltered;
+    std::copy_if(files.begin(), files.end(),
+                 std::back_inserter(filesFiltered),
+                 [&expr](const QString& fname) {
+        return expr.match(fname).hasMatch();
+    });
+
+    return filesFiltered;
+}
+
+QStringList
+utils::unique(const QStringList& list)
+{
+    std::set<QString> tmp(std::begin(list), std::end(list));
+
+    QStringList result;
+    std::copy(tmp.begin(), tmp.end(), std::back_inserter(result));
+    return result;
 }

@@ -7,10 +7,6 @@
         <file>templates/basic_derived_class.h</file>
         <file>templates/basic_module_class.cpp</file>
         <file>templates/basic_module_class.h</file>
-        <file>templates/local_settings.pri</file>
-        <file>templates/module.pro</file>
-        <file>templates/settings.pri</file>
-        <file>templates/deployment.pri</file>
         <file>interfaces/0_datamodel.json</file>
         <file>interfaces/1_process.json</file>
         <file>interfaces/2_mdi.json</file>
@@ -21,10 +17,6 @@
         <file>interfaces/7_network.json</file>
         <file>interfaces/8_collection.json</file>
         <file>interfaces/9_calculator_exec.json</file>
-        <file>templates/.gitignore</file>
-        <file>templates/CHANGELOG.md</file>
-        <file>templates/README.md</file>
-        <file>templates/module_src.pro</file>
         <file>interfaces/class_definitions/gt_abstractaccessdataconnection.json</file>
         <file>interfaces/class_definitions/gt_abstractcalculatorexecutor.json</file>
         <file>interfaces/class_definitions/gt_abstractcollectionsettings.json</file>
@@ -59,8 +51,22 @@
         <file>images/gt-logo.png</file>
         <file>interfaces/type_info/gt_classname.json</file>
         <file>interfaces/class_definitions/gt_object_post.json</file>
-        <file>templates/unittests_main.cpp</file>
-        <file>templates/unittests.pro</file>
-        <file>templates/unittests_test.cpp</file>
+        <file>templates/cmake/src/CMakeLists.txt</file>
+        <file>templates/cmake/CMakeLists.txt</file>
+        <file>templates/cmake/tests/unittests/CMakeLists.txt</file>
+        <file>templates/cmake/tests/unittests/cmake/AddGoogleTest.cmake</file>
+        <file>templates/cmake/cmake/GTlab.cmake</file>
+        <file>templates/git/.gitignore</file>
+        <file>templates/git/CHANGELOG.md</file>
+        <file>templates/git/README.md</file>
+        <file>templates/qmake/features/local_settings.pri</file>
+        <file>templates/qmake/src/src.pro</file>
+        <file>templates/qmake/tests/unittests/unittests.pro</file>
+        <file>templates/qmake/deployment.pri</file>
+        <file>templates/qmake/local_settings.pri</file>
+        <file>templates/qmake/module.pro</file>
+        <file>templates/qmake/settings.pri</file>
+        <file>templates/cmake/tests/unittests/main.cpp</file>
+        <file>templates/cmake/tests/unittests/test.cpp</file>
     </qresource>
 </RCC>
