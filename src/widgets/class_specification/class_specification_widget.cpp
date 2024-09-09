@@ -159,21 +159,6 @@ ClassSpecificationWidget::ClassSpecificationWidget(ClassData const& baseClass,
         m_objectNameEdit->setText(settings->moduleClass().ident);
         m_autoEditCheckBox->setChecked(false);
 
-        // if module requires backwards compatibility package class cannot be
-        // changed
-        if (settings->gtlabMajorVersion() < 2 ||
-            settings->useCompatibilityMacros())
-        {
-            m_autoEditCheckBox->setEnabled(false);
-            m_objectNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
-            m_classNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
-            m_fileNameEdit->setToolTip(S_AUTO_GENERATED_ALT_TOOLTIP);
-
-            m_objectNameEdit->setEnabled(false);
-            m_fileNameEdit->setEnabled(false);
-            m_classNameEdit->setEnabled(false);
-        }
-
         emit hidden();
     }
 }

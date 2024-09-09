@@ -53,24 +53,16 @@ CONFIG(debug, debug|release){
     LIBS += -lGTlabLogging-d
     #LIBS += -lGTlabNumerics-d
 
-    greaterThan(MAJOR_VERSION, 1) {
-        LIBS += -lGTlabDataProcessor-d -lGTlabCore-d -lGTlabGui-d
-    } else {
-        LIBS += -lGTlabDatamodel-d -lGTlabCore-d -lGTlabCalculators-d
-        LIBS += -lGTlabMdi-d  -lGTlabNetwork-d
-    }
+    LIBS += -lGTlabDataProcessor-d -lGTlabCore-d -lGTlabGui-d
+
     # Other$$PRO_LIBS_D$$
 } else {
     # GTLAB CORE
     LIBS += -lGTlabLogging
     #LIBS += -lGTlabNumerics
 
-    greaterThan(MAJOR_VERSION, 1) {
-        LIBS += -lGTlabDataProcessor -lGTlabCore -lGTlabGui
-    } else {
-        LIBS += -lGTlabDatamodel -lGTlabCore -lGTlabCalculators
-        LIBS += -lGTlabMdi -lGTlabNetwork
-    }
+    LIBS += -lGTlabDataProcessor -lGTlabCore -lGTlabGui
+
     # Other$$PRO_LIBS$$
 }
 

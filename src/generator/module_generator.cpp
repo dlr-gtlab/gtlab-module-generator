@@ -94,9 +94,6 @@ const QString
 ModuleGenerator::S_ID_INDENT = QStringLiteral("$$INDENT$$");
 
 const QString
-ModuleGenerator::S_ID_2_0_INCLUDE_ICON = QStringLiteral("$$2_0_INCLUDE_ICON$$");
-
-const QString
 ModuleGenerator::S_ID_CMAKE_SOURCE_FILES = QStringLiteral("$$CMAKE_SOURCE_FILES$$");
 const QString
 ModuleGenerator::S_ID_CMAKE_ADDITIONAL_FILES = QStringLiteral("$$CMAKE_ADDITIONAL_FILES$$");
@@ -109,26 +106,6 @@ ModuleGenerator::S_ID_CMAKE_FIND_PACKAGE_DEPS = QStringLiteral("$$CMAKE_FIND_PAC
 const QString
 ModuleGenerator::S_ID_CMAKE_TARGET_LINK_LIBRARIES = QStringLiteral("$$CMAKE_TARGET_LINK_LIBRARIES$$");
 
-const QString
-ModuleGenerator::S_1_7_VERSION_CHECK =
-        QStringLiteral("#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)");
-
-const QString
-ModuleGenerator::S_2_0_VERSION_CHECK =
-        QStringLiteral("#if GT_VERSION >= GT_VERSION_CHECK(2, 0, 0)");
-
-const QStringList
-ModuleGenerator::S_2_0_INCLUDE_ICON_LIST{
-    "gt_compat",
-    // prior GTlab 2.0
-    S_1_7_VERSION_CHECK + "\n"
-    "#include \"gt_application.h\"\n"
-    "#else\n"
-    "#include \"gt_icons.h\"\n"
-    "#endif\n",
-    "QIcon"
-};
-
 const ConstructorData
 ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
     {}, // params
@@ -138,18 +115,12 @@ ModuleGenerator::G_CONSTRUCTOR_DEFAULT{
 };
 
 // paths
-const QString
-S_TEMPLATES_PATH = QStringLiteral(":/templates/");
-const QString
-S_CMAKE_PATH = QStringLiteral("/lib/cmake/");
-const QString
-S_SRC_DIR      = QStringLiteral("src");
-const QString
-S_FEATURES_DIR = QStringLiteral("features");
+#define S_TEMPLATES_PATH ":/templates/"
+#define S_CMAKE_PATH "/lib/cmake/"
+#define S_SRC_DIR "src"
 
 // for protected methods
-const QString
-S_PROTECTED_TAG = QStringLiteral("protected:");
+#define S_PROTECTED_TAG "protected:"
 
 // qt makros
 const QString
@@ -157,25 +128,22 @@ S_INTERFACE_MACRO(QStringLiteral("Q_INTERFACES(") +
                   ModuleGenerator::S_ID_BASE_CLASS +
                   QStringLiteral(")\n\t"));
 const QString
-S_OVERRIDE(QStringLiteral(" override;"));
+S_OVERRIDE = " override;";
 const QString
-S_Q_INVOKABLE(QStringLiteral("Q_INVOKABLE "));
+S_Q_INVOKABLE = "Q_INVOKABLE ";
 
 // helper strings
 const QString
 S_DERIVE_BASE_CLASS(QStringLiteral(",\n\t\tpublic ") +
                     ModuleGenerator::S_ID_BASE_CLASS);
-const QString
-S_QMAKE_ENDL(QStringLiteral("\\\n\t"));
-const QString
-S_CMAKE_ENDL(QStringLiteral("\n\t"));
+char const* S_QMAKE_ENDL = "\\\n\t";
+char const* S_CMAKE_ENDL = "\n\t";
 
 // cmake specifics
-const QString
-S_CMAKE_GIT_SOURCE_FILES(QStringLiteral(
+char const* S_CMAKE_GIT_SOURCE_FILES =
 R"(
     README_FILE "${PROJECT_SOURCE_DIR}/README.md"
-    CHANGELOG_FILE "${PROJECT_SOURCE_DIR}/CHANGELOG.md")"));
+    CHANGELOG_FILE "${PROJECT_SOURCE_DIR}/CHANGELOG.md")";
 
 struct ModuleGenerator::CMake
 {
@@ -366,7 +334,7 @@ getDependencyLibName(ModuleGeneratorSettings& settings,
     QDirIterator iterator(settings.gtlabPath() + "/modules",
                           QDir::Files, QDirIterator::NoIteratorFlags);
 
-    QStringList nameParts(name.split(QChar{' '}, QString::SkipEmptyParts));
+    QStringList nameParts(name.split(QChar{' '}, Qt::SkipEmptyParts));
 
     while (iterator.hasNext())
     {
@@ -489,10 +457,9 @@ ModuleGenerator::generateModuleDirs()
     path += settings()->outputPath() + QDir::separator();
     path += subFolder + QDir::separator();
 
-    m_srcDir = QDir::cleanPath(path);
+    m_srcDir.setPath(QDir::cleanPath(path));
     m_moduleDir = m_srcDir;
-    m_srcDir = QDir::cleanPath(path + QDir::separator() + S_SRC_DIR);
-//    m_featuresDir = QDir::cleanPath(path + QDir::separator() + S_FEATURES_DIR);
+    m_srcDir.setPath(QDir::cleanPath(path + QDir::separator() + S_SRC_DIR));
 
     // module dir
     if (m_moduleDir.exists() && m_moduleDir.count() > 0)
@@ -713,9 +680,9 @@ ModuleGenerator::generateModuleFiles()
 {
     LOG_INDENT("generating module files...");
 
-    auto headerString = utils::readFile(S_TEMPLATES_PATH +
+    auto headerString = utils::readFile(S_TEMPLATES_PATH
                                         "basic_module_class.h");
-    auto sourceString = utils::readFile(S_TEMPLATES_PATH +
+    auto sourceString = utils::readFile(S_TEMPLATES_PATH
                                         "basic_module_class.cpp");
 
     auto moduleClass = settings()->moduleClass();
@@ -879,7 +846,7 @@ ModuleGenerator::generateFunction(QString& headerString,
 
     if (function.isProtected)
     {
-        functionHeader += "\n" + S_PROTECTED_TAG + "\n";
+        functionHeader += "\n" S_PROTECTED_TAG "\n";
     }
 
     // description
@@ -1143,12 +1110,6 @@ ModuleGenerator::generateIncludes(QString& sourceString,
 
     LOG_INDENT("adding additional includes...");
 
-    if (includes.contains(S_ID_2_0_INCLUDE_ICON))
-    {
-        includes.removeAll(S_ID_2_0_INCLUDE_ICON);
-        includes.append(S_2_0_INCLUDE_ICON_LIST);
-    }
-
     IdentifierPairs identifiers;
 
     for (auto& include : includes)
@@ -1365,38 +1326,10 @@ clearCompatibilityMacros(QString& fileString, bool is_1_7)
     // gt_lobals.h for version dependent code
     fileString.remove("#include \"gt_globals.h\"\n");
 
-    // first block  = group 1
-    // second block = group 4
-    static const QRegularExpression regExp_1_7{QStringLiteral(
-        R"(#if GT_VERSION < GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
-        )};
-    static const QRegularExpression regExp_2_0{QStringLiteral(
-        R"(#if GT_VERSION >= GT_VERSION_CHECK\(2, 0, 0\)\n((.*\n)+?)(#else\n((.*\n)+?))?#endif\n)"
-        )};
-
-    clearCompatibilityMacroHelper(regExp_1_7, fileString,  is_1_7 ? 1 : 4);
-    clearCompatibilityMacroHelper(regExp_2_0, fileString, !is_1_7 ? 1 : 4);
-
-    if (!is_1_7)
-    {
-        static const QRegularExpression compatRegExp{QStringLiteral(
-            R"(#include "gt_compat\.h"\n)"
-            )};
-        fileString.remove(compatRegExp);
-    }
-
-    // remove qmake specific compatibility macros
-    {
-        static const QRegularExpression regExp{
-            "greaterThan\\(MAJOR_VERSION, 1\\)\\s{\\s+" // version check
-            "((\\s|.)+?)" // if block (group 1)
-            "\\s+}\\selse\\s{\\s+"
-            "((\\s|.)+?)" // else block (group 3)
-            "\\s+}"
-        };
-
-        clearCompatibilityMacroHelper(regExp, fileString, is_1_7 ? 3 : 1);
-    }
+    static const QRegularExpression compatRegExp{QStringLiteral(
+        R"(#include "gt_compat\.h"\n)"
+    )};
+    fileString.remove(compatRegExp);
 }
 
 } // namespace

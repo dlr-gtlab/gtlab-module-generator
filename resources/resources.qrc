@@ -12,7 +12,6 @@
         <file>interfaces/2_mdi.json</file>
         <file>interfaces/3_exporter.json</file>
         <file>interfaces/4_importer.json</file>
-        <file>interfaces/5_init.json</file>
         <file>interfaces/6_property.json</file>
         <file>interfaces/7_network.json</file>
         <file>interfaces/8_collection.json</file>

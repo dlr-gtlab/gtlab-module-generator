@@ -79,14 +79,10 @@ public:
     const static QString S_ID_CMAKE_FIND_PACKAGE_DEPS;
     const static QString S_ID_CMAKE_TARGET_LINK_LIBRARIES;
 
-    /// compatability
-    const static QString S_ID_2_0_INCLUDE_ICON;
-
-    const static QString S_1_7_VERSION_CHECK;
-    const static QString S_2_0_VERSION_CHECK;
-
-    const static QStringList S_2_0_INCLUDE_ICON_LIST;
-
+    /**
+     * @brief Getter for settings class
+     * @return Settings
+     */
     ModuleGeneratorSettings const* settings() const;
     ModuleGeneratorSettings* settings();
 

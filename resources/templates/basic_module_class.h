@@ -3,13 +3,9 @@ $$SIGNATURE$$
 #ifndef $$HEADER_NAME$$_H
 #define $$HEADER_NAME$$_H
 
-#include "gt_compat.h"
-
 #include "gt_moduleinterface.h"
 $$INCLUDE_FILE$$
-#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)
-#include "gt_initmoduleinterface.h"
-#endif
+
 
 $$CLASS_FORWARD_DECL$$
 /**
@@ -18,18 +14,12 @@ $$CLASS_FORWARD_DECL$$
  */
 class $$CLASS_NAME$$ : public QObject,
         public GtModuleInterface$$DERIVE_BASE_CLASS$$
-#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)
-        ,public GtInitModuleInterface
-#endif
 {
     Q_OBJECT
 
     GT_MODULE("$$FILE_NAME$$.json")
 
     Q_INTERFACES(GtModuleInterface)
-#if GT_VERSION < GT_VERSION_CHECK(2, 0, 0)
-    Q_INTERFACES(GtInitModuleInterface)
-#endif
     $$INTERFACE_MACRO$$
 public:
 
@@ -50,7 +40,6 @@ public:
      */
     void init() override;
 
-#if GT_VERSION >= GT_VERSION_CHECK(2, 0, 0)
     /**
      * @brief Passes additional module information to the framework.
      *
@@ -59,7 +48,7 @@ public:
      * @return module meta information.
      */
     MetaInformation metaInformation() const override;
-#endif$$FUNCTION$$
+$$FUNCTION$$
 };
 
 #endif // $$HEADER_NAME$$_H
