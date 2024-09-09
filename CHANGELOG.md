@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CMake specific project files will be generated from now on - #25
 - A unittesting structure will be added by default - #38
 
+### Removed
+- Removed support for GTlab version 1.7.X - #40
+
 ## [1.2.0] - 2023-02-16
 ### Changed
 - support for version GTlab 2.0 Beta - #36
