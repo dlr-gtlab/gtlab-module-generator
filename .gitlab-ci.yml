@@ -1,94 +1,93 @@
-########################################################
-############### Pipeline  ############
-########################################################
-#  CATEGORY: 00_tools
-#  PROFILENAME: GtModuleGenerator.pro
-#  TARGETNAME: GtModuleGenerator
-#  SUBDIRNAME: ModuleGenerator
+#################################################################
+############### GTlab Standard Pipeline Version 2.1.0 ###########
+#################################################################
 
+
+# Variables that are defined globally for the pipeline
 variables:
+  PIPELINEVERSION: "2.1.0"
   GIT_SUBMODULE_STRATEGY: none
+  
+  STABLE_BRANCHES: /^master$/
+  
+
+include:
+  - project: 'gtlab/public/development-tools/gitlab-templates'
+    file: '/ci-templates/.ci-templates-cmake-1.0.yml'
 
 stages:
   - build
-  - copy
+  - package
+  - deploy
 
-# Windows build
-windowsBuild:
+# build on Windows system
+build-windows:
   stage: build
-  before_script:
-    - git submodule sync
-    - git submodule update --init
+  extends: 
+    - .build-win_20
   script:
-    - .\pipeline-scripts\build\build-512-tools.bat 1>buildLog512.txt
-  tags:
-    - Win10
-  artifacts:
-    paths:
-      - build\$TARGETNAME.exe
-      - buildLog512.txt
-    expire_in: 1 week
-    when: always
-  variables:
-    BUILDMODE: release
-    #PROFILENAME: GtModuleGenerator.pro
+    - cmake -B build -S . -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install-msvc2019
+    - cmake --build build --target install
+  after_script:
+    - cd install-msvc2019
+    - '& "$env:QT_INSTALL_PATH\bin\windeployqt.exe" bin\GtModuleGenerator.exe --plugindir=bin/plugins'
+    
+# build on Linux system
+build-linux:
+  stage: build
+  extends: 
+    - .build-linux_20
+  script:
+    - cmake -B build -S . -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install-linux
+    - cmake --build build --target install
 
-# Linux build
-linuxBuild:
-  stage: build 
-  tags:
-    - Linux
-  script:
-    - /opt/Qt/5.12.5/gcc_64/bin/qmake $PROFILENAME -spec linux-g++ CONFIG+=$BUILDMODE
-    - make clean
-    - make -j 20 |& tee linuxBuild.txt
-  artifacts:
-    paths:
-      - build/$TARGETNAME
-    when: always
-    expire_in: 1 week
-  variables:
-    BUILDMODE: release
-    #PROFILENAME: GtModuleGenerator.pro
- 
-copyForDeploymentWin:
-  stage: copy
-  before_script:
-    - git submodule sync
-    - git submodule update --init
-  script:
-    - .\pipeline-scripts\deploy\copyTool.bat
+
+package-windows:
+  stage: package
+  extends: 
+    - .build-linux_20
   needs:
-    - windowsBuild
-  dependencies:
-    - windowsBuild
+    - build-windows
+  script:
+    - mv install-msvc2019 gtmodulegenerator-msvc2019
+    - mv gtmodulegenerator-msvc2019/bin/*  gtmodulegenerator-msvc2019/
+    - rm -rf  gtmodulegenerator-msvc2019/bin
+    - rm -rf gtmodulegenerator-msvc2019/translations
+    - tar czvf gtmodulegenerator-msvc2019.tar.gz gtmodulegenerator-msvc2019
+  artifacts:
+    name: "gtmodulegenerator-msvc2019"
+    paths: ["gtmodulegenerator-msvc2019.tar.gz"]
+
+
+package-linux:
+  stage: package
+  extends: 
+    - .build-linux_20
+  needs:
+    - build-linux
+  before_script:
+    - apt install -y patchelf
+    - 'wget --header="JOB-TOKEN: $CI_JOB_TOKEN" ${CI_API_V4_URL}/projects/7584/packages/generic/cqtdeployer/1.6.2365/cqtdeployer_linux64.tar.gz'
+    - tar xf cqtdeployer_linux64.tar.gz
+    - export PATH=`pwd`/cqtdeployer_linux64:$PATH
+  script:
+    # linux package
+    - mv install-linux gtmodulegenerator-linux && cd gtmodulegenerator-linux
+    - CQtDeployer.sh -qmake $QMAKE_PATH -bin bin/GtModuleGenerator -targetDir . noTranslations -libDir $QT_INSTALL_PATH/lib/ 
+    - rm GtModuleGenerator.sh && patchelf --set-rpath '$ORIGIN/../lib' bin/GtModuleGenerator
+    - cd .. && tar czvf gtmodulegenerator-linux.tar.gz gtmodulegenerator-linux
+  artifacts:
+    name: "gtmodulegenerator-linux"
+    paths: ["gtmodulegenerator-linux.tar.gz"]
+
+deploy:
+  stage: deploy
   tags:
-    - Win10
+    - docker, linux
+  image: at-twk-hal9000.intra.dlr.de:5000/dlr-at/buster-dev
+  needs: ["package-linux", "package-windows"]
+  script:
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file gtmodulegenerator-linux.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/GTlabModuleGenerator/${CI_COMMIT_TAG}/gtmodulegenerator-linux.tar.gz"'
+    - 'curl --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file gtmodulegenerator-msvc2019.tar.gz "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/GTlabModuleGenerator/${CI_COMMIT_TAG}/gtmodulegenerator-msvc2019.tar.gz"'
   only:
     - tags
-  variables:
-    PLATFORMNAME:  windows
-    RELEASESTATUS: tools
-#    SUBDIRNAME: ModuleGenerator
-#    CATEGORY: 00_tools
-
-copyForDeploymentLinux:
-  stage: copy
-  before_script:
-    - git submodule sync
-    - git submodule update --init
-  script:
-    - .\pipeline-scripts\deploy\copyTool.bat
-  needs:
-    - linuxBuild
-  dependencies:
-    - linuxBuild
-  tags:
-    - Win10
-  only:
-    - tags
-  variables:
-    PLATFORMNAME:  linux
-    RELEASESTATUS: tools
-#    SUBDIRNAME: ModuleGenerator
-#    CATEGORY: 00_tools
