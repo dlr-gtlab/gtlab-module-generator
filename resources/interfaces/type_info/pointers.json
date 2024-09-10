@@ -1,9 +1,0 @@
-{
-  this is disabled for now/not necessary
-  "returnType": ".+?\\*",
-  "widgetType": "Class",
-  "implementation": 
-  [
-    "new $$CLASS_NAME$${}"
-  ]
-}

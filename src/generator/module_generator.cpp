@@ -439,6 +439,8 @@ ModuleGenerator::generateHelper()
     result = generateModuleProjectFiles();
     if (!result) return false;
 
+    generateUnittestStructure();
+
     // ok to continue
     generateGitFiles();
 
@@ -507,11 +509,15 @@ bool
 ModuleGenerator::generateModuleProjectFiles()
 {
     bool success = false;
-    // either one should succeed
-    success |= generateQMakeFiles();
 
-    success |= generateCMakeFiles();
-
+    if (settings()->useCMakeGenerator())
+    {
+        success |= generateCMakeFiles();
+    }
+    if (settings()->useQMakeGenerator())
+    {
+        success |= generateQMakeFiles();
+    }
     return success;
 }
 
@@ -601,6 +607,27 @@ ModuleGenerator::generateCMakeFiles()
     applyTemplate(S_TEMPLATES_PATH + QStringLiteral("cmake"),
                    m_moduleDir,
                    identifierPairs);
+
+    LOG_INFO << "done!";
+
+    return true;
+}
+
+bool
+ModuleGenerator::generateUnittestStructure()
+{
+    LOG_INDENT("generating unittest structure...");
+
+    IdentifierPairs identifierPairs;
+
+    auto const& moduleClass = settings()->moduleClass();
+
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
+    identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
+
+    applyTemplate(S_TEMPLATES_PATH + QStringLiteral("testing"),
+                  m_moduleDir,
+                  identifierPairs);
 
     LOG_INFO << "done!";
 

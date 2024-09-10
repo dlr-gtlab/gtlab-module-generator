@@ -330,6 +330,8 @@ ModuleGeneratorSettings::serializeUserData() const
     QJsonObject moduleObject;
     moduleObject["target_version"] = m_version;
     moduleObject["use_compatibility_macros"] = m_useCompatibilityMacros;
+    moduleObject["use_cmake_generator"] = m_useCMakeGenerator;
+    moduleObject["use_qmake_generator"] = m_useQMakeGenerator;
 
     QJsonObject rootObject;
     rootObject["user"]   = userObject;
@@ -383,6 +385,14 @@ ModuleGeneratorSettings::deserializeUserData()
     if (moduleObject.contains("use_compatibility_macros"))
     {
         m_useCompatibilityMacros = moduleObject["use_compatibility_macros"].toBool();
+    }
+    if (moduleObject.contains("use_cmake_generator"))
+    {
+        m_useCMakeGenerator = moduleObject["use_cmake_generator"].toBool();
+    }
+    if (moduleObject.contains("use_qmake_generator"))
+    {
+        m_useQMakeGenerator = moduleObject["use_qmake_generator"].toBool();
     }
 
     LOG_INFO << "done!";

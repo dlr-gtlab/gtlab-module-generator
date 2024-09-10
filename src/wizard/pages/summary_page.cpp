@@ -143,6 +143,12 @@ SummaryPage::createSummary()
 
     auto moduleClass = settings()->moduleClass();
 
+    QStringList generator;
+    if (settings()->useCMakeGenerator()) generator << "CMake";
+    if (settings()->useQMakeGenerator()) generator << "QMake";
+
+    content << "generator:\t" + generator.join(", ");
+    content << "";
     content << "moudle prefix:\t" + settings()->modulePrefix();
     content << "module name:  \t" + moduleClass.ident;
     content << "module class name:\t" + moduleClass.className;

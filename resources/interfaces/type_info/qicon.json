@@ -15,10 +15,10 @@
   "includes":
   [
     "gt_icons",
-    "QIcon",
+    "QIcon"
   ],
   "implementation":
   [
-    "return gt::gui::icon::$$VALUE$$()",
+    "gt::gui::icon::$$VALUE$$()"
   ]
 }

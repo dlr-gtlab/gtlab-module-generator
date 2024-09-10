@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- CMake specific project files will be generated from now on - #25
+- Added support for CMake generator. The generator can now be selected in the settings page - #25, #43
 - A unittesting structure will be added by default - #38
 
 ### Removed

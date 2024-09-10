@@ -7,6 +7,8 @@
 class QLineEdit;
 class QComboBox;
 class QCheckBox;
+class QRadioButton;
+
 /**
  * @brief to select output path, gtlab path and dev tools path
  */
@@ -29,6 +31,8 @@ class SettingsPage : public AbstractWizardPage
     static const QString S_VERSION_TOOLTIP;
     static const QString S_USE_MACRO_LABEL;
     static const QString S_USE_MACRO_TOOLTIP;
+    static const QString S_GENERATOR_LABEL;
+    static const QString S_GENERATOR_TOOLTIP;
     static const QString S_DIR_BTN_TOOLTIP;
     static const QString S_DIR_BTN_TEXT;
 
@@ -62,6 +66,9 @@ private:
     QComboBox* m_versionBox{};
 
     QCheckBox* m_useMacroBox{};
+    /// which generator to use
+    QRadioButton* m_cmakeBtn{};
+    QRadioButton* m_qmakeBtn{};
 
     static void updateDirEdit(QLineEdit* edit, QString& path);
 
