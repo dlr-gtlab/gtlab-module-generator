@@ -1,6 +1,4 @@
-$$SIGNATURE$$
-
-#include "gtest/gtest.h"
+$$SIGNATURE$$#include "gtest/gtest.h"
 
 #include <QCoreApplication>
 

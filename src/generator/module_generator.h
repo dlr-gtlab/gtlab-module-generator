@@ -24,6 +24,11 @@ public:
 
     const static QString S_ID_SIGNATURE;
     const static QString S_ID_GENERATOR_VERSION;
+    // current year
+    const static QString S_ID_YEAR;
+    // current date
+    const static QString S_ID_DATE;
+
     /// include for header file
     const static QString S_ID_INCLUDE_FILE;
     /// qt inlcude (for <...> styled includes)
@@ -78,6 +83,12 @@ public:
     const static QString S_ID_CMAKE_INCLUDE_DIRS;
     const static QString S_ID_CMAKE_FIND_PACKAGE_DEPS;
     const static QString S_ID_CMAKE_TARGET_LINK_LIBRARIES;
+
+    /**
+     * @brief Applies the default values for certain indentifiers.
+     * @param identifierPairs
+     */
+    void registerDefaults(IdentifierPairs& identifierPairs);
 
     /**
      * @brief Getter for settings class

@@ -8,6 +8,8 @@ class QLineEdit;
 class QGridLayout;
 class QTextEdit;
 class QRegularExpressionValidator;
+class QCheckBox;
+
 class SignaturePage : public AbstractWizardPage
 {
     Q_OBJECT
@@ -17,7 +19,6 @@ class SignaturePage : public AbstractWizardPage
     static const QString S_INFO_TEXT;
     static const QString S_AUTHOR_LABEL;
     static const QString S_EMAIL_LABEL;
-    static const QString S_SIGNATURE_LABEL;
 
 public:
 
@@ -37,6 +38,8 @@ private:
     QLineEdit* m_authorEdit{};
     QLineEdit* m_emailEdit{};
     QTextEdit* m_signatureTextEdit{};
+    QTextEdit* m_signatureTextView{};
+    QCheckBox* m_useSignature{};
 
     /// author name validator
     QRegularExpressionValidator* m_authorValdidator{};

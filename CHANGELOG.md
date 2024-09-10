@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for CMake generator. The generator can now be selected in the settings page - #25, #43
 - A unittesting structure will be added by default - #38
 
+### Changed
+- Applying a signature to all generated source files may now be disabled - #44
+- The signature can bed modified if desired - #44
+
 ### Removed
 - Removed support for GTlab version 1.7.X - #40
 

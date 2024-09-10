@@ -1,6 +1,4 @@
-$$SIGNATURE$$
-
-#ifndef $$HEADER_NAME$$_H
+$$SIGNATURE$$#ifndef $$HEADER_NAME$$_H
 #define $$HEADER_NAME$$_H
 
 #include "$$BASE_FILE_NAME$$.h"
