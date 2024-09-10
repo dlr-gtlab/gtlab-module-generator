@@ -139,6 +139,12 @@ private:
     bool generateModuleDirs();
 
     /**
+     * @brief Generates the unittest file structure
+     * @return Success
+     */
+    bool generateUnittestStructure();
+
+    /**
      * @brief Generates the project files of the module
      * @return Success
      */

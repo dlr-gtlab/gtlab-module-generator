@@ -38,7 +38,6 @@
         <file>interfaces/type_info/gt_linkedclass.json</file>
         <file>interfaces/type_info/gt_metaobject.json</file>
         <file>interfaces/type_info/gt_taskdata.json</file>
-        <file>interfaces/type_info/pointers.json</file>
         <file>interfaces/type_info/qdockwidgetarea.json</file>
         <file>interfaces/type_info/qicon.json</file>
         <file>interfaces/type_info/qlist.json</file>
@@ -65,7 +64,7 @@
         <file>templates/qmake/local_settings.pri</file>
         <file>templates/qmake/module.pro</file>
         <file>templates/qmake/settings.pri</file>
-        <file>templates/cmake/tests/unittests/main.cpp</file>
-        <file>templates/cmake/tests/unittests/test.cpp</file>
+        <file>templates/testing/tests/unittests/main.cpp</file>
+        <file>templates/testing/tests/unittests/test.cpp</file>
     </qresource>
 </RCC>

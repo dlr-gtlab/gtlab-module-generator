@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QRadioButton>
 
 #include "settings_page.h"
 
@@ -59,6 +60,11 @@ SettingsPage::S_USE_MACRO_TOOLTIP =
                        "and enable code depending on the current\nGTlab "
                        "version. Thus the same module may be used\nfor "
                        "different versions of GTlab.");
+const QString
+SettingsPage::S_GENERATOR_LABEL = QStringLiteral("Generator:");
+const QString
+SettingsPage::S_GENERATOR_TOOLTIP =
+        QStringLiteral("Generator used to organize the project files");
 
 const QString
 SettingsPage::S_DIR_BTN_TOOLTIP = QStringLiteral("select directory");
@@ -85,13 +91,17 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     auto* devToolsLabel      = new QLabel(S_DEVTOOLS_LABEL);
     auto* devToolsDirPushBtn = new QPushButton(S_DIR_BTN_TEXT);
     auto* baseGridLayout     = new QGridLayout;
-    auto* label = new QLabel(S_VERSION_LABEL);
+    auto* versionLabel = new QLabel(S_VERSION_LABEL);
+    auto* generatorLabel = new QLabel(S_GENERATOR_LABEL);
 
     m_outputDirEdit      = new QLineEdit;
     m_gtlabDirEdit       = new QLineEdit;
     m_devToolsDirEdit    = new QLineEdit;
     m_versionBox = new QComboBox;
     m_useMacroBox = new QCheckBox{S_USE_MACRO_LABEL};
+
+    m_cmakeBtn = new QRadioButton("CMake");
+    m_qmakeBtn = new QRadioButton("QMake (deprecated)");
 
     // page gui
     setTitle(tr(C_SETTINGS_PAGE_TITLE));
@@ -113,6 +123,9 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     m_versionBox->setToolTip(S_VERSION_TOOLTIP);
     m_useMacroBox->setToolTip(S_USE_MACRO_TOOLTIP);
 
+    m_cmakeBtn->setToolTip(S_GENERATOR_TOOLTIP);
+    m_qmakeBtn->setToolTip(S_GENERATOR_TOOLTIP);
+
     // layout
     int row = 0;
     baseGridLayout->addWidget(infoLabel, row++, 0, 1, 3);
@@ -125,9 +138,12 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     baseGridLayout->addWidget(devToolsLabel, row, 0);
     baseGridLayout->addWidget(m_devToolsDirEdit, row, 1, 1, 2);
     baseGridLayout->addWidget(devToolsDirPushBtn, row++, 3);
-    baseGridLayout->addWidget(label, row, 0);
+    baseGridLayout->addWidget(versionLabel, row, 0);
     baseGridLayout->addWidget(m_versionBox, row, 1);
     baseGridLayout->addWidget(m_useMacroBox, row++, 2, 1, 2);
+    baseGridLayout->addWidget(generatorLabel, row, 0);
+    baseGridLayout->addWidget(m_cmakeBtn, row++, 1, 1, 2);
+    baseGridLayout->addWidget(m_qmakeBtn, row++, 1, 1, 2);
     baseGridLayout->setColumnMinimumWidth(0, AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
     setLayout(baseGridLayout);
@@ -146,7 +162,6 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
             this, SIGNAL(completeChanged()));
     connect(gtlabDirPushBtn, SIGNAL(clicked(bool)),
             this, SLOT(onPressedGTlabDirPushBtn()));
-
 
     connect(m_devToolsDirEdit, SIGNAL(textEdited(QString)),
             this, SLOT(onEditedDevToolsDir(QString)));
@@ -184,6 +199,13 @@ SettingsPage::initializePage()
 
     m_useMacroBox->setChecked(settings()->useCompatibilityMacros());
 
+    m_cmakeBtn->setChecked(settings()->useCMakeGenerator());
+    m_qmakeBtn->setChecked(settings()->useQMakeGenerator());
+    if (!m_cmakeBtn->isChecked() && !m_qmakeBtn->isChecked())
+    {
+        m_cmakeBtn->setChecked(true);
+    }
+
     // register versions
     auto versions = settings()->supportedVersions();
     auto const& lastVersion = settings()->gtlabVersion();
@@ -215,6 +237,8 @@ SettingsPage::isComplete() const
     retVal &= setLineEditColor(m_gtlabDirEdit, true);
     retVal &= setLineEditColor(m_devToolsDirEdit);
 
+    if (!retVal) return false;
+
     if (m_outputDirEdit->text().isEmpty() ||
         m_gtlabDirEdit->text().isEmpty() ||
         m_devToolsDirEdit->text().isEmpty())
@@ -222,7 +246,12 @@ SettingsPage::isComplete() const
         return false;
     }
 
-    return retVal;
+    if (!m_cmakeBtn->isChecked() && !m_qmakeBtn->isChecked())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool
@@ -245,12 +274,18 @@ SettingsPage::validatePage()
         settings()->setDevToolsPath(m_devToolsDirEdit->text());
         settings()->setGTlabVersion(m_versionBox->currentText());
         settings()->setUseCompatibilityMacros(m_useMacroBox->isChecked());
+        settings()->setUseCMakeGenerator(m_cmakeBtn->isChecked());
+        settings()->setUseQMakeGenerator(m_qmakeBtn->isChecked());
 
         LOG_INFO << "target version: " << settings()->gtlabVersion() << ENDL;
         LOG_INFO << "major version:  "
                  << QString::number(settings()->gtlabMajorVersion()) << ENDL;
         LOG_INFO << "use compatibility macros: "
                  << QString{m_useMacroBox->isChecked() ? "true":"false"}
+                 << ENDL;
+        LOG_INFO << "using generator: "
+                 << QString{m_cmakeBtn->isChecked() ? "cmake ":""}
+                 << QString{m_qmakeBtn->isChecked() ? "qmake ":""}
                  << ENDL;
 
         if (settings()->useCompatibilityMacros())

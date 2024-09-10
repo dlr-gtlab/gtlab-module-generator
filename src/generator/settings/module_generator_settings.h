@@ -73,6 +73,12 @@ public:
     void setGTlabPath(QString const& path) { m_gtlabPath = path; }
     void setDevToolsPath(QString const& path) { m_devToolsPath = path; }
 
+    bool useCMakeGenerator() const { return m_useCMakeGenerator; }
+    bool useQMakeGenerator() const { return m_useQMakeGenerator; }
+
+    void setUseCMakeGenerator(bool value) { m_useCMakeGenerator = value; }
+    void setUseQMakeGenerator(bool value) { m_useQMakeGenerator = value; }
+
     // specifications
     QString const& modulePrefix() const;
     void setModulePrefix(QString const& prefix);
@@ -122,6 +128,9 @@ private:
 
     bool m_createGitFiles{true};
     bool m_useCompatibilityMacros{true};
+
+    bool m_useCMakeGenerator{true};
+    bool m_useQMakeGenerator{false};
 
     QString m_outputPath{};
     QString m_gtlabPath{};
