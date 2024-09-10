@@ -20,6 +20,10 @@ ModuleGenerator::S_ID_SIGNATURE(QStringLiteral("$$SIGNATURE$$"));
 const QString
 ModuleGenerator::S_ID_GENERATOR_VERSION(QStringLiteral("$$GENERATOR_VERSION$$"));
 const QString
+ModuleGenerator::S_ID_YEAR(QStringLiteral("$$YEAR$$"));
+const QString
+ModuleGenerator::S_ID_DATE(QStringLiteral("$$DATE$$"));
+const QString
 ModuleGenerator::S_ID_INCLUDE_FILE(QStringLiteral("$$INCLUDE_FILE$$"));
 const QString
 ModuleGenerator::S_ID_QT_INCLUDE_FILE(QStringLiteral("$$QT_INCLUDE_FILE$$"));
@@ -393,6 +397,21 @@ registerDependencies(ModuleGeneratorSettings& settings,
 
 };
 
+void
+ModuleGenerator::registerDefaults(IdentifierPairs& identifierPairs)
+{
+    identifierPairs.append({ S_ID_SIGNATURE, settings()->signature() });
+    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
+    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
+    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
+    identifierPairs.append({ S_ID_YEAR, settings()->currentYear() });
+    identifierPairs.append({ S_ID_DATE, settings()->currentDate() });
+
+    auto const& moduleClass = settings()->moduleClass();
+    identifierPairs.append({ S_ID_PREFIX, settings()->modulePrefix() });
+    identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
+}
+
 ModuleGeneratorSettings const*
 ModuleGenerator::settings() const
 {
@@ -530,6 +549,7 @@ ModuleGenerator::generateQMakeFiles()
     auto const& prefix = settings()->modulePrefix();
 
     IdentifierPairs identifierPairs;
+    registerDefaults(identifierPairs);
 
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
@@ -593,9 +613,9 @@ ModuleGenerator::generateCMakeFiles()
     LOG_INDENT("generating cmake files...");
 
     IdentifierPairs identifierPairs;
+    registerDefaults(identifierPairs);
 
     auto const& moduleClass = settings()->moduleClass();
-
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
 
@@ -619,9 +639,11 @@ ModuleGenerator::generateUnittestStructure()
     LOG_INDENT("generating unittest structure...");
 
     IdentifierPairs identifierPairs;
+    registerDefaults(identifierPairs);
 
     auto const& moduleClass = settings()->moduleClass();
 
+    identifierPairs.append({ S_ID_PREFIX, settings()->modulePrefix() });
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
 
@@ -642,14 +664,13 @@ ModuleGenerator::generateGitFiles()
     LOG_INDENT("generating git files...");
 
     IdentifierPairs identifierPairs;
+    registerDefaults(identifierPairs);
 
-    auto moduleClass = settings()->moduleClass();
+    auto const& moduleClass = settings()->moduleClass();
 
-    identifierPairs.append({ S_ID_PREFIX, settings()->modulePrefix() });
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_MODULE_DESCRIPTION, moduleClass.description });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleClass.version });
-    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
     
     applyTemplate(S_TEMPLATES_PATH + QStringLiteral("git"),
                    m_moduleDir,
@@ -722,6 +743,7 @@ ModuleGenerator::generateModuleFiles()
                                              moduleClass.fileName });
 
     IdentifierPairs identifierPairs;
+    registerDefaults(identifierPairs);
 
     LOG_INFO << "implementing interfaces..." << ENDL;
 
@@ -772,7 +794,7 @@ ModuleGenerator::generateModuleFiles()
     }
 
     // FILL IDENTIFIER
-    identifierPairs.append({ S_ID_SIGNATURE, ModuleGeneratorSettings::S_SIGNATURE });
+    registerDefaults(identifierPairs);
     identifierPairs.append({ S_ID_HEADER_NAME, moduleClass.fileName.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, moduleClass.className });
     identifierPairs.append({ S_ID_FILE_NAME, moduleClass.fileName });
@@ -780,12 +802,8 @@ ModuleGenerator::generateModuleFiles()
     identifierPairs.append({ S_ID_MODULE_NAME, moduleClass.ident });
     identifierPairs.append({ S_ID_MODULE_VERSION, moduleVersion });
     identifierPairs.append({ S_ID_MODULE_DESCRIPTION, moduleClass.description });
-    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
-    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
-    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
 
     utils::replaceIdentifier(headerString, identifierPairs);
-
     utils::replaceIdentifier(sourceString, identifierPairs);
 
     LOG_INFO << "cleanup..." << ENDL;
@@ -1070,8 +1088,6 @@ ModuleGenerator::generateBasicClass(ClassData const& base,
 
     generateConstructors(headerString, sourceString, base, derived.className);
 
-    IdentifierPairs identifierPairs;
-
     // IMPLEMENT FUNCTIONS
     for (auto& function : derived.functions)
     {
@@ -1090,18 +1106,16 @@ ModuleGenerator::generateBasicClass(ClassData const& base,
 
     LOG_INFO << "setting identifiers..." << ENDL;
 
+    IdentifierPairs identifierPairs;
+    registerDefaults(identifierPairs);
+
     // FILL IDENTIFIER
-    identifierPairs.append({ S_ID_SIGNATURE, ModuleGeneratorSettings::S_SIGNATURE });
     identifierPairs.append({ S_ID_BASE_FILE_NAME, base.fileName});
     identifierPairs.append({ S_ID_BASE_CLASS,
                              QStringLiteral("public ") + base.className });
     identifierPairs.append({ S_ID_HEADER_NAME, derived.className.toUpper() });
     identifierPairs.append({ S_ID_CLASS_NAME, derived.className });
-
     identifierPairs.append({ S_ID_OBJECT_NAME, derived.objectName });
-    identifierPairs.append({ S_ID_AUTHOR, settings()->authorDetails().name });
-    identifierPairs.append({ S_ID_AUTHOR_EMAIL, settings()->authorDetails().email });
-    identifierPairs.append({ S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
 
     utils::replaceIdentifier(headerString, identifierPairs);
     utils::replaceIdentifier(sourceString, identifierPairs);
@@ -1315,7 +1329,6 @@ ModuleGenerator::generatedIncludePaths() const
             includePaths.push_back(data.dir);
         }
     }
-    qDebug() << __FUNCTION__ << utils::unique(includePaths);
     return utils::unique(includePaths);
 }
 

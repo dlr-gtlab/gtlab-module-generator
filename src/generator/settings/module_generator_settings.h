@@ -29,7 +29,7 @@ public:
     /// mono font
     const static QFont F_MONO_FONT;
     /// signature base string
-    const static QString S_SIGNATURE;
+    const static QString S_DEFAULT_SIGNATURE;
 
     /// exec
     const static QString S_EXEC_SUFFIX;
@@ -44,6 +44,9 @@ public:
     ModuleGeneratorSettings();
 
     static bool isOsWindows();
+
+    static QString currentYear();
+    static QString currentDate();
 
     QString classNamingScheme(QString const& name, const QString& prefix) const;
     QString classNamingScheme(QString const& name) const;
@@ -61,6 +64,15 @@ public:
 
     bool useCompatibilityMacros() const  { return m_useCompatibilityMacros; }
     void setUseCompatibilityMacros(bool yes) { m_useCompatibilityMacros = yes; }
+
+    QString const& plainSignature() const { return m_signature; }
+    void setPlainSignature(QString const& sig) { m_signature = sig; }
+
+    /// actual signature to use
+    QString signature() const;
+
+    bool useSignature() const  { return m_useSignature; }
+    void setUseSignature(bool yes) { m_useSignature = yes; }
 
     static QStringList supportedVersions();
 
@@ -126,6 +138,7 @@ private:
 
     QString m_version{};
 
+    bool m_useSignature{true};
     bool m_createGitFiles{true};
     bool m_useCompatibilityMacros{true};
 

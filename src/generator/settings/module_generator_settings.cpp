@@ -15,7 +15,7 @@
 #include <QFont>
 
 const QString
-ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.2.0"));
+ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.3.0"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z_]|\\d)*"));
 const QRegularExpression
@@ -36,18 +36,12 @@ ModuleGeneratorSettings::REG_AUTHOR_EMAIL(QStringLiteral(".*"));
 const QFont
 ModuleGeneratorSettings::F_MONO_FONT{QStringLiteral("Consolas"), 9};
 
-const QString S_YEAR = QDate::currentDate().toString("yyyy");
-const QString S_DATE = QDate::currentDate().toString("dd.MM.yyyy");
-
-const QString ModuleGeneratorSettings::S_SIGNATURE = QStringLiteral(
-        "/* GTlab - Gas Turbine laboratory\n"
-//        " * Source File: $$FILE_NAME$$\n"
-        " * copyright 2009-") + S_YEAR + QStringLiteral(" by DLR\n"
-        " * \n"
-        " * Created on: ") + S_DATE + QStringLiteral("\n"
-        " * Author: ") + ModuleGenerator::S_ID_AUTHOR + QStringLiteral("\n"
-        " * Email: ") + ModuleGenerator::S_ID_AUTHOR_EMAIL + QStringLiteral("\n"
-        " */");
+const QString ModuleGeneratorSettings::S_DEFAULT_SIGNATURE = QStringLiteral(
+R"(/* %1 Module
+ * Author: %2
+ */)")
+.arg(ModuleGenerator::S_ID_MODULE_NAME,
+     ModuleGenerator::S_ID_AUTHOR);
 
 const QString
 ModuleGeneratorSettings::S_EXEC_SUFFIX(isOsWindows() ? QStringLiteral(".exe"):
@@ -75,6 +69,10 @@ ModuleGeneratorSettings::ModuleGeneratorSettings()
     {
         m_moduleClass.version = QStringLiteral("0.0.1");
     }
+    if (m_signature.isEmpty())
+    {
+        m_signature = S_DEFAULT_SIGNATURE;
+    }
 
     LOG_INDENT("Setup took " + QString::number(timer.elapsed()) + " ms");
 }
@@ -83,6 +81,18 @@ bool
 ModuleGeneratorSettings::isOsWindows()
 {
     return QSysInfo::productType() == "windows";
+}
+
+QString
+ModuleGeneratorSettings::currentYear()
+{
+    return QDate::currentDate().toString("yyyy");
+}
+
+QString
+ModuleGeneratorSettings::currentDate()
+{
+    return QDate::currentDate().toString("dd.MM.yyyy");
 }
 
 QString
@@ -151,6 +161,14 @@ int
 ModuleGeneratorSettings::gtlabMajorVersion() const
 {
     return QVersionNumber::fromString(m_version).majorVersion();
+}
+
+QString
+ModuleGeneratorSettings::signature() const
+{
+    if (!useSignature()) return {};
+
+    return m_signature + QStringLiteral("\n\n");
 }
 
 QStringList
@@ -333,10 +351,17 @@ ModuleGeneratorSettings::serializeUserData() const
     moduleObject["use_cmake_generator"] = m_useCMakeGenerator;
     moduleObject["use_qmake_generator"] = m_useQMakeGenerator;
 
+    QJsonObject signatureObject;
+    signatureObject["use_signature"] = m_useSignature;
+
+    bool hasCustomSignature = (m_signature != S_DEFAULT_SIGNATURE);
+    signatureObject["text"] = hasCustomSignature ? m_signature : QString{};
+
     QJsonObject rootObject;
     rootObject["user"]   = userObject;
     rootObject["paths"]  = pathsObject;
     rootObject["module"] = moduleObject;
+    rootObject["signature"] = signatureObject;
 
     QJsonDocument document(rootObject);
 
@@ -393,6 +418,16 @@ ModuleGeneratorSettings::deserializeUserData()
     if (moduleObject.contains("use_qmake_generator"))
     {
         m_useQMakeGenerator = moduleObject["use_qmake_generator"].toBool();
+    }
+
+    QJsonObject signatureObject = document["signature"].toObject();
+    if (signatureObject.contains("use_signature"))
+    {
+        m_useSignature = signatureObject["use_signature"].toBool();
+    }
+    if (signatureObject.contains("text"))
+    {
+        m_signature = signatureObject["text"].toString();
     }
 
     LOG_INFO << "done!";

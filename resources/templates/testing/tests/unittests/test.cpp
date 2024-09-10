@@ -1,6 +1,4 @@
-$$SIGNATURE$$
-
-#include "gtest/gtest.h"
+$$SIGNATURE$$#include "gtest/gtest.h"
 
 /// This is a test fixture that does a init for each test
 class MyTest : public ::testing::Test

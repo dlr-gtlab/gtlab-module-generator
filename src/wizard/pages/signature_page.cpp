@@ -10,19 +10,21 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QRegularExpressionValidator>
+#include <QCheckBox>
+#include <QDate>
 
 const char*
 SignaturePage::C_TITLE_SIGNATURE_PAGE = "File Signature";
 
 const QString
-SignaturePage::S_INFO_TEXT = QStringLiteral("Enter your user details to "
-                                            "generate a file signature.");
+SignaturePage::S_INFO_TEXT =
+        QStringLiteral("Enter your user details to generate a file signature. "
+                       "Contact details will also be used for the meta data "
+                       "of the module.");
 const QString
 SignaturePage::S_AUTHOR_LABEL = QStringLiteral("Author name:");
 const QString
 SignaturePage::S_EMAIL_LABEL = QStringLiteral("E-Mail:");
-const QString
-SignaturePage::S_SIGNATURE_LABEL = QStringLiteral("Signature:");
 
 SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent) :
     AbstractWizardPage(settings, parent)
@@ -30,12 +32,13 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
     auto* infoLabel = new QLabel(S_INFO_TEXT);
     auto* authorLabel = new QLabel(S_AUTHOR_LABEL);
     auto* emailLabel = new QLabel(S_EMAIL_LABEL);
-    auto* signatureLabel = new QLabel(S_SIGNATURE_LABEL);
+    auto* signatureLabel = new QLabel(tr("Signature preview:"));
     auto* baseLayout = new QGridLayout;
 
     m_authorEdit = new QLineEdit;
     m_emailEdit = new QLineEdit;
     m_signatureTextEdit = new QTextEdit;
+    m_signatureTextView = new QTextEdit;
 
     m_authorValdidator = new QRegularExpressionValidator(
                 ModuleGeneratorSettings::REG_AUTHOR, this);
@@ -54,8 +57,27 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
     m_emailEdit->setValidator(m_emailValdidator);
 
     signatureLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-    m_signatureTextEdit->setReadOnly(true);
+    signatureLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     m_signatureTextEdit->setFont(ModuleGeneratorSettings::F_MONO_FONT);
+    m_signatureTextEdit->setToolTip(tr(
+R"(Signature template. Following identifiers may be used:
+- $$YEAR$: current year
+- $$DATE$: current date
+- $$AUTHOR$: author name
+- $$AUTHOR_EMAIL$: author email
+- $$MODULE_NAME$$: module name
+- $$PREFIX$$: module prefix
+)"));
+
+    m_signatureTextView->setFont(ModuleGeneratorSettings::F_MONO_FONT);
+    m_signatureTextView->setReadOnly(true);
+    m_signatureTextView->setToolTip(tr("Preview of generated signature"));
+
+    m_useSignature = new QCheckBox(tr("Signature:"));
+    m_useSignature->setToolTip(tr("If disabled, no signature will "
+                                  "be applied to the generated source files"));
+    m_useSignature->setChecked(true);
+
 
     int row = 0;
     baseLayout->addWidget(infoLabel, row++, 0, 1, 3);
@@ -63,8 +85,10 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
     baseLayout->addWidget(m_authorEdit, row++, 1);
     baseLayout->addWidget(emailLabel, row, 0);
     baseLayout->addWidget(m_emailEdit, row++, 1);
-    baseLayout->addWidget(signatureLabel, row, 0);
+    baseLayout->addWidget(m_useSignature, row, 0, Qt::AlignTop | Qt::AlignLeft);
     baseLayout->addWidget(m_signatureTextEdit, row++, 1, 1, 2);
+    baseLayout->addWidget(signatureLabel, row, 0);
+    baseLayout->addWidget(m_signatureTextView, row++, 1, 1, 2);
     baseLayout->setColumnMinimumWidth(0,
                                       AbstractWizardPage::I_PAGES_COLUMN_WIDTH);
 
@@ -75,20 +99,33 @@ SignaturePage::SignaturePage(ModuleGeneratorSettings* settings, QWidget* parent)
             this, SLOT(updateSignature()));
     connect(m_emailEdit, SIGNAL(textEdited(QString)),
             this, SLOT(updateSignature()));
+    connect(m_signatureTextEdit, SIGNAL(textChanged()),
+            this, SLOT(updateSignature()));
+
     connect(m_authorEdit, SIGNAL(textEdited(QString)),
-            this, SIGNAL(completeChanged()));    
+            this, SIGNAL(completeChanged()));
+    connect(m_emailEdit, SIGNAL(textEdited(QString)),
+            this, SIGNAL(completeChanged()));
+
+    connect(m_useSignature, &QCheckBox::stateChanged, this, [=](){
+        m_signatureTextEdit->setEnabled(m_useSignature->isChecked());
+        m_signatureTextView->setEnabled(m_useSignature->isChecked());
+    });
 
     // defaults
     m_authorEdit->setText(settings->authorDetails().name);
     m_emailEdit->setText(settings->authorDetails().email);
-
-    updateSignature();
 }
 
 void
 SignaturePage::initializePage()
 {
     LOG_INDENT("signature page...");
+
+    m_useSignature->setChecked(settings()->useSignature());
+    m_signatureTextEdit->setText(settings()->plainSignature());
+
+    updateSignature();
 }
 
 bool
@@ -113,6 +150,12 @@ SignaturePage::validatePage()
     details.email = m_emailEdit->text().simplified();
 
     settings()->setAuthorDetails(details);
+    settings()->setPlainSignature(m_signatureTextEdit->toPlainText());
+    settings()->setUseSignature(m_useSignature->isChecked());
+
+    LOG_INFO << "use signature: " << (settings()->useSignature() ? "true":"false") << ENDL;
+    LOG_INFO << "signature text: " << settings()->plainSignature() << ENDL;
+    LOG_INFO << "done!";
 
     return true;
 }
@@ -122,16 +165,19 @@ SignaturePage::updateSignature()
 {
     QString author(m_authorEdit->text().simplified());
     QString email(m_emailEdit->text().simplified());
-    QString signature(ModuleGeneratorSettings::S_SIGNATURE);
+    QString signature(m_signatureTextEdit->toPlainText());
 
-    IdentifierPairs identifier;
+    IdentifierPairs identifierPairs;
+    identifierPairs.append({ ModuleGenerator::S_ID_AUTHOR, author });
+    identifierPairs.append({ ModuleGenerator::S_ID_AUTHOR_EMAIL, email });
+    identifierPairs.append({ ModuleGenerator::S_ID_GENERATOR_VERSION, ModuleGeneratorSettings::S_VERSION });
+    identifierPairs.append({ ModuleGenerator::S_ID_YEAR, settings()->currentYear() });
+    identifierPairs.append({ ModuleGenerator::S_ID_DATE, settings()->currentDate() });
 
-    identifier << IdentifierPair{ ModuleGenerator::S_ID_AUTHOR, author };
-    identifier << IdentifierPair{ ModuleGenerator::S_ID_AUTHOR_EMAIL, email };
-    identifier << IdentifierPair{ ModuleGenerator::S_ID_FILE_NAME,
-                  QStringLiteral("filename")};
+    identifierPairs.append({ ModuleGenerator::S_ID_PREFIX, settings()->modulePrefix() });
+    identifierPairs.append({ ModuleGenerator::S_ID_MODULE_NAME, settings()->moduleClass().ident });
 
-    utils::replaceIdentifier(signature, identifier);
+    utils::replaceIdentifier(signature, identifierPairs);
 
-    m_signatureTextEdit->setText(signature);
+    m_signatureTextView->setText(signature);
 }
