@@ -1,7 +1,9 @@
 #################################################################
 ############### GTlab Standard Pipeline Version 2.1.0 ###########
 #################################################################
-
+#
+# SPDX-FileCopyrightText: 2024 German Aerospace Center (DLR)
+# SPDX-License-Identifier: MPL-2.0+
 
 # Variables that are defined globally for the pipeline
 variables:
