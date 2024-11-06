@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2017 University of Cincinnati
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
 # 
 #
 # Downloads GTest and provides a helper macro to add tests. Add make check, as well, which
@@ -6,20 +10,21 @@
 #
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-# Build gtest as a static library
+# Build gtest as a static lib
 set(BUILD_SHARED_LIBS OFF)
 
 include(FetchContent)
 FetchContent_Declare(googletest
-    GIT_REPOSITORY      https://github.com/google/googletest.git
-    GIT_TAG             v1.15.2)
+	GIT_REPOSITORY      https://github.com/google/googletest.git
+	GIT_TAG             release-1.12.1)
 FetchContent_GetProperties(googletest)
 if(NOT googletest_POPULATED)
-    FetchContent_Populate(googletest)
-    set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
-    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
-    unset(CMAKE_SUPPRESS_DEVELOPER_WARNINGS)
+	FetchContent_Populate(googletest)
+	set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE BOOL "")
+	add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+	unset(CMAKE_SUPPRESS_DEVELOPER_WARNINGS)
 endif()
+
 
 if(CMAKE_CONFIGURATION_TYPES)
     add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} 
@@ -35,6 +40,7 @@ set_target_properties(check PROPERTIES FOLDER "Scripts")
 
 # More modern way to do the last line, less messy but needs newish CMake:
 # target_include_directories(gtest INTERFACE ${gtest_SOURCE_DIR}/include)
+
 
 if(GOOGLE_TEST_INDIVIDUAL)
     if(NOT CMAKE_VERSION VERSION_LESS 3.9)

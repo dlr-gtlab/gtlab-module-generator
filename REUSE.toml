@@ -1,0 +1,26 @@
+# GTlab Module Generator
+#
+# SPDX-License-Identifier: MPL-2.0+
+# SPDX-FileCopyrightText: 2024 German Aerospace Center (DLR)
+
+version = 1
+SPDX-PackageName = "GTlab Module Generator"
+SPDX-PackageSupplier = "Marius Broecker <marius.broecker@dlr.de>"
+
+[[annotations]]
+path = "resources/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 German Aerospace Center (DLR)"
+SPDX-License-Identifier = "MPL-2.0+"
+
+[[annotations]]
+path = ["images/**", "src/app.rc", "src/icon.ico"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 German Aerospace Center (DLR)"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = "**.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2024 German Aerospace Center (DLR)"
+SPDX-License-Identifier = "MPL-2.0+"

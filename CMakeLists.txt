@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MPL-2.0+
+# SPDX-FileCopyrightText: 2024 German Aerospace Center (DLR)
+
 #             ______________      __
 #            / ____/_  __/ /___  / /_
 #           / / __  / / / / __ `/ __

@@ -1,3 +1,10 @@
+/*
+ * GTlab Module Generator
+ *
+ * SPDX-License-Identifier: MPL-2.0+
+ * SPDX-FileCopyrightText: 2024 German Aerospace Center (DLR)
+ */
+
 #include "class_specification_list.h"
 
 #include "class_specification_item.h"
