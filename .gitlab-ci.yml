@@ -19,6 +19,7 @@ include:
 
 stages:
   - build
+  - codequality
   - package
   - deploy
 
@@ -81,3 +82,15 @@ package-linux:
   artifacts:
     name: "gtmodulegenerator-linux"
     paths: ["gtmodulegenerator-linux.tar.gz"]
+    
+check-license:
+   stage: codequality
+   tags: ["docker", "linux"]
+   needs: []
+   image: at-twk-hal9000.intra.dlr.de:5000/dlr-at/buster-dev
+   before_script:
+    - python3 -m pip install reuse
+   script:
+    - reuse lint
+   variables:
+     GIT_SUBMODULE_STRATEGY: "none"
