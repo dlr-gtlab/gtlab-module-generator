@@ -181,7 +181,8 @@ ModuleGeneratorSettings::supportedVersions()
     return retVal;
 }
 
-QString ModuleGeneratorSettings::gtlabInstallDir() const
+QString
+ModuleGeneratorSettings::gtlabInstallDir() const
 {
     QDir prefixDir(m_gtlabPath);
     prefixDir.cdUp();
