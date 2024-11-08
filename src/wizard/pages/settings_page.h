@@ -1,6 +1,12 @@
+/*
+ * GTlab Module Generator
+ *
+ * SPDX-License-Identifier: MPL-2.0+
+ * SPDX-FileCopyrightText: 2024 German Aerospace Center (DLR)
+ */
+
 #ifndef SETTINGSPAGE_H
 #define SETTINGSPAGE_H
-
 
 #include "abstract_wizardpage.h"
 
