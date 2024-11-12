@@ -22,7 +22,7 @@
 #include <QFont>
 
 const QString
-ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.3.0"));
+ModuleGeneratorSettings::S_VERSION(QStringLiteral("1.4.0"));
 const QRegularExpression
 ModuleGeneratorSettings::REG_PREFIX(QStringLiteral("[A-Za-z]([A-Za-z_]|\\d)*"));
 const QRegularExpression
