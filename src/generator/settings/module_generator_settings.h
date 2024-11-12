@@ -86,11 +86,10 @@ public:
     // settings
     QString const& outputPath() const { return m_outputPath; }
     QString const& gtlabPath() const { return m_gtlabPath; }
-    QString const& devToolsPath() const { return m_devToolsPath; }
+    QString gtlabInstallDir() const;
 
     void setOutputPath(QString const& path) { m_outputPath = path; }
     void setGTlabPath(QString const& path) { m_gtlabPath = path; }
-    void setDevToolsPath(QString const& path) { m_devToolsPath = path; }
 
     bool useCMakeGenerator() const { return m_useCMakeGenerator; }
     bool useQMakeGenerator() const { return m_useQMakeGenerator; }
@@ -154,7 +153,6 @@ private:
 
     QString m_outputPath{};
     QString m_gtlabPath{};
-    QString m_devToolsPath{};
 
     QString m_modulePrefix{};
     ModuleData m_moduleClass{};

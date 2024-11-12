@@ -172,8 +172,7 @@ SummaryPage::createSummary()
 
     content << "";
     content << "Output directory:\t" + outputPath;
-    content << "DevTools directory:\t" + settings()->devToolsPath();
-    content << "GTlab directory:\t" + settings()->gtlabPath();
+    content << "GTlab prefix:\t" + settings()->gtlabInstallDir();
     content << "GTlab target version:\t" + settings()->gtlabVersion();
 
     content << "";

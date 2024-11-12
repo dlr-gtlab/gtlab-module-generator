@@ -188,6 +188,15 @@ ModuleGeneratorSettings::supportedVersions()
     return retVal;
 }
 
+QString
+ModuleGeneratorSettings::gtlabInstallDir() const
+{
+    QDir prefixDir(m_gtlabPath);
+    prefixDir.cdUp();
+
+    return QDir::toNativeSeparators(prefixDir.path());
+}
+
 QString const&
 ModuleGeneratorSettings::modulePrefix() const
 {
@@ -262,7 +271,7 @@ ModuleGeneratorSettings::preLoad()
 {
     if (m_lastPreLoadPath != gtlabPath() || m_preLoader.prefixes().isEmpty())
     {
-        m_preLoader.findPrefixData(devToolsPath());
+        m_preLoader.findPrefixData(gtlabInstallDir());
     }
 
     if (m_lastPreLoadPath != gtlabPath() || m_preLoader.dependencies().isEmpty())
@@ -349,7 +358,6 @@ ModuleGeneratorSettings::serializeUserData() const
 
     QJsonObject pathsObject;
     pathsObject["output"]   = m_outputPath;
-    pathsObject["devtools"] = m_devToolsPath;
     pathsObject["gtlab"]    = m_gtlabPath;
 
     QJsonObject moduleObject;
@@ -406,7 +414,6 @@ ModuleGeneratorSettings::deserializeUserData()
 
     QJsonObject pathsObject = document["paths"].toObject();
     m_outputPath   = pathsObject["output"].toString();
-    m_devToolsPath = pathsObject["devtools"].toString();
     m_gtlabPath    = pathsObject["gtlab"].toString();
 
     QJsonObject moduleObject = document["module"].toObject();

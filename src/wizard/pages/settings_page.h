@@ -28,10 +28,8 @@ class SettingsPage : public AbstractWizardPage
 
     static const QString S_INFO_TEXT;
     static const QString S_OUTPUT_LABEL;
-    static const QString S_DEVTOOLS_LABEL;
     static const QString S_GTLAB_LABEL;
     static const QString S_OUTPUT_TOOLTIP;
-    static const QString S_DEVTOOLS_TOOLTIP;
     static const QString S_GTLAB_TOOLTIP;
     static const QString S_VERSION_LABEL;
     static const QString S_VERSION_TOOLTIP;
@@ -66,8 +64,6 @@ private:
     QLineEdit* m_outputDirEdit{};
     /// gtlab line edit
     QLineEdit* m_gtlabDirEdit{};
-    /// dev tools line edit
-    QLineEdit* m_devToolsDirEdit{};
 
     QComboBox* m_versionBox{};
 
@@ -93,11 +89,6 @@ private slots:
     void onEditedGTlabDir(QString path);
 
     /**
-     * @brief onEditedDevToolsDir
-     */
-    void onEditedDevToolsDir(QString path);
-
-    /**
      * @brief onPressedOutputDirPushBtn - opens file dialog
      * selects dir in CREATE mode, selects file in EDIT mode
      */
@@ -107,11 +98,6 @@ private slots:
      * @brief onPressedGTlabDirPushBtn - opens file dialog
      */
     void onPressedGTlabDirPushBtn();
-
-    /**
-     * @brief onPressedDevToolsDirPushBtn - opens file dialog
-     */
-    void onPressedDevToolsDirPushBtn();
 
 };
 

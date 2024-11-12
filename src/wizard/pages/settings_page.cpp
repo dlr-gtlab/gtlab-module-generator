@@ -33,13 +33,10 @@ SettingsPage::C_SETTINGS_PAGE_TITLE = "Settings";
 
 const QString
 SettingsPage::S_INFO_TEXT = QStringLiteral("Enter the output directory for the "
-                                           "generated module. Select the GTlab "
-                                           "application and enter the path to "
-                                           "your local DevTools installation.");
+                                           "generated module. Select the path "
+                                           "to the GTlab application.");
 const QString
 SettingsPage::S_OUTPUT_LABEL = QStringLiteral("Output directory:");
-const QString
-SettingsPage::S_DEVTOOLS_LABEL = QStringLiteral("DevTools directory:");
 const QString
 SettingsPage::S_GTLAB_LABEL = QStringLiteral("GTlab application:");
 
@@ -48,10 +45,7 @@ SettingsPage::S_OUTPUT_TOOLTIP = QStringLiteral("All module files will be "
                                                 "placed in a separate sub"
                                                 "folder.\nThe path is created "
                                                 "at runtime if necessary");
-const QString
-SettingsPage::S_DEVTOOLS_TOOLTIP = QStringLiteral("This directory should "
-                                                  "contain:\ninclude/ lib/ "
-                                                  "ThirdPartyLibraries/");
+
 const QString
 SettingsPage::S_GTLAB_TOOLTIP = QStringLiteral("This must point to GTlab");
 const QString
@@ -95,15 +89,12 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     auto* gtlabLabel         = new QLabel(S_GTLAB_LABEL);
     auto* gtlabDirPushBtn    = new QPushButton(S_DIR_BTN_TEXT);
 
-    auto* devToolsLabel      = new QLabel(S_DEVTOOLS_LABEL);
-    auto* devToolsDirPushBtn = new QPushButton(S_DIR_BTN_TEXT);
     auto* baseGridLayout     = new QGridLayout;
     auto* versionLabel = new QLabel(S_VERSION_LABEL);
     auto* generatorLabel = new QLabel(S_GENERATOR_LABEL);
 
     m_outputDirEdit      = new QLineEdit;
     m_gtlabDirEdit       = new QLineEdit;
-    m_devToolsDirEdit    = new QLineEdit;
     m_versionBox = new QComboBox;
     m_useMacroBox = new QCheckBox{S_USE_MACRO_LABEL};
 
@@ -123,9 +114,6 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     m_gtlabDirEdit->setToolTip(S_GTLAB_TOOLTIP);
     gtlabDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
 
-    m_devToolsDirEdit->setToolTip(S_DEVTOOLS_TOOLTIP);
-    devToolsDirPushBtn->setFixedWidth(I_DIR_PUSHBTN_WIDTH);
-
     m_versionBox->setMaximumWidth(100);
     m_versionBox->setToolTip(S_VERSION_TOOLTIP);
     m_useMacroBox->setToolTip(S_USE_MACRO_TOOLTIP);
@@ -142,9 +130,6 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     baseGridLayout->addWidget(gtlabLabel, row, 0);
     baseGridLayout->addWidget(m_gtlabDirEdit, row, 1, 1, 2);
     baseGridLayout->addWidget(gtlabDirPushBtn, row++, 3);
-    baseGridLayout->addWidget(devToolsLabel, row, 0);
-    baseGridLayout->addWidget(m_devToolsDirEdit, row, 1, 1, 2);
-    baseGridLayout->addWidget(devToolsDirPushBtn, row++, 3);
     baseGridLayout->addWidget(versionLabel, row, 0);
     baseGridLayout->addWidget(m_versionBox, row, 1);
     baseGridLayout->addWidget(m_useMacroBox, row++, 2, 1, 2);
@@ -170,17 +155,9 @@ SettingsPage::SettingsPage(ModuleGeneratorSettings* settings, QWidget* parent) :
     connect(gtlabDirPushBtn, SIGNAL(clicked(bool)),
             this, SLOT(onPressedGTlabDirPushBtn()));
 
-    connect(m_devToolsDirEdit, SIGNAL(textEdited(QString)),
-            this, SLOT(onEditedDevToolsDir(QString)));
-    connect(m_devToolsDirEdit, SIGNAL(textChanged(QString)),
-            this, SIGNAL(completeChanged()));
-    connect(devToolsDirPushBtn, SIGNAL(clicked(bool)),
-            this, SLOT(onPressedDevToolsDirPushBtn()));
-
     // tool tips
     outputDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
     gtlabDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
-    devToolsDirPushBtn->setToolTip(S_DIR_BTN_TOOLTIP);
 }
 
 /*
@@ -201,8 +178,6 @@ SettingsPage::initializePage()
     m_outputDirEdit->setText(QDir::toNativeSeparators(
                                  settings()->outputPath()));
     m_gtlabDirEdit->setText(QDir::toNativeSeparators(gtlabPath));
-    m_devToolsDirEdit->setText(QDir::toNativeSeparators(
-                                   settings()->devToolsPath()));
 
     m_useMacroBox->setChecked(settings()->useCompatibilityMacros());
 
@@ -242,13 +217,11 @@ SettingsPage::isComplete() const
 
     setLineEditColor(m_outputDirEdit);
     retVal &= setLineEditColor(m_gtlabDirEdit, true);
-    retVal &= setLineEditColor(m_devToolsDirEdit);
 
     if (!retVal) return false;
 
     if (m_outputDirEdit->text().isEmpty() ||
-        m_gtlabDirEdit->text().isEmpty() ||
-        m_devToolsDirEdit->text().isEmpty())
+        m_gtlabDirEdit->text().isEmpty())
     {
         return false;
     }
@@ -274,11 +247,9 @@ SettingsPage::validatePage()
 
         LOG_INFO << "output path      " << m_outputDirEdit->text() << ENDL;
         LOG_INFO << "path to GTlab    " << path << ENDL;
-        LOG_INFO << "path to DevTools " << m_devToolsDirEdit->text() << ENDL;
 
         settings()->setOutputPath(m_outputDirEdit->text());
         settings()->setGTlabPath(path);
-        settings()->setDevToolsPath(m_devToolsDirEdit->text());
         settings()->setGTlabVersion(m_versionBox->currentText());
         settings()->setUseCompatibilityMacros(m_useMacroBox->isChecked());
         settings()->setUseCMakeGenerator(m_cmakeBtn->isChecked());
@@ -297,7 +268,7 @@ SettingsPage::validatePage()
 
         if (settings()->useCompatibilityMacros())
         {
-            QDir devtoolsDir = settings()->devToolsPath(); // dev tools path
+            QDir devtoolsDir = settings()->gtlabInstallDir(); // dev tools path
             devtoolsDir.cdUp(); // e.g. 2_0
             devtoolsDir.cdUp(); // root dir
 
@@ -383,12 +354,6 @@ SettingsPage::onEditedGTlabDir(QString path)
 }
 
 void
-SettingsPage::onEditedDevToolsDir(QString path)
-{
-    updateDirEdit(m_devToolsDirEdit, path);
-}
-
-void
 SettingsPage::onPressedOutputDirPushBtn()
 {
     QString dirOutput = QFileDialog::getExistingDirectory(
@@ -417,19 +382,4 @@ SettingsPage::onPressedGTlabDirPushBtn()
         onEditedGTlabDir(dirGTlab);
     }
 }
-
-void
-SettingsPage::onPressedDevToolsDirPushBtn()
-{
-    QString dirDevTools = QFileDialog::getExistingDirectory(
-                this, tr("Select DevTools directory"),
-                m_devToolsDirEdit->text(),
-                QFileDialog::DontResolveSymlinks);
-
-    if (!dirDevTools.isEmpty())
-    {
-        onEditedDevToolsDir(dirDevTools);
-    }
-}
-
 

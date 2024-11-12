@@ -163,7 +163,7 @@ static QString
 getCMakePackageName(const ModuleGeneratorSettings& settings,
                     const QString& moduleName)
 {
-    QDirIterator iterator(settings.devToolsPath() + S_CMAKE_PATH,
+    QDirIterator iterator(settings.gtlabInstallDir() + S_CMAKE_PATH,
                           QDir::Dirs, QDirIterator::NoIteratorFlags);
 
     QString normalizedName = moduleName;
@@ -207,7 +207,7 @@ getCMakePackageTargets(const ModuleGeneratorSettings& settings,
 {
     LOG_INDENT(QObject::tr("Searching cmake targets for package '%1'").arg(packageName));
 
-    QDir pkgDir(settings.devToolsPath() + S_CMAKE_PATH + packageName);
+    QDir pkgDir(settings.gtlabInstallDir() + S_CMAKE_PATH + packageName);
 
     if (!pkgDir.exists())
     {
@@ -567,7 +567,7 @@ ModuleGenerator::generateQMakeFiles()
     QDir gtlabDir{settings()->gtlabPath()};
     identifierPairs.append({ S_ID_GTLAB_INSTALL_BIN_DIR, gtlabDir.dirName() });
     identifierPairs.append({ S_ID_DEVTOOLS_INSTALL_DIR,
-                            QDir::cleanPath(settings()->devToolsPath()) });
+                            QDir::cleanPath(settings()->gtlabInstallDir()) });
     identifierPairs.append({ S_ID_GTLAB_MAJOR_VERSION,
                             QString::number(settings()->gtlabMajorVersion())});
 
